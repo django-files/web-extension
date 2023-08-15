@@ -18,7 +18,7 @@ async function genericOnClick(info) {
         let options = {
             method: 'POST', headers: headers, body: body
         }
-        const response = await fetch(url + '/chrome/', options);
+        const response = await fetch(url + '/api/remote/', options);
         console.log('Status: ' + response.status);
         console.log(response);
         if (response.ok) {
@@ -30,7 +30,7 @@ async function genericOnClick(info) {
                 iconUrl: '/images/logo128.png',
                 title: `Image Uploaded`,
                 message: 'URL: ' + data['url'],
-                priority: 1
+                priority: 1,
             });
 
             let uploads = (await chrome.storage.local.get('uploads'))['uploads'];
@@ -43,6 +43,17 @@ async function genericOnClick(info) {
             console.log(uploads);
 
             // await navigator.clipboard.writeText(data['url']);
+        } else {
+            const data = await response.json();
+            console.log(data);
+            console.log(data['error']);
+            chrome.notifications.create({
+                type: 'basic',
+                iconUrl: '/images/logo128.png',
+                title: `ERROR`,
+                message: 'Error: ' + data['error'],
+                priority: 1,
+            });
         }
     }
 }

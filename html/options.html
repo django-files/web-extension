@@ -8,13 +8,17 @@
 </head>
 <body>
 
+<video poster="../video/loop.jpg" id="bgvid" playsinline autoplay muted loop>
+    <source src="../video/loop.webm" type="video/webm">
+</video>
+
 <div class="container p-3">
     <div class="row">
         <div class="col-lg-6 col-12 m-auto">
             <div class="card p-3" >
                 <div class="card-body">
                     <h1 class="text-center">Django Files Chrome</h1>
-                    <img src="../images/logo.png" class="img-thumbnail m-auto d-block my-3" alt="Django Files" style="max-width: 192px">
+                    <img src="../images/logo.png" class="img-fluid m-auto d-block my-3" alt="Django Files" height="192" width="192">
                     <form>
                         <div class="mb-3">
                             <label for="url" class="form-label">Django Files URL</label>
@@ -26,7 +30,7 @@
                             <input type="password" class="form-control" id="token" aria-describedby="tokenHelp">
                             <div id="tokenHelp" class="form-text">Token From Django Files Settings.</div>
                         </div>
-                        <button id="submit" type="submit" class="btn btn-outline-success">Save Settings</button>
+                        <button id="submit" type="submit" class="btn btn-success">Save Settings</button>
                     </form>
                 </div>
             </div>

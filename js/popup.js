@@ -20,7 +20,7 @@ async function init_main () {
 
             let newRow = tbodyRef.insertRow();
             let newCell = newRow.insertCell();
-            let count = document.createTextNode(i + '. ');
+            let count = document.createTextNode(i + ' - ');
             newCell.appendChild(count);
             newCell.appendChild(a);
         }
