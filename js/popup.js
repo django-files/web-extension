@@ -15,8 +15,8 @@ async function init_main () {
     console.log('url: ' + url);
     console.log('token: ' + token);
 
-    let headers = {Authorization: token};
-    let options = {method: 'POST', headers: headers}
+    let headers = {'Authorization': token};
+    let options = {method: 'GET', headers: headers, cache: 'no-cache'}
     let response;
     let data;
     try {
