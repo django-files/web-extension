@@ -3,7 +3,7 @@
   "description": "Django Files Chrome Extension",
   "version": "0.0.2",
   "manifest_version": 3,
-  "permissions": ["storage", "activeTab", "scripting", "contextMenus", "notifications", "clipboardWrite"],
+  "permissions": ["storage", "activeTab", "scripting", "contextMenus", "notifications", "clipboardWrite", "offscreen"],
   "options_page": "html/options.html",
   "background": {
     "service_worker": "js/service-worker.js"

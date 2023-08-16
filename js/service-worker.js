@@ -1,5 +1,18 @@
 
-async function send_notification(title, text){
+async function addToClipboard(value) {
+    await chrome.offscreen.createDocument({
+        url: 'html/offscreen.html',
+        reasons: [chrome.offscreen.Reason.CLIPBOARD],
+        justification: 'Write text to the clipboard.'
+    });
+    chrome.runtime.sendMessage({
+        type: 'copy-data-to-clipboard',
+        target: 'offscreen-doc',
+        data: value
+    });
+}
+
+async function sendNotification(title, text){
     chrome.notifications.create({
         type: 'basic',
         iconUrl: '/images/logo128.png',
@@ -9,7 +22,7 @@ async function send_notification(title, text){
     });
 }
 
-async function post_url(endpoint, url){
+async function postURL(endpoint, url){
     console.log('Processing URL: ' + url);
 
     let _url = (await chrome.storage.local.get('url'))['url'];
@@ -39,19 +52,20 @@ async function genericOnClick(ctx) {
                 console.log('Processing URL: ' + ctx.srcUrl);
                 let response;
                 try {
-                    response = await post_url('remote', ctx.srcUrl)
+                    response = await postURL('remote', ctx.srcUrl)
                 } catch (error) {
-                    await send_notification('Fetch Error', 'Error: ' + error.message);
+                    await sendNotification('Fetch Error', 'Error: ' + error.message);
                 }
                 const data = await response.json();
                 console.log(data);
                 if (response.ok) {
                     console.log(data['url']);
-                    await send_notification('Image Uploaded', data['url']);
+                    await addToClipboard(data['url']);
+                    await sendNotification('Image Uploaded', data['url']);
                     // await navigator.clipboard.writeText(data['url']);
                 } else {
                     console.log(data['error']);
-                    await send_notification('Processing Error', 'Error: ' + data['error']);
+                    await sendNotification('Processing Error', 'Error: ' + data['error']);
                 }
             }
             break;
@@ -61,19 +75,19 @@ async function genericOnClick(ctx) {
                 console.log('Processing URL: ' + ctx.linkUrl);
                 let response;
                 try {
-                    response = await post_url('shorten', ctx.linkUrl)
+                    response = await postURL('shorten', ctx.linkUrl);
                 } catch (error) {
-                    await send_notification('Fetch Error', 'Error: ' + error.message);
+                    await sendNotification('Fetch Error', 'Error: ' + error.message);
                 }
                 const data = await response.json();
                 console.log(data);
                 if (response.ok) {
                     console.log(data['url']);
-                    await send_notification('Short Created', data['url']);
-                    // await navigator.clipboard.writeText(data['url']);
+                    await addToClipboard(data['url']);
+                    await sendNotification('Short Created', data['url']);
                 } else {
                     console.log(data['error']);
-                    await send_notification('Processing Error', 'Error: ' + data['error']);
+                    await sendNotification('Processing Error', 'Error: ' + data['error']);
                 }
             }
             break;
