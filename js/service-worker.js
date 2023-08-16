@@ -1,65 +1,59 @@
 
+async function send_notification(title, text){
+    chrome.notifications.create({
+        type: 'basic',
+        iconUrl: '/images/logo128.png',
+        title: title,
+        message: text,
+        priority: 1,
+    });
+}
+
+async function post_url(endpoint, url){
+    console.log('Processing URL: ' + url);
+
+    let _url = (await chrome.storage.local.get('url'))['url'];
+    let token = (await chrome.storage.local.get('token'))['token'];
+    console.log('_url: ' + _url);
+    console.log('token: ' + token);
+
+    let headers = {Authorization: token};
+    let body = JSON.stringify({url: url})
+    let options = {
+        method: 'POST', headers: headers, body: body
+    }
+    let response = await fetch(_url + '/api/' + endpoint + '/', options);
+    console.log('Status: ' + response.status);
+    console.log(response);
+    return response;
+}
+
 chrome.contextMenus.onClicked.addListener(genericOnClick);
 
-async function genericOnClick(info) {
-    console.log('info.menuItemId: ' + info.menuItemId);
-    // Standard context menu item function
-    console.log('Standard context menu item clicked.');
-    if (info.srcUrl) {
-        console.log('Processing URL: ' + info.srcUrl);
-
-        const url = (await chrome.storage.local.get('url'))['url'];
-        const token = (await chrome.storage.local.get('token'))['token'];
-        console.log('url: ' + url);
-        console.log('token: ' + token);
-
-        let headers = {Authorization: token};
-        let body = JSON.stringify({url: info.srcUrl})
-        let options = {
-            method: 'POST', headers: headers, body: body
+async function genericOnClick(ctx) {
+    console.log('info.menuItemId: ' + ctx.menuItemId);
+    if (ctx.srcUrl) {
+        console.log('Processing URL: ' + ctx.srcUrl);
+        let response;
+        try {
+            response = await post_url('remote', ctx.srcUrl)
+        } catch (error) {
+            await send_notification('Fetch Error', 'Error: ' + error.message);
         }
-        const response = await fetch(url + '/api/remote/', options);
-        console.log('Status: ' + response.status);
-        console.log(response);
+        const data = await response.json();
+        console.log(data);
         if (response.ok) {
-            const data = await response.json();
-            console.log(data);
             console.log(data['url']);
-            chrome.notifications.create({
-                type: 'basic',
-                iconUrl: '/images/logo128.png',
-                title: `Image Uploaded`,
-                message: 'URL: ' + data['url'],
-                priority: 1,
-            });
-
-            let uploads = (await chrome.storage.local.get('uploads'))['uploads'];
-            if (uploads === undefined) {
-                uploads = [];
-            }
-            uploads.push(data['url'])
-            uploads.slice(0,5)
-            chrome.storage.local.set({['uploads']: uploads});
-            console.log(uploads);
-
+            await send_notification('Image Uploaded', data['url']);
             // await navigator.clipboard.writeText(data['url']);
         } else {
-            const data = await response.json();
-            console.log(data);
             console.log(data['error']);
-            chrome.notifications.create({
-                type: 'basic',
-                iconUrl: '/images/logo128.png',
-                title: `ERROR`,
-                message: 'Error: ' + data['error'],
-                priority: 1,
-            });
+            await send_notification('Processing Error', 'Error: ' + data['error']);
         }
     }
 }
 
 chrome.runtime.onInstalled.addListener(function () {
-    // Create one test item for each context type.
     let contexts = [
         // 'page',
         // 'selection',
@@ -77,5 +71,4 @@ chrome.runtime.onInstalled.addListener(function () {
             id: context,
         });
     }
-
 });

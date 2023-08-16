@@ -8,7 +8,6 @@ async function show_error(message) {
 async function init_main () {
     console.log("function: init_main");
     $('html').hide().fadeIn('slow');
-    // let uploads = (await chrome.storage.local.get('uploads'))['uploads'];
 
     const url = (await chrome.storage.local.get('url'))['url'];
     const token = (await chrome.storage.local.get('token'))['token'];
