@@ -31,7 +31,6 @@ async function post_url(endpoint, url){
 chrome.contextMenus.onClicked.addListener(genericOnClick);
 
 async function genericOnClick(ctx) {
-
     console.log('info.menuItemId: ' + ctx.menuItemId);
     switch (ctx.menuItemId) {
         case 'image':
