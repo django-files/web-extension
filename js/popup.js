@@ -8,8 +8,8 @@ async function displayError(message) {
 async function initPopup() {
     console.log('function: initPopup')
     jQuery('html').hide().fadeIn('slow')
-    const url = (await browser.storage.local.get('url'))['url']
-    const token = (await browser.storage.local.get('token'))['token']
+    const url = (await chrome.storage.local.get('url'))['url']
+    const token = (await chrome.storage.local.get('token'))['token']
     console.log('url: ' + url)
     console.log('token: ' + token)
     if (url === '' || token === '') {

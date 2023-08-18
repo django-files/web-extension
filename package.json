@@ -11,6 +11,9 @@
   "bugs": {
     "url": "https://github.com/django-files/chrome-extension/issues"
   },
+  "scripts": {
+    "lint": "npx eslint js --ignore-pattern *.min.js"
+  },
   "dependencies": {
     "bootstrap": "latest",
     "jquery": "latest"

@@ -3,8 +3,7 @@
   "description": "Django Files Web Extension",
   "version": "0.0.3",
   "manifest_version": 3,
-  "permissions": ["storage", "activeTab", "scripting", "contextMenus", "notifications", "clipboardWrite", "offscreen"],
-  "options_page": "html/options.html",
+  "permissions": ["storage", "activeTab", "scripting", "contextMenus", "notifications", "clipboardWrite"],
   "background": {
     "scripts": ["js/service-worker.js"]
   },

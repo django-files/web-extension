@@ -1,19 +1,22 @@
 async function addToClipboard(value) {
-    navigator.clipboard.writeText(value)
-    await browser.offscreen.createDocument({
-        url: 'html/offscreen.html',
-        reasons: [browser.offscreen.Reason.CLIPBOARD],
-        justification: 'Write text to the clipboard.',
-    })
-    browser.runtime.sendMessage({
-        type: 'copy-data-to-clipboard',
-        target: 'offscreen-doc',
-        data: value,
-    })
+    try {
+        navigator.clipboard.writeText(value)
+    } catch {
+        await chrome.offscreen.createDocument({
+            url: 'html/offscreen.html',
+            reasons: [chrome.offscreen.Reason.CLIPBOARD],
+            justification: 'Write text to the clipboard.',
+        })
+        chrome.runtime.sendMessage({
+            type: 'copy-data-to-clipboard',
+            target: 'offscreen-doc',
+            data: value,
+        })
+    }
 }
 
 async function sendNotification(title, text) {
-    browser.notifications.create({
+    chrome.notifications.create({
         type: 'basic',
         iconUrl: '/images/logo128.png',
         title: title,
@@ -25,8 +28,8 @@ async function sendNotification(title, text) {
 async function postURL(endpoint, url) {
     console.log('Processing URL: ' + url)
 
-    let _url = (await browser.storage.local.get('url'))['url']
-    let token = (await browser.storage.local.get('token'))['token']
+    let _url = (await chrome.storage.local.get('url'))['url']
+    let token = (await chrome.storage.local.get('token'))['token']
     console.log('_url: ' + _url)
     console.log('token: ' + token)
 
@@ -43,7 +46,7 @@ async function postURL(endpoint, url) {
     return response
 }
 
-browser.contextMenus.onClicked.addListener(genericOnClick)
+chrome.contextMenus.onClicked.addListener(genericOnClick)
 
 async function genericOnClick(ctx) {
     console.log('info.menuItemId: ' + ctx.menuItemId)
@@ -109,7 +112,7 @@ async function genericOnClick(ctx) {
     }
 }
 
-browser.runtime.onInstalled.addListener(function () {
+chrome.runtime.onInstalled.addListener(function () {
     let contexts = [
         // 'page',
         // 'selection',
@@ -120,7 +123,7 @@ browser.runtime.onInstalled.addListener(function () {
     ]
     for (let i = 0; i < contexts.length; i++) {
         let context = contexts[i]
-        browser.contextMenus.create({
+        chrome.contextMenus.create({
             title: context[1],
             contexts: [context[0]],
             id: context[0],
