@@ -1,5 +1,6 @@
 .idea/
 *.iml
 build/
+node_modules/
 *.zip
 manifest.json

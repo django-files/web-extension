@@ -1,3 +1,5 @@
+// Background Service Worker JS
+
 async function addToClipboard(value) {
     try {
         navigator.clipboard.writeText(value)
