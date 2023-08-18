@@ -32,11 +32,11 @@ The addon should now be installed and running in Chrome.
 
 ## Configure
 
-1. Click the `Puzzle Piece` in the top right corner, find `Django Files` and click the `Pin` icon.
-2. Click on the `Django Files icon` and click on `Open Options`.
-3. Log in to your Django Files instance, and select `Copy URL` from the menu in the top right.
-4. Go back to the Django Files Options tab and paste the `URL` into the URL box.
-5. Repeat #3 and #4 for Auth Token then click `Save Settings`.
+1.  Click the `Puzzle Piece` in the top right corner, find `Django Files` and click the `Pin` icon.
+2.  Click on the `Django Files icon` and click on `Open Options`.
+3.  Log in to your Django Files instance, and select `Copy URL` from the menu in the top right.
+4.  Go back to the Django Files Options tab and paste the `URL` into the URL box.
+5.  Repeat #3 and #4 for Auth Token then click `Save Settings`.
 
 The addon should now be configured to work with your Django Files instance.
 
