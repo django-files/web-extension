@@ -1,10 +1,11 @@
 async function addToClipboard(value) {
-    await chrome.offscreen.createDocument({
+    navigator.clipboard.writeText(value)
+    await browser.offscreen.createDocument({
         url: 'html/offscreen.html',
-        reasons: [chrome.offscreen.Reason.CLIPBOARD],
+        reasons: [browser.offscreen.Reason.CLIPBOARD],
         justification: 'Write text to the clipboard.',
     })
-    chrome.runtime.sendMessage({
+    browser.runtime.sendMessage({
         type: 'copy-data-to-clipboard',
         target: 'offscreen-doc',
         data: value,
@@ -12,7 +13,7 @@ async function addToClipboard(value) {
 }
 
 async function sendNotification(title, text) {
-    chrome.notifications.create({
+    browser.notifications.create({
         type: 'basic',
         iconUrl: '/images/logo128.png',
         title: title,
@@ -24,8 +25,8 @@ async function sendNotification(title, text) {
 async function postURL(endpoint, url) {
     console.log('Processing URL: ' + url)
 
-    let _url = (await chrome.storage.local.get('url'))['url']
-    let token = (await chrome.storage.local.get('token'))['token']
+    let _url = (await browser.storage.local.get('url'))['url']
+    let token = (await browser.storage.local.get('token'))['token']
     console.log('_url: ' + _url)
     console.log('token: ' + token)
 
@@ -42,7 +43,7 @@ async function postURL(endpoint, url) {
     return response
 }
 
-chrome.contextMenus.onClicked.addListener(genericOnClick)
+browser.contextMenus.onClicked.addListener(genericOnClick)
 
 async function genericOnClick(ctx) {
     console.log('info.menuItemId: ' + ctx.menuItemId)
@@ -108,7 +109,7 @@ async function genericOnClick(ctx) {
     }
 }
 
-chrome.runtime.onInstalled.addListener(function () {
+browser.runtime.onInstalled.addListener(function () {
     let contexts = [
         // 'page',
         // 'selection',
@@ -119,7 +120,7 @@ chrome.runtime.onInstalled.addListener(function () {
     ]
     for (let i = 0; i < contexts.length; i++) {
         let context = contexts[i]
-        chrome.contextMenus.create({
+        browser.contextMenus.create({
             title: context[1],
             contexts: [context[0]],
             id: context[0],

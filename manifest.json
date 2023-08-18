@@ -1,12 +1,12 @@
 {
   "name": "Django Files",
-  "description": "Django Files Chrome Extension",
+  "description": "Django Files Web Extension",
   "version": "0.0.3",
   "manifest_version": 3,
   "permissions": ["storage", "activeTab", "scripting", "contextMenus", "notifications", "clipboardWrite", "offscreen"],
   "options_page": "html/options.html",
   "background": {
-    "service_worker": "js/service-worker.js"
+    "scripts": ["js/service-worker.js"]
   },
   "action": {
     "default_popup": "html/popup.html",

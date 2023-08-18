@@ -1,8 +1,8 @@
 async function initOptions() {
     console.log('function: initOptions')
 
-    let url = (await chrome.storage.local.get('url'))['url']
-    let token = (await chrome.storage.local.get('token'))['token']
+    let url = (await browser.storage.local.get('url'))['url']
+    let token = (await browser.storage.local.get('token'))['token']
 
     console.log('url: ' + url)
     console.log('token: ' + token)
@@ -30,10 +30,10 @@ async function saveOptions(event) {
     console.log('url: ' + url)
     console.log('token: ' + token)
 
-    chrome.storage.local.set({
+    browser.storage.local.set({
         ['url']: url,
     })
-    chrome.storage.local.set({
+    browser.storage.local.set({
         ['token']: token,
     })
 
