@@ -3,9 +3,23 @@
   "description": "Django Files Web Extension",
   "version": "0.1.0",
   "manifest_version": 3,
-  "permissions": ["storage", "activeTab", "scripting", "contextMenus", "notifications", "clipboardWrite"],
+  "permissions": [
+    "notifications",
+    "scripting",
+    "storage",
+    "activeTab",
+    "clipboardWrite",
+    "contextMenus",
+    "webRequest"
+  ],
+  "options_ui": {
+    "page": "html/options.html",
+    "open_in_tab": true
+  },
   "background": {
-    "scripts": ["js/service-worker.js"]
+    "scripts": [
+      "js/service-worker.js"
+    ]
   },
   "action": {
     "default_popup": "html/popup.html",
