@@ -1,5 +1,24 @@
 // Background Service Worker JS
 
+chrome.runtime.onInstalled.addListener(function () {
+    let contexts = [
+        // 'page',
+        // 'selection',
+        ['link', 'Create Short URL'],
+        ['image', 'Upload to Django Files'],
+        ['video', 'Upload to Django Files'],
+        ['audio', 'Upload to Django Files'],
+    ]
+    for (let i = 0; i < contexts.length; i++) {
+        let context = contexts[i]
+        chrome.contextMenus.create({
+            title: context[1],
+            contexts: [context[0]],
+            id: context[0],
+        })
+    }
+})
+
 async function addToClipboard(value) {
     try {
         // Firefox
@@ -116,22 +135,3 @@ async function genericOnClick(ctx) {
             console.log('Warning: Click not handled.')
     }
 }
-
-chrome.runtime.onInstalled.addListener(function () {
-    let contexts = [
-        // 'page',
-        // 'selection',
-        ['link', 'Create Short URL'],
-        ['image', 'Upload to Django Files'],
-        ['video', 'Upload to Django Files'],
-        ['audio', 'Upload to Django Files'],
-    ]
-    for (let i = 0; i < contexts.length; i++) {
-        let context = contexts[i]
-        chrome.contextMenus.create({
-            title: context[1],
-            contexts: [context[0]],
-            id: context[0],
-        })
-    }
-})
