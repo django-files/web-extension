@@ -22,7 +22,8 @@ if (Test-Path $build_dir) {
 }
 
 
-Write-Host "Creating FireFox Addon."
+$manifest_data = Get-Content -Raw $firefox | ConvertFrom-Json
+Write-Host "Creating FireFox Addon Version: $($manifest_data.version)"
 Copy-Item -Force -Path $firefox -Destination $manifest
 $package = Get-ChildItem -Path $(Get-Location) -Exclude $excludeList
 $compress = @{
@@ -33,7 +34,8 @@ $compress = @{
 Compress-Archive @compress
 
 
-Write-Host "Creating Chrome Addon."
+$manifest_data = Get-Content -Raw $chrome | ConvertFrom-Json
+Write-Host "Creating Chrome Addon Version: $($manifest_data.version)"
 Copy-Item -Force -Path $chrome -Destination $manifest
 $package = Get-ChildItem -Path $(Get-Location) -Exclude $excludeList
 $compress = @{
