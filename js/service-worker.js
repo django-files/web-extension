@@ -2,8 +2,10 @@
 
 async function addToClipboard(value) {
     try {
+        // Firefox
         navigator.clipboard.writeText(value)
     } catch {
+        // Chrome
         await chrome.offscreen.createDocument({
             url: 'html/offscreen.html',
             reasons: [chrome.offscreen.Reason.CLIPBOARD],
@@ -18,10 +20,11 @@ async function addToClipboard(value) {
 }
 
 async function sendNotification(title, text) {
+    console.log(`sendNotification: ${title} - ${text}`)
     chrome.notifications.create({
         type: 'basic',
-        iconUrl: '/images/logo128.png',
-        title: title,
+        iconUrl: chrome.runtime.getURL('images/logo128.png'),
+        title,
         message: text,
         priority: 1,
     })

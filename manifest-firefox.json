@@ -1,6 +1,6 @@
 {
   "name": "Django Files",
-  "description": "Django Files Web Extension",
+  "description": "Django Files Firefox Extension",
   "version": "0.1.0",
   "manifest_version": 3,
   "permissions": [
@@ -17,9 +17,7 @@
     "open_in_tab": true
   },
   "background": {
-    "scripts": [
-      "js/service-worker.js"
-    ]
+    "scripts": ["js/service-worker.js"]
   },
   "action": {
     "default_popup": "html/popup.html",
