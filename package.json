@@ -1,0 +1,28 @@
+{
+  "name": "django-files",
+  "version": "0.1.0",
+  "author": "Shane",
+  "description": "Upload Files Directly from the Google Chrome Browser.",
+  "homepage": "https://github.com/django-files/chrome-extension",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/django-files/chrome-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/django-files/chrome-extension/issues"
+  },
+  "dependencies": {
+    "bootstrap": "latest",
+    "jquery": "latest"
+  },
+  "devDependencies": {
+    "eslint": "latest",
+    "prettier": "latest"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 4,
+    "semi": false,
+    "singleQuote": true
+  }
+}
