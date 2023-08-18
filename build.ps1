@@ -8,7 +8,7 @@ $build_dir = Join-Path -Path $(Get-Location) -ChildPath "web-ext-artifacts"
 $manifest = Join-Path -Path $(Get-Location) -ChildPath "manifest.json"
 $firefox = Join-Path -Path $(Get-Location) -ChildPath "manifest-firefox.json"
 $chrome = Join-Path -Path $(Get-Location) -ChildPath "manifest-chrome.json"
-#$firefox_archive = Join-Path -Path $build_dir -ChildPath "firefox.zip"
+$firefox_archive = Join-Path -Path $build_dir -ChildPath "firefox.zip"
 $chrome_archive = Join-Path -Path $build_dir -ChildPath "chrome.zip"
 
 if (Test-Path $build_dir) {
@@ -20,6 +20,8 @@ if (Test-Path $build_dir) {
     New-Item -ItemType Directory -Path $build_dir | Out-Null
 }
 
+
+## Chrome
 
 $manifest_data = Get-Content -Raw $chrome | ConvertFrom-Json
 Write-Host "Creating Chrome Addon Version: $($manifest_data.version)"
@@ -34,10 +36,15 @@ Compress-Archive -Force @compress
 #Move-Item -Path "chrome.zip" -Destination $build_dir
 
 
+## FireFox
+
 $manifest_data = Get-Content -Raw $firefox | ConvertFrom-Json
 Write-Host "Creating FireFox Addon Version: $($manifest_data.version)"
 Copy-Item -Force -Path $firefox -Destination $manifest
 Start-Process -FilePath npx -ArgumentList "web-ext build --overwrite-dest --ignore-files=package* manifest-* build*" -NoNewWindow -Wait
+$zip_name = $(Get-ChildItem $build_dir -Include  *-*).name
+$zip_path = Join-Path -Path $build_dir -ChildPath $zip_name
+Move-Item -Path $zip_path -Destination $firefox_archive
 #$package = Get-ChildItem -Path $(Get-Location) -Exclude $excludeList
 #$compress = @{
 #    LiteralPath = $package
