@@ -52,6 +52,9 @@ Move-Item -Path $zip_path -Destination $firefox_archive
 #    DestinationPath = $firefox_archive
 #}
 #Compress-Archive @compress
+$name = $($manifest_data.name -replace '\s','-').ToLower() + ".xpi"
+$firefox_xpi = Join-Path -Path $build_dir -ChildPath $name
+Copy-Item -Force -Path $firefox_archive -Destination $firefox_xpi
 
 
 if (Test-Path $manifest) {
