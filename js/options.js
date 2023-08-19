@@ -1,3 +1,5 @@
+// Options JS
+
 async function initOptions() {
     console.log('function: initOptions')
 

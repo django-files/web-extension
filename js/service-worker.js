@@ -1,21 +1,49 @@
+// Background Service Worker JS
+
+chrome.runtime.onInstalled.addListener(function () {
+    let contexts = [
+        // 'page',
+        // 'selection',
+        ['link', 'Create Short URL'],
+        ['image', 'Upload to Django Files'],
+        ['video', 'Upload to Django Files'],
+        ['audio', 'Upload to Django Files'],
+    ]
+    for (let i = 0; i < contexts.length; i++) {
+        let context = contexts[i]
+        chrome.contextMenus.create({
+            title: context[1],
+            contexts: [context[0]],
+            id: context[0],
+        })
+    }
+})
+
 async function addToClipboard(value) {
-    await chrome.offscreen.createDocument({
-        url: 'html/offscreen.html',
-        reasons: [chrome.offscreen.Reason.CLIPBOARD],
-        justification: 'Write text to the clipboard.',
-    })
-    chrome.runtime.sendMessage({
-        type: 'copy-data-to-clipboard',
-        target: 'offscreen-doc',
-        data: value,
-    })
+    try {
+        // Firefox
+        navigator.clipboard.writeText(value)
+    } catch {
+        // Chrome
+        await chrome.offscreen.createDocument({
+            url: 'html/offscreen.html',
+            reasons: [chrome.offscreen.Reason.CLIPBOARD],
+            justification: 'Write text to the clipboard.',
+        })
+        chrome.runtime.sendMessage({
+            type: 'copy-data-to-clipboard',
+            target: 'offscreen-doc',
+            data: value,
+        })
+    }
 }
 
 async function sendNotification(title, text) {
+    console.log(`sendNotification: ${title} - ${text}`)
     chrome.notifications.create({
         type: 'basic',
-        iconUrl: '/images/logo128.png',
-        title: title,
+        iconUrl: chrome.runtime.getURL('images/logo128.png'),
+        title,
         message: text,
         priority: 1,
     })
@@ -107,22 +135,3 @@ async function genericOnClick(ctx) {
             console.log('Warning: Click not handled.')
     }
 }
-
-chrome.runtime.onInstalled.addListener(function () {
-    let contexts = [
-        // 'page',
-        // 'selection',
-        ['link', 'Create Short URL'],
-        ['image', 'Upload to Django Files'],
-        ['video', 'Upload to Django Files'],
-        ['audio', 'Upload to Django Files'],
-    ]
-    for (let i = 0; i < contexts.length; i++) {
-        let context = contexts[i]
-        chrome.contextMenus.create({
-            title: context[1],
-            contexts: [context[0]],
-            id: context[0],
-        })
-    }
-})

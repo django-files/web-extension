@@ -1,4 +1,6 @@
 .idea/
 *.iml
 build/
-*.zip
+node_modules/
+web-ext-artifacts/
+manifest.json

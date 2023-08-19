@@ -1,3 +1,4 @@
+// Popup JS
 
 async function displayError(message) {
     let div = document.getElementById('error-alert')
