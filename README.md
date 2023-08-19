@@ -22,7 +22,7 @@ _Work in Progress_
 
 ## Chrome Install
 
-1.  Download the latest release: https://github.com/django-files/web-extension/releases/latest/download/chrome.zip
+1.  Download the latest release: [chrome.zip](https://github.com/django-files/web-extension/releases/latest/download/chrome.zip)
 1.  Unzip the archive, place the folder where it must remain and note its location for later.
 1.  Open Chrome, click the `3 dots` in the top right, click `Extensions`, click `Manage Extensions`.
 1.  In the top right, click `Developer Mode` then on the top left click `Load unpacked`.
@@ -32,15 +32,13 @@ The addon should now be installed and running in Chrome.
 
 ## FireFox Install
 
-This **does not** work on Release FireFox! You must use ESR, Development, or Nightly.  
-Recommended, FireFox Extended Support Release: https://www.mozilla.org/en-CA/firefox/all/#product-desktop-esr  
+This **does not** work on Release FireFox! You must use [ESR](https://www.mozilla.org/en-CA/firefox/all/#product-desktop-esr) (recommended), Development, or Nightly.
 
-1.  Download the latest release: https://github.com/django-files/web-extension/releases/latest/download/firefox.zip
+1.  Download the latest release: [firefox.zip](https://github.com/django-files/web-extension/releases/latest/download/firefox.zip)
 1.  Open `about:config` search for `xpinstall.signatures.required` and set to `false`.
 1.  Open `about:addons` and drag the zip file to the page or choose Install from File from the Settings Wheel.
 
 The addon should now be installed and running in FireFox.
-
 
 ## Configure
 
@@ -52,8 +50,8 @@ The addon should now be installed and running in FireFox.
 
 The addon should now be configured to work with your Django Files instance.
 
-Now clicking the `Django Files icon` should show your most recent uploads.  
-You can also right-click on any Image, Video, Audio, or URL upload to Django Files or Shorten URL.  
+Click the Django Files add-on icon to view your recetn uploads.  
+Right-click on any Image, Video, Audio, or URL upload to Django Files or Shorten URL.  
 
 ## Known Issues
 
