@@ -9,12 +9,7 @@ async function displayError(message) {
 async function initPopup() {
     console.log('function: initPopup')
     jQuery('html').hide().fadeIn('slow')
-    // let url = auth['url']
-    // let token = auth['token']
-    // const url = (await chrome.storage.local.get('url'))['url']
-    // const token = (await chrome.storage.local.get('token'))['token']
-    // console.log('url: ' + url)
-    // console.log('token: ' + token)
+
     let auth = (await chrome.storage.local.get('auth'))['auth'] || {}
     console.log('auth.url: ' + auth['url'])
     console.log('auth.token: ' + auth['token'])
@@ -35,6 +30,7 @@ async function initPopup() {
     }
     console.log('Status: ' + response.status)
     console.log(response)
+    console.log(data)
 
     if (!response.ok) {
         console.log('error: ' + data['error'])
@@ -47,24 +43,32 @@ async function initPopup() {
         return await displayError('No Files Returned.')
     }
 
-    console.log(data)
     let tbodyRef = document
         .getElementById('recent')
         .getElementsByTagName('tbody')[0]
-    for (let i in data) {
-        let name = data[i].split('/').reverse()[0]
-        let a = document.createElement('a')
-        let linkText = document.createTextNode(name)
-        a.appendChild(linkText)
-        a.title = name
-        a.href = data[i]
-        a.target = '_blank'
-        let newRow = tbodyRef.insertRow()
-        let newCell = newRow.insertCell()
-        let count = document.createTextNode(i + ' - ')
-        newCell.appendChild(count)
-        newCell.appendChild(a)
-    }
+
+    data.forEach(function (value, i) {
+        let name = String(value.split('/').reverse()[0])
+
+        let copyLink = document.createTextNode(i + 1)
+        // let copyLink = document.createElement('a')
+        // copyLink.text = 1 + i
+        // copyLink.title = name
+        // copyLink.href = value
+        // copyLink.target = '_blank'
+
+        let fileLink = document.createElement('a')
+        fileLink.text = name
+        fileLink.title = name
+        fileLink.href = value
+        fileLink.target = '_blank'
+
+        let row = tbodyRef.insertRow()
+        let cell1 = row.insertCell()
+        cell1.appendChild(copyLink)
+        let cell2 = row.insertCell()
+        cell2.appendChild(fileLink)
+    })
 }
 
 document.addEventListener('DOMContentLoaded', initPopup)
