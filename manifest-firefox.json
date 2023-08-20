@@ -5,12 +5,10 @@
   "manifest_version": 3,
   "permissions": [
     "notifications",
-    "scripting",
     "storage",
     "activeTab",
     "clipboardWrite",
-    "contextMenus",
-    "webRequest"
+    "contextMenus"
   ],
   "options_ui": {
     "page": "html/options.html",
