@@ -2,7 +2,6 @@
 
 async function initOptions() {
     console.log('function: initOptions')
-
     let auth = (await chrome.storage.local.get('auth'))['auth'] || {}
     console.log('auth.url: ' + auth['url'])
     console.log('auth.token: ' + auth['token'])
@@ -14,9 +13,6 @@ async function initOptions() {
         url_input.placeholder = 'https://example.com'
     }
     token_input.value = auth['token'] || ''
-    // if (token) {
-    //     token_input.value = token
-    // }
 }
 
 async function saveOptions(event) {
@@ -26,21 +22,11 @@ async function saveOptions(event) {
         url: document.getElementById('url').value.replace(/\/$/, ''),
         token: document.getElementById('token').value,
     }
-    // let url = document.getElementById('url').value.replace(/\/$/, '')
-    // let token = document.getElementById('token').value
     console.log('auth.url: ' + auth['url'])
     console.log('auth.token: ' + auth['token'])
     chrome.storage.local.set({
         ['auth']: auth,
     })
-
-    // chrome.storage.local.set({
-    //     ['url']: url,
-    // })
-    // chrome.storage.local.set({
-    //     ['token']: token,
-    // })
-
     let url_input = document.getElementById('url')
     url_input.value = auth['url']
 }

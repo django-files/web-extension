@@ -52,10 +52,6 @@ async function sendNotification(title, text) {
 async function postURL(endpoint, url) {
     console.log('Processing URL: ' + url)
     let auth = (await chrome.storage.local.get('auth'))['auth']
-    // let url = auth['url']
-    // let token = auth['token']
-    // let _url = (await chrome.storage.local.get('url'))['url']
-    // let token = (await chrome.storage.local.get('token'))['token']
     console.log('auth.url: ' + auth['url'])
     console.log('auth.token: ' + auth['token'])
 
@@ -72,11 +68,11 @@ async function postURL(endpoint, url) {
     return response
 }
 
-async function postData(url, message) {
+async function processRemote(endpoint, url, message) {
     console.log('Processing URL: ' + url)
     let response
     try {
-        response = await postURL('remote', url)
+        response = await postURL(endpoint, url)
     } catch (error) {
         await sendNotification('Fetch Error', 'Error: ' + error.message)
     }
@@ -97,18 +93,23 @@ chrome.contextMenus.onClicked.addListener(genericOnClick)
 async function genericOnClick(ctx) {
     console.log('info.menuItemId: ' + ctx.menuItemId)
     switch (ctx.menuItemId) {
+        case 'audio':
         case 'image':
+        case 'video':
+            let type =
+                ctx.menuItemId.charAt(0).toUpperCase() + ctx.menuItemId.slice(1)
+            console.log('type:', type)
             console.log('ctx:', ctx)
             if (ctx.srcUrl) {
                 console.log('Processing URL: ' + ctx.srcUrl)
-                await postData(ctx.srcUrl, 'Image Uploaded')
+                await processRemote('remote', ctx.srcUrl, `${type} Uploaded`)
             }
             break
         case 'link':
             console.log('ctx:', ctx)
             if (ctx.linkUrl) {
                 console.log('Processing URL: ' + ctx.linkUrl)
-                await postData(ctx.linkUrl, 'Short Created')
+                await processRemote('shorten', ctx.linkUrl, 'Short Created')
             }
             break
         default:
