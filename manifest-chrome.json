@@ -1,16 +1,14 @@
 {
   "name": "Django Files",
   "description": "Django Files Chrome Extension",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "manifest_version": 3,
   "permissions": [
     "notifications",
-    "scripting",
     "storage",
     "activeTab",
     "clipboardWrite",
     "contextMenus",
-    "webRequest",
     "offscreen"
   ],
   "options_page": "html/options.html",

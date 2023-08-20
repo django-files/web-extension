@@ -2,45 +2,33 @@
 
 async function initOptions() {
     console.log('function: initOptions')
-
-    let url = (await chrome.storage.local.get('url'))['url']
-    let token = (await chrome.storage.local.get('token'))['token']
-
-    console.log('url: ' + url)
-    console.log('token: ' + token)
-
+    let auth = (await chrome.storage.local.get('auth'))['auth'] || {}
+    console.log('auth.url: ' + auth['url'])
+    console.log('auth.token: ' + auth['token'])
     let url_input = document.getElementById('url')
     let token_input = document.getElementById('token')
-
-    if (url) {
-        url_input.value = url
+    if (auth['url']) {
+        url_input.value = auth['url']
     } else {
         url_input.placeholder = 'https://example.com'
     }
-    if (token) {
-        token_input.value = token
-    }
+    token_input.value = auth['token'] || ''
 }
 
 async function saveOptions(event) {
     event.preventDefault()
     console.log('function: saveOptions')
-
-    let url = document.getElementById('url').value.replace(/\/$/, '')
-    let token = document.getElementById('token').value
-
-    console.log('url: ' + url)
-    console.log('token: ' + token)
-
+    let auth = {
+        url: document.getElementById('url').value.replace(/\/$/, ''),
+        token: document.getElementById('token').value,
+    }
+    console.log('auth.url: ' + auth['url'])
+    console.log('auth.token: ' + auth['token'])
     chrome.storage.local.set({
-        ['url']: url,
+        ['auth']: auth,
     })
-    chrome.storage.local.set({
-        ['token']: token,
-    })
-
     let url_input = document.getElementById('url')
-    url_input.value = url
+    url_input.value = auth['url']
 }
 
 document.addEventListener('DOMContentLoaded', initOptions)

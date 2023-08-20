@@ -1,3 +1,10 @@
-div.container {
+body {
     width: 360px;
+}
+
+a {
+    white-space: -moz-pre-wrap !important;
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
 }

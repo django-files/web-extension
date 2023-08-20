@@ -1,16 +1,14 @@
 {
   "name": "Django Files",
   "description": "Django Files Firefox Extension",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "manifest_version": 3,
   "permissions": [
     "notifications",
-    "scripting",
     "storage",
     "activeTab",
     "clipboardWrite",
-    "contextMenus",
-    "webRequest"
+    "contextMenus"
   ],
   "options_ui": {
     "page": "html/options.html",
@@ -36,7 +34,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "shane-web@cssnr.com"
+      "id": "django-files@hosted-domains.com"
     }
   }
 }
