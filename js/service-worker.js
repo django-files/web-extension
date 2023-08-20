@@ -91,28 +91,22 @@ async function processRemote(endpoint, url, message) {
 chrome.contextMenus.onClicked.addListener(genericOnClick)
 
 async function genericOnClick(ctx) {
-    console.log('info.menuItemId: ' + ctx.menuItemId)
-    switch (ctx.menuItemId) {
-        case 'audio':
-        case 'image':
-        case 'video':
-            let type =
+    console.log('ctx.menuItemId: ' + ctx.menuItemId)
+    console.log(ctx)
+    if (ctx.menuItemId.match(/^(audio|image|video)$/)) {
+        if (ctx.srcUrl) {
+            let mediaType =
                 ctx.menuItemId.charAt(0).toUpperCase() + ctx.menuItemId.slice(1)
-            console.log('type:', type)
-            console.log('ctx:', ctx)
-            if (ctx.srcUrl) {
-                console.log('Processing URL: ' + ctx.srcUrl)
-                await processRemote('remote', ctx.srcUrl, `${type} Uploaded`)
-            }
-            break
-        case 'link':
-            console.log('ctx:', ctx)
-            if (ctx.linkUrl) {
-                console.log('Processing URL: ' + ctx.linkUrl)
-                await processRemote('shorten', ctx.linkUrl, 'Short Created')
-            }
-            break
-        default:
-            console.log('Warning: Click not handled.')
+            console.log('Processing URL: ' + ctx.srcUrl)
+            console.log('mediaType: ' + mediaType)
+            await processRemote('remote', ctx.srcUrl, `${mediaType} Uploaded`)
+        }
+    } else if (ctx.menuItemId.match(/^(link)$/)) {
+        if (ctx.linkUrl) {
+            console.log('Processing URL: ' + ctx.linkUrl)
+            await processRemote('shorten', ctx.linkUrl, 'Short Created')
+        }
+    } else {
+        console.log('Warning: Action not handled.')
     }
 }
