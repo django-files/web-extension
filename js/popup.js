@@ -9,20 +9,25 @@ async function displayError(message) {
 async function initPopup() {
     console.log('function: initPopup')
     jQuery('html').hide().fadeIn('slow')
-    const url = (await chrome.storage.local.get('url'))['url']
-    const token = (await chrome.storage.local.get('token'))['token']
-    console.log('url: ' + url)
-    console.log('token: ' + token)
-    if (url === '' || token === '') {
+    // let url = auth['url']
+    // let token = auth['token']
+    // const url = (await chrome.storage.local.get('url'))['url']
+    // const token = (await chrome.storage.local.get('token'))['token']
+    // console.log('url: ' + url)
+    // console.log('token: ' + token)
+    let auth = (await chrome.storage.local.get('auth'))['auth'] || {}
+    console.log('auth.url: ' + auth['url'])
+    console.log('auth.token: ' + auth['token'])
+    if (!auth['url'] || !auth['token']) {
         return await displayError('No URL or Token.')
     }
 
-    let headers = { Authorization: token }
+    let headers = { Authorization: auth['token'] }
     let options = { method: 'GET', headers: headers, cache: 'no-cache' }
     let response
     let data
     try {
-        response = await fetch(url + '/api/recent/', options)
+        response = await fetch(auth['url'] + '/api/recent/', options)
         data = await response.json()
     } catch (error) {
         console.log(error)
