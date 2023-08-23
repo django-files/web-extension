@@ -25,7 +25,7 @@ jobs:
 
       - name: "Test Chrome"
         run: |
-          echo ${{ secrets.CHROME_PRIVATE_KEY }} > .key
+          echo "${{ secrets.CHROME_PRIVATE_KEY }}" > .key
           echo Installed chromium version: ${{ steps.setup-chrome.outputs.chrome-version }}
           ${{ steps.setup-chrome.outputs.chrome-path }} --version
           ${{ steps.setup-chrome.outputs.chrome-path }} --pack-extension=./src --pack-extension-key=.key
