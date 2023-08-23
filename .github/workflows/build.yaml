@@ -58,7 +58,4 @@ jobs:
 
       - name: "Debug"
         run: |
-          echo ----------
-          ls -l .
-          echo ----------
           ls -l web-ext-artifacts
