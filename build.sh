@@ -8,7 +8,6 @@ _build_dir="web-ext-artifacts"
 _manifest_chrome="manifest-chrome.json"
 _manifest_firefox="manifest-firefox.json"
 
-
 cd src
 
 echo '--------------------'
@@ -16,6 +15,9 @@ pwd
 echo '--------------------'
 ls -lah
 echo '--------------------'
+
+echo "Not Implemented"
+exit 1
 
 
 echo "Building: ${_manifest_chrome}"
