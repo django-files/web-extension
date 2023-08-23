@@ -17,32 +17,13 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v3
 
-      - name: "setup-chrome"
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: latest
-        id: setup-chrome
-
-      - name: "Test Chrome"
-        run: |
-          cp -f manifest-chrome.json src/manifest.json
-          echo "${{ secrets.CHROME_PRIVATE_KEY }}" > .key
-          echo Installed chromium version: ${{ steps.setup-chrome.outputs.chrome-version }}
-          ${{ steps.setup-chrome.outputs.chrome-path }} --version
-          ${{ steps.setup-chrome.outputs.chrome-path }} --pack-extension=./src --pack-extension-key=.key
-          pwd
-          echo -----
-          ls -l .
-          echo -----
-          ls -l ..
-
       - name: "Update Firefox Manifest"
+        id: manifest
         run: |
-          ls -lAh .
+          echo "version=$(jq '.version' < manifest-firefox.json)" >> "$GITHUB_OUTPUT"
           cp -f manifest-firefox.json src/manifest.json
-          ls -lAh .
 
-      - name: "web-ext build"
+      - name: "Build Firefox"
         id: web-ext-build
         uses: kewisch/action-web-ext@v1
         with:
@@ -50,13 +31,28 @@ jobs:
           source: src
           filename: "{name}-{version}.xpi"
 
-      - name: "Zip Chrome"
-        working-directory: "src"
+      - name: "Setup Chrome"
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: latest
+
+      - name: "Build Chrome"
         run: |
-          ls -lAh .
-          cp -f ../manifest-chrome.json manifest.json
-          mkdir -p ../web-ext-artifacts
-          zip "../web-ext-artifacts/chrome.zip" -r .
+          cp -f manifest-chrome.json src/manifest.json
+          echo "${{ secrets.CHROME_PRIVATE_KEY }}" > .key
+          echo Installed chromium version: ${{ steps.setup-chrome.outputs.chrome-version }}
+          ${{ steps.setup-chrome.outputs.chrome-path }} --version
+          ${{ steps.setup-chrome.outputs.chrome-path }} --pack-extension=./src --pack-extension-key=.key
+          mv src.crx web-ext-artifacts/django_files-${{ steps.manifest.outputs.version }}.crx
+
+#      - name: "Zip Chrome"
+#        working-directory: "src"
+#        run: |
+#          ls -lAh .
+#          cp -f ../manifest-chrome.json manifest.json
+#          mkdir -p ../web-ext-artifacts
+#          zip "../web-ext-artifacts/chrome.zip" -r .
 
       - name: "Archive Artifacts"
         uses: actions/upload-artifact@v3
@@ -66,4 +62,7 @@ jobs:
 
       - name: "Debug"
         run: |
-          ls -lAhR .
+          echo ----------
+          ls -l .
+          echo ----------
+          ls -l web-ext-artifacts
