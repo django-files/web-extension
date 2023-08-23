@@ -12,7 +12,7 @@
     "url": "https://github.com/django-files/chrome-extension/issues"
   },
   "scripts": {
-    "lint": "npx eslint js --ignore-pattern *.min.js"
+    "lint": "npx eslint src/js --ignore-pattern *.min.js"
   },
   "dependencies": {
     "bootstrap": "latest",
@@ -22,11 +22,5 @@
     "eslint": "latest",
     "prettier": "latest",
     "web-ext": "^7.6.2"
-  },
-  "prettier": {
-    "trailingComma": "es5",
-    "tabWidth": 4,
-    "semi": false,
-    "singleQuote": true
   }
 }
