@@ -15,7 +15,8 @@
     "open_in_tab": true
   },
   "background": {
-    "scripts": ["js/service-worker.js"]
+    "page": "html/background-page.html",
+    "persistent": false
   },
   "action": {
     "default_popup": "html/popup.html",
