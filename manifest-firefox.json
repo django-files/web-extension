@@ -15,8 +15,7 @@
     "open_in_tab": true
   },
   "background": {
-    "page": "html/background-page.html",
-    "persistent": false
+    "page": "html/background-page.html"
   },
   "action": {
     "default_popup": "html/popup.html",
