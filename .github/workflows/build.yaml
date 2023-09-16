@@ -2,6 +2,8 @@ name: Build
 
 on:
   workflow_dispatch:
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -12,6 +14,14 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v3
+
+      - name: "Setup Node 18"
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: "Node Install"
+        run: npm install
 
       - name: "Update Firefox Manifest"
         id: manifest
@@ -31,7 +41,7 @@ jobs:
         id: setup-chrome
         uses: browser-actions/setup-chrome@v1
         with:
-          chrome-version: latest
+          chrome-version: "1191187"
 
       - name: "Build Chrome"
         run: |

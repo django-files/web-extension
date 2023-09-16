@@ -19,6 +19,29 @@ chrome.runtime.onInstalled.addListener(function () {
     }
 })
 
+chrome.contextMenus.onClicked.addListener(genericOnClick)
+
+async function genericOnClick(ctx) {
+    console.log('ctx.menuItemId: ' + ctx.menuItemId)
+    console.log(ctx)
+    if (ctx.menuItemId.match(/^(audio|image|video)$/)) {
+        if (ctx.srcUrl) {
+            let mediaType =
+                ctx.menuItemId.charAt(0).toUpperCase() + ctx.menuItemId.slice(1)
+            console.log('mediaType: ' + mediaType)
+            console.log('Processing URL: ' + ctx.srcUrl)
+            await processRemote('remote', ctx.srcUrl, `${mediaType} Uploaded`)
+        }
+    } else if (ctx.menuItemId.match(/^(link)$/)) {
+        if (ctx.linkUrl) {
+            console.log('Processing URL: ' + ctx.linkUrl)
+            await processRemote('shorten', ctx.linkUrl, 'Short Created')
+        }
+    } else {
+        console.log('Warning: Action not handled.')
+    }
+}
+
 async function addToClipboard(value) {
     try {
         // Firefox
@@ -85,28 +108,5 @@ async function processRemote(endpoint, url, message) {
     } else {
         console.log(data['error'])
         await sendNotification('Processing Error', 'Error: ' + data['error'])
-    }
-}
-
-chrome.contextMenus.onClicked.addListener(genericOnClick)
-
-async function genericOnClick(ctx) {
-    console.log('ctx.menuItemId: ' + ctx.menuItemId)
-    console.log(ctx)
-    if (ctx.menuItemId.match(/^(audio|image|video)$/)) {
-        if (ctx.srcUrl) {
-            let mediaType =
-                ctx.menuItemId.charAt(0).toUpperCase() + ctx.menuItemId.slice(1)
-            console.log('Processing URL: ' + ctx.srcUrl)
-            console.log('mediaType: ' + mediaType)
-            await processRemote('remote', ctx.srcUrl, `${mediaType} Uploaded`)
-        }
-    } else if (ctx.menuItemId.match(/^(link)$/)) {
-        if (ctx.linkUrl) {
-            console.log('Processing URL: ' + ctx.linkUrl)
-            await processRemote('shorten', ctx.linkUrl, 'Short Created')
-        }
-    } else {
-        console.log('Warning: Action not handled.')
     }
 }
