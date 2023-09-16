@@ -41,7 +41,7 @@ jobs:
         id: setup-chrome
         uses: browser-actions/setup-chrome@v1
         with:
-          chrome-version: latest
+          chrome-version: "118.0"
 
       - name: "Build Chrome"
         run: |
