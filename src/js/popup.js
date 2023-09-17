@@ -1,7 +1,7 @@
 // Popup JS
 
 async function displayError(message) {
-    let div = document.getElementById('error-alert')
+    const div = document.getElementById('error-alert')
     div.innerHTML = message
     div.style.display = 'block'
 }
@@ -10,19 +10,19 @@ async function initPopup() {
     console.log('function: initPopup')
     jQuery('html').hide().fadeIn('slow')
 
-    let auth = (await chrome.storage.local.get('auth'))['auth'] || {}
-    console.log('auth.url: ' + auth['url'])
-    console.log('auth.token: ' + auth['token'])
-    if (!auth['url'] || !auth['token']) {
-        return await displayError('No URL or Token.')
+    const { url, token } = await chrome.storage.local.get(['url', 'token'])
+    console.log(`url: ${url}`)
+    console.log(`token: ${token}`)
+    if (!url || !token) {
+        return await displayError('Missing URL or Token.')
     }
 
-    let headers = { Authorization: auth['token'] }
-    let options = { method: 'GET', headers: headers, cache: 'no-cache' }
+    const headers = { Authorization: token }
+    const options = { method: 'GET', headers: headers, cache: 'no-cache' }
     let response
     let data
     try {
-        response = await fetch(auth['url'] + '/api/recent/', options)
+        response = await fetch(`${url}/api/recent/`, options)
         data = await response.json()
     } catch (error) {
         console.log(error)

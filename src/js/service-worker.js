@@ -1,7 +1,7 @@
 // Background Service Worker JS
 
 chrome.runtime.onInstalled.addListener(function () {
-    let contexts = [
+    const contexts = [
         // 'page',
         // 'selection',
         ['link', 'Create Short URL'],
@@ -9,8 +9,8 @@ chrome.runtime.onInstalled.addListener(function () {
         ['video', 'Upload to Django Files'],
         ['audio', 'Upload to Django Files'],
     ]
-    for (let i = 0; i < contexts.length; i++) {
-        let context = contexts[i]
+    for (const element of contexts) {
+        let context = element
         chrome.contextMenus.create({
             title: context[1],
             contexts: [context[0]],
@@ -45,7 +45,7 @@ async function genericOnClick(ctx) {
 async function addToClipboard(value) {
     try {
         // Firefox
-        navigator.clipboard.writeText(value)
+        await navigator.clipboard.writeText(value)
     } catch {
         // Chrome
         await chrome.offscreen.createDocument({
@@ -53,7 +53,7 @@ async function addToClipboard(value) {
             reasons: [chrome.offscreen.Reason.CLIPBOARD],
             justification: 'Write text to the clipboard.',
         })
-        chrome.runtime.sendMessage({
+        await chrome.runtime.sendMessage({
             type: 'copy-data-to-clipboard',
             target: 'offscreen-doc',
             data: value,
@@ -63,41 +63,41 @@ async function addToClipboard(value) {
 
 async function sendNotification(title, text) {
     console.log(`sendNotification: ${title} - ${text}`)
-    chrome.notifications.create({
+    await chrome.notifications.create({
         type: 'basic',
         iconUrl: chrome.runtime.getURL('images/logo128.png'),
-        title,
+        title: title,
         message: text,
         priority: 1,
     })
 }
 
-async function postURL(endpoint, url) {
-    console.log('Processing URL: ' + url)
-    let auth = (await chrome.storage.local.get('auth'))['auth']
-    console.log('auth.url: ' + auth['url'])
-    console.log('auth.token: ' + auth['token'])
+async function postURL(endpoint, srcUrl) {
+    console.log(`Processing URL: ${srcUrl}`)
+    const { url, token } = await chrome.storage.local.get(['url', 'token'])
+    console.log(`url: ${url}`)
+    console.log(`token: ${token}`)
 
-    let headers = { Authorization: auth['token'] }
-    let body = JSON.stringify({ url: url })
-    let options = {
+    const headers = { Authorization: token }
+    const body = JSON.stringify({ url: srcUrl })
+    const options = {
         method: 'POST',
         headers: headers,
         body: body,
     }
-    let response = await fetch(auth['url'] + '/api/' + endpoint + '/', options)
-    console.log('Status: ' + response.status)
+    const response = await fetch(`${url}/api/${endpoint}/`, options)
+    console.log(`Status: ${response.status}`)
     console.log(response)
     return response
 }
 
 async function processRemote(endpoint, url, message) {
-    console.log('Processing URL: ' + url)
+    console.log(`Processing URL: ${url}`)
     let response
     try {
         response = await postURL(endpoint, url)
     } catch (error) {
-        await sendNotification('Fetch Error', 'Error: ' + error.message)
+        await sendNotification('Fetch Error', `Error: ${error.message}`)
     }
     const data = await response.json()
     console.log(data)
@@ -110,3 +110,64 @@ async function processRemote(endpoint, url, message) {
         await sendNotification('Processing Error', 'Error: ' + data['error'])
     }
 }
+
+let ws = null
+
+async function connect() {
+    console.log('websocket connect function')
+    // let gettingItem = browser.storage.local.get(['url', 'token'])
+    // chrome.storage.local.get(['url', 'token'], (items) => {
+    //     console.log(`url: ${url}`)
+    //     console.log(`token: ${token}`)
+    // })
+    const { url, token } = await chrome.storage.local.get(['url', 'token'])
+    console.log(`url: ${url}`)
+    console.log(`token: ${token}`)
+    if (!url || !token) {
+        console.log('Missing URL or Token')
+        return
+    }
+    const appUrl = new URL(url)
+    const wssUrl = `wss://${appUrl.host}/ws/home/`
+    console.log(`wssUrl: ${wssUrl}`)
+    ws = new WebSocket(wssUrl)
+    ws.onopen = (event) => {
+        console.log('websocket open')
+        ws.send(
+            JSON.stringify({
+                method: 'authorize',
+                authorization: token,
+            })
+        )
+        keepAlive()
+    }
+
+    ws.onmessage = (event) => {
+        console.log(`websocket received message: ${event.data}`)
+    }
+
+    ws.onclose = (event) => {
+        console.log('websocket connection closed')
+        ws = null
+    }
+}
+
+function keepAlive() {
+    const keepAliveIntervalId = setInterval(() => {
+        if (ws) {
+            ws.send('ping')
+        } else {
+            clearInterval(keepAliveIntervalId)
+        }
+    }, 20 * 1000)
+}
+
+// Start function
+const start = async function () {
+    const result = await connect()
+    console.log(result)
+}
+
+start()
+
+// await connect()

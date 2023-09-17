@@ -11,7 +11,10 @@
     "contextMenus",
     "offscreen"
   ],
-  "options_page": "html/options.html",
+  "options_ui": {
+    "page": "html/options.html",
+    "open_in_tab": true
+  },
   "background": {
     "service_worker": "js/service-worker.js"
   },
