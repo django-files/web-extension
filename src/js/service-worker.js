@@ -113,43 +113,38 @@ async function processRemote(endpoint, url, message) {
 
 let ws = null
 
-async function connect() {
+function connect() {
     console.log('websocket connect function')
     // let gettingItem = browser.storage.local.get(['url', 'token'])
-    // chrome.storage.local.get(['url', 'token'], (items) => {
-    //     console.log(`url: ${url}`)
-    //     console.log(`token: ${token}`)
-    // })
-    const { url, token } = await chrome.storage.local.get(['url', 'token'])
-    console.log(`url: ${url}`)
-    console.log(`token: ${token}`)
-    if (!url || !token) {
-        console.log('Missing URL or Token')
-        return
-    }
-    const appUrl = new URL(url)
-    const wssUrl = `wss://${appUrl.host}/ws/home/`
-    console.log(`wssUrl: ${wssUrl}`)
-    ws = new WebSocket(wssUrl)
-    ws.onopen = (event) => {
-        console.log('websocket open')
-        ws.send(
-            JSON.stringify({
-                method: 'authorize',
-                authorization: token,
-            })
-        )
-        keepAlive()
-    }
+    chrome.storage.local.get(['url', 'token'], (items) => {
+        console.log(`url: ${items.url}`)
+        console.log(`token: ${items.token}`)
+        if (items.url && items.token) {
+            const appUrl = new URL(items.url)
+            const wssUrl = `wss://${appUrl.host}/ws/home/`
+            console.log(`wssUrl: ${wssUrl}`)
+            ws = new WebSocket(wssUrl)
+            ws.onopen = (event) => {
+                console.log('websocket open')
+                ws.send(
+                    JSON.stringify({
+                        method: 'authorize',
+                        authorization: items.token,
+                    })
+                )
+                keepAlive()
+            }
 
-    ws.onmessage = (event) => {
-        console.log(`websocket received message: ${event.data}`)
-    }
+            ws.onmessage = (event) => {
+                console.log(`websocket received message: ${event.data}`)
+            }
 
-    ws.onclose = (event) => {
-        console.log('websocket connection closed')
-        ws = null
-    }
+            ws.onclose = (event) => {
+                console.log('websocket connection closed')
+                ws = null
+            }
+        }
+    })
 }
 
 function keepAlive() {
@@ -162,12 +157,12 @@ function keepAlive() {
     }, 20 * 1000)
 }
 
-// Start function
-const start = async function () {
-    const result = await connect()
-    console.log(result)
-}
+// // Start function
+// const start = async function () {
+//     const result = await connect()
+//     console.log(result)
+// }
 
-start()
+connect()
 
 // await connect()
