@@ -63,12 +63,17 @@ async function addToClipboard(value) {
 
 async function sendNotification(title, text) {
     console.log(`sendNotification: ${title} - ${text}`)
-    await chrome.notifications.create({
+    const options = {
         type: 'basic',
         iconUrl: chrome.runtime.getURL('images/logo128.png'),
         title: title,
         message: text,
         priority: 1,
+    }
+    chrome.notifications.create(options, function (notification) {
+        setTimeout(function () {
+            chrome.notifications.clear(notification)
+        }, 10000)
     })
 }
 
