@@ -137,8 +137,7 @@ function processMessage(event) {
 let ws = null
 
 function wsConnect() {
-    console.log('websocket connect function')
-    // let gettingItem = browser.storage.sync.get(['url', 'token'])
+    console.log('wsConnect function')
     chrome.storage.sync.get(['url', 'token'], (items) => {
         console.log(`url: ${items.url}`)
         console.log(`token: ${items.token}`)
@@ -158,7 +157,6 @@ function wsConnect() {
                 )
                 keepAlive()
             }
-
             ws.onmessage = (event) => {
                 console.log(event)
                 console.log(`event.data: ${event.data}`)
@@ -173,15 +171,29 @@ function wsConnect() {
                     console.log(e)
                 }
             }
-
             ws.onclose = (event) => {
                 console.log('websocket connection closed')
                 console.log(event)
-                ws = null
+                if (event.code !== 1000) {
+                    console.log(event)
+                    setTimeout(function () {
+                        console.log('Reconnecting...')
+                        wsConnect()
+                    }, 20 * 1000)
+                } else {
+                    ws = null
+                }
             }
         }
     })
 }
+
+// function wsDisconnect() {
+//     if (ws.readyState !== WebSocket.CLOSED) {
+//         ws.close()
+//         console.log('websocket disconnected')
+//     }
+// }
 
 function keepAlive() {
     const keepAliveIntervalId = setInterval(() => {
@@ -192,5 +204,14 @@ function keepAlive() {
         }
     }, 20 * 1000)
 }
+
+chrome.runtime.onMessage.addListener(function (request) {
+    console.log('onMessage')
+    console.log(request)
+    if (request.connect) {
+        // wsDisconnect()
+        wsConnect()
+    }
+})
 
 wsConnect()

@@ -20,6 +20,7 @@ async function saveOptions(event) {
     console.log(`token: ${token}`)
     await chrome.storage.sync.set({ url: url, token: token })
     urlInput.value = url
+    await chrome.runtime.sendMessage({ connect: true })
 }
 
 document.addEventListener('DOMContentLoaded', initOptions)
