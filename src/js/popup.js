@@ -10,7 +10,7 @@ async function initPopup() {
     console.log('function: initPopup')
     jQuery('html').hide().fadeIn('slow')
 
-    const { url, token } = await chrome.storage.local.get(['url', 'token'])
+    const { url, token } = await chrome.storage.sync.get(['url', 'token'])
     console.log(`url: ${url}`)
     console.log(`token: ${token}`)
     if (!url || !token) {

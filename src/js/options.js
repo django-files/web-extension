@@ -2,7 +2,7 @@
 
 async function initOptions() {
     console.log('initOptions')
-    const { url, token } = await chrome.storage.local.get(['url', 'token'])
+    const { url, token } = await chrome.storage.sync.get(['url', 'token'])
     console.log(`url: ${url}`)
     console.log(`token: ${token}`)
     document.getElementById('url').value = url || ''
@@ -18,7 +18,7 @@ async function saveOptions(event) {
     let token = tokenInput.value
     console.log(`url: ${url}`)
     console.log(`token: ${token}`)
-    await chrome.storage.local.set({ url: url, token: token })
+    await chrome.storage.sync.set({ url: url, token: token })
     urlInput.value = url
 }
 

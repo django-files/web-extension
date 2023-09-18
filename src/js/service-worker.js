@@ -74,7 +74,7 @@ async function sendNotification(title, text) {
 
 async function postURL(endpoint, srcUrl) {
     console.log(`Processing URL: ${srcUrl}`)
-    const { url, token } = await chrome.storage.local.get(['url', 'token'])
+    const { url, token } = await chrome.storage.sync.get(['url', 'token'])
     console.log(`url: ${url}`)
     console.log(`token: ${token}`)
 
@@ -93,6 +93,7 @@ async function postURL(endpoint, srcUrl) {
 
 async function processRemote(endpoint, url, message) {
     console.log(`Processing URL: ${url}`)
+    // TODO: Update this fetch block
     let response
     try {
         response = await postURL(endpoint, url)
@@ -111,12 +112,29 @@ async function processRemote(endpoint, url, message) {
     }
 }
 
+function processMessage(event) {
+    console.log('processMessage')
+    console.log(event)
+    console.log(`event: ${event.event}`)
+
+    switch (event.event) {
+        case 'file-new':
+            sendNotification('File Created', `File ${event.pk} Created!`).then()
+            break
+        case 'file-delete':
+            sendNotification('File Deleted', `File ${event.pk} Deleted!`).then()
+            break
+        default:
+            console.log(`Unknown Event: ${event.event}`)
+    }
+}
+
 let ws = null
 
-function connect() {
+function wsConnect() {
     console.log('websocket connect function')
-    // let gettingItem = browser.storage.local.get(['url', 'token'])
-    chrome.storage.local.get(['url', 'token'], (items) => {
+    // let gettingItem = browser.storage.sync.get(['url', 'token'])
+    chrome.storage.sync.get(['url', 'token'], (items) => {
         console.log(`url: ${items.url}`)
         console.log(`token: ${items.token}`)
         if (items.url && items.token) {
@@ -136,7 +154,14 @@ function connect() {
             }
 
             ws.onmessage = (event) => {
-                console.log(`websocket received message: ${event.data}`)
+                console.log(event)
+                console.log(`event.data: ${event.data}`)
+                const data = JSON.parse(event.data)
+                console.log(`data: ${data}`)
+                console.log(`event.data.event: ${data.event}`)
+                if (data.event) {
+                    processMessage(data)
+                }
             }
 
             ws.onclose = (event) => {
@@ -157,12 +182,4 @@ function keepAlive() {
     }, 20 * 1000)
 }
 
-// // Start function
-// const start = async function () {
-//     const result = await connect()
-//     console.log(result)
-// }
-
-connect()
-
-// await connect()
+wsConnect()
