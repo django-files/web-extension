@@ -149,6 +149,7 @@ function wsConnect() {
             ws = new WebSocket(wssUrl)
             ws.onopen = (event) => {
                 console.log('websocket open')
+                console.log(event)
                 ws.send(
                     JSON.stringify({
                         method: 'authorize',
@@ -175,6 +176,7 @@ function wsConnect() {
 
             ws.onclose = (event) => {
                 console.log('websocket connection closed')
+                console.log(event)
                 ws = null
             }
         }
