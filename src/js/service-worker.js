@@ -161,11 +161,15 @@ function wsConnect() {
             ws.onmessage = (event) => {
                 console.log(event)
                 console.log(`event.data: ${event.data}`)
-                const data = JSON.parse(event.data)
-                console.log(`data: ${data}`)
-                console.log(`event.data.event: ${data.event}`)
-                if (data.event) {
-                    processMessage(data)
+                try {
+                    const data = JSON.parse(event.data)
+                    console.log(`data: ${data}`)
+                    console.log(`event.data.event: ${data.event}`)
+                    if (data.event) {
+                        processMessage(data)
+                    }
+                } catch (e) {
+                    console.log(e)
                 }
             }
 
