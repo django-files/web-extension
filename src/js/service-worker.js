@@ -131,13 +131,15 @@ async function processMessage(event) {
         case 'file-new':
             data[event.name] = event
             if (!names.includes(event.name)) {
-                const { url } = await chrome.storage.sync.get(['url'])
-                await addToClipboard(`${url}/u/${event.name}`)
-                await sendNotification(
-                    'File Created',
-                    `New File: ${event.name}`,
-                    event.name
-                )
+                // const { url } = await chrome.storage.sync.get(['url'])
+                chrome.storage.sync.get(['url'], (items) => {
+                    addToClipboard(`${items.url}/u/${event.name}`)
+                    sendNotification(
+                        'File Created',
+                        `New File: ${event.name}`,
+                        event.name
+                    )
+                })
             }
             break
         case 'file-delete':
