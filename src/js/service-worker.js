@@ -61,19 +61,18 @@ async function addToClipboard(value) {
     }
 }
 
-async function sendNotification(title, text) {
-    console.log(`sendNotification: ${title} - ${text}`)
+async function sendNotification(title, text, id) {
+    console.log(`sendNotification: ${id}: ${title} - ${text}`)
     const options = {
         type: 'basic',
         iconUrl: chrome.runtime.getURL('images/logo128.png'),
         title: title,
         message: text,
-        priority: 1,
     }
-    chrome.notifications.create(options, function (notification) {
+    chrome.notifications.create(id, options, function (notification) {
         setTimeout(function () {
             chrome.notifications.clear(notification)
-        }, 10000)
+        }, 10 * 1000)
     })
 }
 
@@ -96,6 +95,8 @@ async function postURL(endpoint, srcUrl) {
     return response
 }
 
+let names = []
+
 async function processRemote(endpoint, url, message) {
     console.log(`Processing URL: ${url}`)
     // TODO: Update this fetch block
@@ -108,26 +109,39 @@ async function processRemote(endpoint, url, message) {
     const data = await response.json()
     console.log(data)
     if (response.ok) {
-        console.log(data['url'])
-        await addToClipboard(data['url'])
-        await sendNotification(message, data['url'])
+        console.log(`data.url: ${data.url}`)
+        let filename = data.url.substring(url.lastIndexOf('/') + 1)
+        console.log(`filename: ${filename}`)
+        names.push(filename)
+        await addToClipboard(data.url)
+        await sendNotification(message, data.url)
     } else {
         console.log(data['error'])
         await sendNotification('Processing Error', 'Error: ' + data['error'])
     }
 }
 
-function processMessage(event) {
+let data = {}
+
+async function processMessage(event) {
     console.log('processMessage')
     console.log(event)
     console.log(`event: ${event.event}`)
 
+    const key = `pk.${event.id}`
     switch (event.event) {
         case 'file-new':
-            sendNotification('File Created', `File ${event.pk} Created!`).then()
+            data[key] = event
+            if (!names.includes(event.name)) {
+                await sendNotification(
+                    'File Created',
+                    `New File: ${event.name}`,
+                    key
+                )
+            }
             break
         case 'file-delete':
-            sendNotification('File Deleted', `File ${event.pk} Deleted!`).then()
+            await sendNotification('File Deleted', `File: ${event.name}`, key)
             break
         default:
             console.log(`Unknown Event: ${event.event}`)
@@ -205,6 +219,8 @@ function keepAlive() {
     }, 20 * 1000)
 }
 
+wsConnect()
+
 chrome.runtime.onMessage.addListener(function (request) {
     console.log('onMessage')
     console.log(request)
@@ -214,4 +230,20 @@ chrome.runtime.onMessage.addListener(function (request) {
     }
 })
 
-wsConnect()
+chrome.notifications.onClicked.addListener((notificationId) => {
+    console.log(`notifications.onClicked: ${notificationId}`)
+    console.log(data[notificationId])
+    if (data[notificationId]) {
+        chrome.storage.sync.get(['url'], (items) => {
+            console.log(items.url)
+            const fullUrl = `${items.url}/u/${data[notificationId].name}`
+            console.log(fullUrl)
+            chrome.tabs.create({
+                url: fullUrl,
+            })
+            chrome.notifications.clear(notificationId)
+        })
+    } else {
+        console.error(`Not Found notificationId: ${notificationId}`)
+    }
+})
