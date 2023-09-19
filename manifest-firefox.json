@@ -6,7 +6,6 @@
   "permissions": [
     "notifications",
     "storage",
-    "activeTab",
     "clipboardWrite",
     "contextMenus"
   ],

@@ -178,6 +178,9 @@ function wsConnect() {
             ws.onmessage = (event) => {
                 console.log(event)
                 console.log(`event.data: ${event.data}`)
+                if (event.data === 'pong') {
+                    return
+                }
                 try {
                     const data = JSON.parse(event.data)
                     console.log(`data: ${data}`)
@@ -215,7 +218,7 @@ function wsConnect() {
 
 function keepAlive() {
     const keepAliveIntervalId = setInterval(() => {
-        if (ws) {
+        if (ws.readyState === 1) {
             ws.send('ping')
         } else {
             clearInterval(keepAliveIntervalId)
