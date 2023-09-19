@@ -114,9 +114,9 @@ async function processRemote(endpoint, url, message) {
         console.log(`filename: ${filename}`)
         names.push(filename)
         await addToClipboard(data.url)
-        await sendNotification(message, data.url)
+        await sendNotification(message, data.url, filename)
     } else {
-        console.log(data['error'])
+        console.error(data['error'])
         await sendNotification('Processing Error', 'Error: ' + data['error'])
     }
 }
@@ -127,21 +127,25 @@ async function processMessage(event) {
     console.log('processMessage')
     console.log(event)
     console.log(`event: ${event.event}`)
-
-    const key = `pk.${event.id}`
     switch (event.event) {
         case 'file-new':
-            data[key] = event
+            data[event.name] = event
             if (!names.includes(event.name)) {
+                const { url } = await chrome.storage.sync.get(['url'])
+                await addToClipboard(`${url}/u/${event.name}`)
                 await sendNotification(
                     'File Created',
                     `New File: ${event.name}`,
-                    key
+                    event.name
                 )
             }
             break
         case 'file-delete':
-            await sendNotification('File Deleted', `File: ${event.name}`, key)
+            await sendNotification(
+                'File Deleted',
+                `File: ${event.name}`,
+                event.name
+            )
             break
         default:
             console.log(`Unknown Event: ${event.event}`)
@@ -244,6 +248,6 @@ chrome.notifications.onClicked.addListener((notificationId) => {
             chrome.notifications.clear(notificationId)
         })
     } else {
-        console.error(`Not Found notificationId: ${notificationId}`)
+        console.error(`404 notificationId: ${notificationId}`)
     }
 })
