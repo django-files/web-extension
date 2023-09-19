@@ -4,7 +4,6 @@ function initOptions() {
     console.log('initOptions')
     console.log(chrome.storage.sync)
     console.log(chrome.storage.sync.get('url'))
-    // const { url, token } = await chrome.storage.sync.get(['url', 'token'])
     chrome.storage.sync.get(['url', 'token'], (items) => {
         console.log(`url: ${items.url}`)
         console.log(`token: ${items.token}`)

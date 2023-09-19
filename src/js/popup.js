@@ -8,10 +8,6 @@ function displayError(message) {
 
 function initPopup() {
     console.log('function: initPopup')
-    console.log(chrome.storage.sync)
-    jQuery('html').hide().fadeIn('slow')
-
-    // const { url, token } = chrome.storage.sync.get(['url', 'token'])
     chrome.storage.sync.get(['url', 'token'], (items) => {
         console.log(`url: ${items.url}`)
         console.log(`token: ${items.token}`)
@@ -19,22 +15,14 @@ function initPopup() {
             return displayError('Missing URL or Token.')
         }
 
-        const headers = { Authorization: items.token }
-        const options = { method: 'GET', headers: headers, cache: 'no-cache' }
-        // let response
-        // let data
-        // try {
-        //     response = fetch(`${items.url}/api/recent/`, options)
-        //     data = response.json()
-        // } catch (error) {
-        //     console.log(error)
-        //     return displayError(error.message)
-        // }
+        const options = {
+            method: 'GET',
+            headers: { Authorization: items.token },
+            cache: 'no-cache',
+        }
         fetch(`${items.url}/api/recent/`, options).then((response) => {
             console.log('Status: ' + response.status)
             console.log(response)
-            // const data = response.json()
-            // console.log(data)
             if (!response.ok) {
                 console.log('error: ' + data['error'])
                 return displayError(data['error'])
@@ -55,20 +43,12 @@ function initPopup() {
 
                 data.forEach(function (value, i) {
                     let name = String(value.split('/').reverse()[0])
-
                     let copyLink = document.createTextNode(i + 1)
-                    // let copyLink = document.createElement('a')
-                    // copyLink.text = 1 + i
-                    // copyLink.title = name
-                    // copyLink.href = value
-                    // copyLink.target = '_blank'
-
                     let fileLink = document.createElement('a')
                     fileLink.text = name
                     fileLink.title = name
                     fileLink.href = value
                     fileLink.target = '_blank'
-
                     let row = tbodyRef.insertRow()
                     let cell1 = row.insertCell()
                     cell1.appendChild(copyLink)

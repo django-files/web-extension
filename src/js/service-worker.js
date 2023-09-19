@@ -165,7 +165,13 @@ function wsConnect() {
             const appUrl = new URL(items.url)
             const wssUrl = `wss://${appUrl.host}/ws/home/`
             console.log(`wssUrl: ${wssUrl}`)
+            // wsDisconnect()
+            if (ws) {
+                ws.close()
+                console.log('websocket close')
+            }
             ws = new WebSocket(wssUrl)
+            let keepAliveIntervalId
             ws.onopen = (event) => {
                 console.log('websocket open')
                 console.log(event)
@@ -175,7 +181,14 @@ function wsConnect() {
                         authorization: items.token,
                     })
                 )
-                keepAlive()
+                // keepAlive()
+                keepAliveIntervalId = setInterval(() => {
+                    if (ws.readyState === 1) {
+                        ws.send('ping')
+                    } else {
+                        clearInterval(keepAliveIntervalId)
+                    }
+                }, 20 * 1000)
             }
             ws.onmessage = (event) => {
                 console.log(event)
@@ -197,14 +210,15 @@ function wsConnect() {
             ws.onclose = (event) => {
                 console.log('websocket connection closed')
                 console.log(event)
+                clearInterval(keepAliveIntervalId)
                 if (event.code !== 1000) {
                     console.log(event)
                     setTimeout(function () {
                         console.log('Reconnecting...')
+                        // wsDisconnect()
+                        // ws.close()
                         wsConnect()
                     }, 20 * 1000)
-                } else {
-                    ws = null
                 }
             }
         }
@@ -212,21 +226,23 @@ function wsConnect() {
 }
 
 // function wsDisconnect() {
-//     if (ws.readyState !== WebSocket.CLOSED) {
+//     console.log('wsDisconnect')
+//     console.log(ws)
+//     if (ws) {
 //         ws.close()
 //         console.log('websocket disconnected')
 //     }
 // }
 
-function keepAlive() {
-    const keepAliveIntervalId = setInterval(() => {
-        if (ws.readyState === 1) {
-            ws.send('ping')
-        } else {
-            clearInterval(keepAliveIntervalId)
-        }
-    }, 20 * 1000)
-}
+// function keepAlive() {
+//     const keepAliveIntervalId = setInterval(() => {
+//         if (ws.readyState === 1) {
+//             ws.send('ping')
+//         } else {
+//             clearInterval(keepAliveIntervalId)
+//         }
+//     }, 20 * 1000)
+// }
 
 wsConnect()
 
