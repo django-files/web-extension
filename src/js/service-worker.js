@@ -158,6 +158,10 @@ let ws = null
 
 function wsConnect() {
     console.log('wsConnect function')
+    if (ws) {
+        ws.close()
+        console.log('websocket close')
+    }
     chrome.storage.sync.get(['url', 'token'], (items) => {
         console.log(`url: ${items.url}`)
         console.log(`token: ${items.token}`)
@@ -166,10 +170,6 @@ function wsConnect() {
             const wssUrl = `wss://${appUrl.host}/ws/home/`
             console.log(`wssUrl: ${wssUrl}`)
             // wsDisconnect()
-            if (ws) {
-                ws.close()
-                console.log('websocket close')
-            }
             ws = new WebSocket(wssUrl)
             let keepAliveIntervalId
             ws.onopen = (event) => {
