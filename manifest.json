@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "version": "0.2.0",
+  "name": "Django Files",
+  "description": "Django Files Web Extension",
+  "homepage_url": "https://github.com/django-files/web-extension",
+  "author": "Shane",
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+Z"
+      },
+      "description": "Show Popup"
+    }
+  },
+  "permissions": ["clipboardWrite", "contextMenus", "notifications", "storage"],
+  "background": {
+    "type": "module"
+  },
+  "options_ui": {
+    "page": "html/options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "Django Files",
+    "default_popup": "html/popup.html",
+    "default_icon": {
+      "16": "images/logo16.png",
+      "32": "images/logo32.png",
+      "48": "images/logo48.png",
+      "96": "images/logo96.png",
+      "128": "images/logo128.png"
+    }
+  },
+  "icons": {
+    "16": "images/logo16.png",
+    "32": "images/logo32.png",
+    "48": "images/logo48.png",
+    "96": "images/logo96.png",
+    "128": "images/logo128.png"
+  }
+}

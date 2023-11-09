@@ -1,4 +1,4 @@
-name: test
+name: "Test"
 
 on:
   push:
@@ -23,8 +23,8 @@ jobs:
         with:
           node-version: 18
 
-      - name: "npm ci"
-        run: npm ci
-
-      - name: "eslint"
-        run: npm run lint
+      - name: "Lint"
+        run: |
+          npm install
+          npm run manifest:firefox
+          npm run lint

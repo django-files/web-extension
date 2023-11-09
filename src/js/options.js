@@ -1,35 +1,54 @@
-// Options JS
+// JS for options.html
 
+import { createContextMenus } from './exports.js'
+
+document.addEventListener('DOMContentLoaded', initOptions)
+
+document.getElementById('options-form').addEventListener('submit', saveOptions)
+
+/**
+ * Options Init Function
+ * @function initOptions
+ */
 async function initOptions() {
-    console.log('function: initOptions')
-    let auth = (await chrome.storage.local.get('auth'))['auth'] || {}
-    console.log('auth.url: ' + auth['url'])
-    console.log('auth.token: ' + auth['token'])
-    let url_input = document.getElementById('url')
-    let token_input = document.getElementById('token')
-    if (auth['url']) {
-        url_input.value = auth['url']
+    console.log('initOptions')
+    const { auth, options } = await chrome.storage.sync.get(['auth', 'options'])
+    console.log(auth, options)
+    const url_input = document.getElementById('url')
+    if (auth?.url) {
+        url_input.value = auth.url
     } else {
         url_input.placeholder = 'https://example.com'
+        url_input.focus()
     }
-    token_input.value = auth['token'] || ''
+    document.getElementById('token').value = auth?.token || ''
+    document.getElementById('contextMenu').checked = options.contextMenu
+    const commands = await chrome.commands.getAll()
+    document.getElementById('mainKey').textContent =
+        commands.find((x) => x.name === '_execute_action').shortcut || 'Not Set'
 }
 
+/**
+ * Save Options Submit Callback
+ * @function saveOptions
+ * @param {SubmitEvent} event
+ */
 async function saveOptions(event) {
+    console.log('saveOptions:', event)
     event.preventDefault()
-    console.log('function: saveOptions')
     let auth = {
         url: document.getElementById('url').value.replace(/\/$/, ''),
         token: document.getElementById('token').value,
     }
-    console.log('auth.url: ' + auth['url'])
-    console.log('auth.token: ' + auth['token'])
-    chrome.storage.local.set({
-        ['auth']: auth,
-    })
-    let url_input = document.getElementById('url')
-    url_input.value = auth['url']
+    console.log('auth:', auth)
+    let options = {}
+    options.contextMenu = document.getElementById('contextMenu').checked
+    if (options.contextMenu) {
+        createContextMenus()
+    } else {
+        chrome.contextMenus.removeAll()
+    }
+    console.log('options:', options)
+    await chrome.storage.sync.set({ auth, options })
+    document.getElementById('url').value = auth.url
 }
-
-document.addEventListener('DOMContentLoaded', initOptions)
-document.querySelector('#submit').addEventListener('click', saveOptions)
