@@ -59,6 +59,9 @@ async function postURL(endpoint, url) {
     console.log('Processing URL: ' + url)
     const { auth } = await chrome.storage.sync.get(['auth'])
     console.log('auth:', auth)
+    if (!auth?.url || !auth?.token) {
+        throw new Error('Missing URL or Token.')
+    }
 
     let headers = { Authorization: auth.token }
     let body = JSON.stringify({ url: url })

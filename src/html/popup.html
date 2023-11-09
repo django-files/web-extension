@@ -15,7 +15,17 @@
         <h2>Django Files Extension</h2>
     </div>
     <div class="d-grid g-2">
-        <a class="btn btn-primary my-1" role="button" target="_blank" href="../html/options.html">Open Options</a>
+        <div id="django-files-links" class="btn-group btn-group-sm" role="group" aria-label="Django Files Links" style="display: none;">
+            <button type="button" class="btn btn-outline-success" data-href="" data-location="/files/">
+                Files</button>
+            <button type="button" class="btn btn-outline-success" data-href="" data-location="/gallery/">
+                Gallery</button>
+<!--            <button type="button" class="btn btn-outline-primary" data-href="../html/options.html">-->
+<!--                Options</button>-->
+        </div>
+
+        <a class="btn btn-outline-primary btn-sm my-1" role="button" target="_blank" data-href="../html/options.html">Open Options</a>
+
     </div>
     <p class="mb-0">Recent Uploads:</p>
     <table id="recent" class="table table-striped table-sm mb-0 ">

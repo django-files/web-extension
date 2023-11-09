@@ -2,6 +2,32 @@
 
 document.addEventListener('DOMContentLoaded', initPopup)
 
+document.querySelectorAll('[data-href]').forEach((el) => {
+    el.addEventListener('click', popupLink)
+})
+
+/**
+ * Popup Links Callback
+ * because firefox needs us to call window.close() from the popup
+ * @function popupLink
+ * @param {MouseEvent} event
+ */
+async function popupLink(event) {
+    console.log('popupLink: event:', event)
+    const { auth } = await chrome.storage.sync.get(['auth'])
+    let url
+    if (event.target.dataset.location) {
+        url = auth?.url + event.target.dataset.location
+    } else if (event.target.dataset.href.startsWith('http')) {
+        url = event.target.dataset.href
+    } else {
+        url = chrome.runtime.getURL(event.target.dataset.href)
+    }
+    console.log(`url: ${url}`)
+    await chrome.tabs.create({ active: true, url })
+    window.close()
+}
+
 /**
  * Popup Init Function
  * TODO: Overhaul this function
@@ -14,6 +40,7 @@ async function initPopup() {
     if (!auth?.url || !auth?.token) {
         return displayError('Missing URL or Token.')
     }
+    document.getElementById('django-files-links').style.display = 'flex'
 
     let headers = { Authorization: auth.token }
     let options = { method: 'GET', headers: headers, cache: 'no-cache' }
