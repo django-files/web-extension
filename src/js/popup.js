@@ -13,7 +13,7 @@ document.querySelectorAll('[data-href]').forEach((el) => {
  * @param {MouseEvent} event
  */
 async function popupLink(event) {
-    console.log('popupLink: event:', event)
+    console.log('popupLink:', event)
     const { auth } = await chrome.storage.sync.get(['auth'])
     let url
     if (event.target.dataset.location) {
@@ -50,14 +50,13 @@ async function initPopup() {
         response = await fetch(auth.url + '/api/recent/', options)
         data = await response.json()
     } catch (error) {
-        console.log(error)
+        console.warn(error)
         return displayError(error.message)
     }
-    console.log(`response.status: ${response.status}`)
-    console.log(response, data)
+    console.log(`response.status: ${response.status}`, response, data)
 
     if (!response.ok) {
-        console.log('error: ' + data['error'])
+        console.warn('error: ' + data['error'])
         return displayError(data['error'])
     }
     if (data === undefined) {

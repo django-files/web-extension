@@ -13,8 +13,7 @@ document.getElementById('options-form').addEventListener('submit', saveOptions)
 async function initOptions() {
     console.log('initOptions')
     const { auth, options } = await chrome.storage.sync.get(['auth', 'options'])
-    console.log('auth:', auth)
-    console.log('options:', options)
+    console.log(auth, options)
     const url_input = document.getElementById('url')
     if (auth?.url) {
         url_input.value = auth.url
