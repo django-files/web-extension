@@ -1,7 +1,7 @@
 [![Chrome Web Store Users](https://img.shields.io/chrome-web-store/users/abpbiefojfkekhkjnpakpekkpeibnjej?logo=google&logoColor=white&label=google%20users)](https://chrome.google.com/webstore/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
 [![Mozilla Add-on Users](https://img.shields.io/amo/users/django-files?logo=mozilla&label=mozilla%20users)](https://addons.mozilla.org/addon/django-files)
 [![Manifest Version](https://img.shields.io/github/manifest-json/v/django-files/web-extension?filename=manifest.json&logo=json&label=manifest)](https://github.com/django-files/web-extension/blob/master/manifest.json)
-[![GitHub Release](https://img.shields.io/github/v/release/django-files/web-extension)](https://github.com/django-files/web-extension/releases/latest)
+[![GitHub Release Version](https://img.shields.io/github/v/release/django-files/web-extension?logo=github)](https://github.com/django-files/web-extension/releases/latest)
 [![Mozilla Add-on Version](https://img.shields.io/amo/v/django-files?label=firefox&logo=firefox)](https://addons.mozilla.org/addon/django-files)
 [![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/abpbiefojfkekhkjnpakpekkpeibnjej?label=chrome&logo=googlechrome)](https://chrome.google.com/webstore/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
 [![Build](https://github.com/django-files/web-extension/actions/workflows/build.yaml/badge.svg)](https://github.com/django-files/web-extension/actions/workflows/build.yaml)
