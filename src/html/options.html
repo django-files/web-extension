@@ -1,45 +1,55 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark" class="h-100">
 <head>
     <title>Django Files Options</title>
     <link rel="icon" href="../images/logo16.png" sizes="any">
     <link rel="stylesheet" type="text/css" href="../dist/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="../css/main.css">
     <link rel="stylesheet" type="text/css" href="../css/options.css">
-    <script type="text/javascript" src="../js/theme.js"></script>
 </head>
-<body>
+<body class="h-100">
 
-<video poster="../video/loop.jpg" id="bgvid" playsinline autoplay muted loop>
-    <source src="../video/loop.webm" type="video/webm">
+<video poster="../images/loop.jpg" id="bgvid" playsinline autoplay muted loop>
+    <source src="../images/loop.webm" type="video/webm">
 </video>
 
-<div class="container-fluid p-3">
-    <div class="row">
+<div class="container-fluid p-3 h-100">
+    <div class="d-flex align-items-center h-100">
         <div class="col-md-6 col-12 m-auto">
             <div class="card p-3" >
                 <div class="card-body">
                     <h1 class="text-center">Django Files Extension</h1>
-                    <img src="../images/logo.png" class="img-fluid m-auto d-block my-3" alt="Django Files" height="192" width="192">
-                    <form>
+                    <img src="../images/logo96.png" class="img-fluid m-auto d-block my-3" alt="Django Files" height="96" width="96">
+                    <table class="table table-sm table-borderless">
+                        <caption class="visually-hidden">Keyboard Shortcuts</caption>
+                        <thead class="visually-hidden"><tr><th>Description</th><th>Shortcut</th></tr></thead>
+                        <tbody><tr>
+                            <td class="bg-transparent">Show Popup Action</td>
+                            <td class="bg-transparent text-end"><kbd id="mainKey">Unknown</kbd></td>
+                        </tr></tbody>
+                    </table>
+                    <form id="options-form">
                         <div class="mb-3">
                             <label for="url" class="form-label">Django Files URL</label>
-                            <input type="text" class="form-control" id="url" aria-describedby="urlHelp">
+                            <input type="text" class="form-control" id="url" aria-describedby="urlHelp" autocomplete="off">
                             <div id="urlHelp" class="form-text">The Full URL to your Django Files server.</div>
                         </div>
                         <div class="mb-3">
                             <label for="token" class="form-label">Auth Token</label>
-                            <input type="password" class="form-control" id="token" aria-describedby="tokenHelp">
+                            <input type="password" class="form-control" id="token" aria-describedby="tokenHelp" autocomplete="off">
                             <div id="tokenHelp" class="form-text">Token From Django Files Settings.</div>
                         </div>
-                        <button id="submit" type="submit" class="btn btn-success">Save Settings</button>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="contextMenu">
+                            <label class="form-check-label" for="contextMenu" aria-describedby="contextMenuHelp">Enable Right Click Menu</label>
+                        </div>
+                        <button id="submit" type="submit" class="btn btn-outline-success w-100">Save Settings</button>
                     </form>
                 </div>
                 <div class="text-center">
-                    <a class="icon-link icon-link-hover" style="--bs-link-hover-color-rgb: 25, 135, 84;" target="_blank"
-                       href="https://github.com/django-files/chrome-extension#table-of-contents">Get Help</a>
+                    <a class="link-body-emphasis text-decoration-none" target="_blank"
+                       href="https://github.com/django-files/chrome-extension#readme">Get Help</a>
                     |
-                    <a class="icon-link icon-link-hover" style="--bs-link-hover-color-rgb: 25, 135, 84;" target="_blank"
+                    <a class="link-body-emphasis text-decoration-none" target="_blank"
                        href="https://github.com/django-files/chrome-extension">View Source</a>
                 </div>
             </div>
@@ -51,8 +61,7 @@
 <script type="text/javascript" src="../dist/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="../dist/bootstrap/bootstrap.bundle.min.js"></script>
 <script type="text/javascript" src="../dist/clipboard/clipboard.min.js"></script>
-<script type="text/javascript" src="../js/main.js"></script>
-<script type="text/javascript" src="../js/options.js"></script>
+<script type="module" src="../js/options.js"></script>
 
 </body>
 </html>
