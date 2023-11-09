@@ -26,4 +26,5 @@ jobs:
       - name: "Lint"
         run: |
           npm install
+          npm run manifest:firefox
           npm run lint
