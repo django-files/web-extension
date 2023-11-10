@@ -77,6 +77,6 @@ function showToast(message, bsClass = 'success') {
     toastEl.find('.toast-body').text(message)
     toastEl.addClass('text-bg-' + bsClass)
     $('#toast-container').append(toastEl)
-    const toast = new bootstrap.Toast(toastEl)
+    const toast = new bootstrap.Toast(toastEl) // eslint-disable-line
     toast.show()
 }

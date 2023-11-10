@@ -50,7 +50,7 @@ async function initPopup() {
     }
 
     updateTable(data)
-    const clipboard = new ClipboardJS('.clip')
+    const clipboard = new ClipboardJS('.clip') // eslint-disable-line
     document.querySelectorAll('[data-href]').forEach((el) => {
         el.addEventListener('click', popupLink)
     })
