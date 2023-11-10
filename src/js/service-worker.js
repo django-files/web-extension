@@ -18,7 +18,7 @@ chrome.notifications.onClicked.addListener((notificationId) => {
 export async function onInstalled() {
     console.log('onInstalled')
     let { options } = await chrome.storage.sync.get(['options'])
-    options = options || { contextMenu: true }
+    options = options || { contextMenu: true, recentFiles: '10' }
     console.log('options:', options)
     await chrome.storage.sync.set({ options })
     if (options.contextMenu) {
@@ -34,7 +34,7 @@ export async function onInstalled() {
 async function contextMenuClick(ctx) {
     console.log('contextMenuClick:', ctx)
     console.log(`ctx.menuItemId: ${ctx.menuItemId}`)
-    if (ctx.menuItemId === 'upload') {
+    if (ctx.menuItemId.startsWith('upload')) {
         if (ctx.srcUrl) {
             let mediaType =
                 ctx.menuItemId.charAt(0).toUpperCase() + ctx.menuItemId.slice(1)
@@ -101,8 +101,8 @@ async function processRemote(endpoint, url, message) {
  * @function sendNotification
  * @param {String} title
  * @param {String} text
- * @param {String} id
- * @param {Number} timeout
+ * @param {String} id - Optional
+ * @param {Number} timeout - Optional
  */
 async function sendNotification(title, text, id = '', timeout = 10) {
     console.log(`sendNotification: ${id || 'randomID'}: ${title} - ${text}`)
