@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "name": "Django Files",
   "description": "Django Files Web Extension",
   "homepage_url": "https://github.com/django-files/web-extension",
