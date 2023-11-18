@@ -21,6 +21,8 @@ async function initOptions() {
         url_input.placeholder = 'https://example.com'
         url_input.focus()
     }
+    document.getElementById('version').textContent =
+        chrome.runtime.getManifest().version
     document.getElementById('token').value = auth?.token || ''
     document.getElementById('contextMenu').checked = options.contextMenu
     document.getElementById('showUpdate').checked = options.showUpdate
