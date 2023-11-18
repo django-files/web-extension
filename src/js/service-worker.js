@@ -3,7 +3,6 @@
 import { createContextMenus } from './exports.js'
 
 chrome.runtime.onInstalled.addListener(onInstalled)
-
 chrome.contextMenus.onClicked.addListener(contextMenuClick)
 
 chrome.notifications.onClicked.addListener((notificationId) => {
@@ -127,7 +126,7 @@ async function sendNotification(title, text, id = '', timeout = 10) {
     console.log(`sendNotification: ${id || 'randomID'}: ${title} - ${text}`)
     const options = {
         type: 'basic',
-        iconUrl: chrome.runtime.getURL('images/logo128.png'),
+        iconUrl: chrome.runtime.getURL('media/logo96.png'),
         title: title,
         message: text,
     }
