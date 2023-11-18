@@ -50,6 +50,7 @@ async function initPopup() {
     }
 
     updateTable(data)
+
     const clipboard = new ClipboardJS('.clip') // eslint-disable-line
     document.querySelectorAll('[data-href]').forEach((el) => {
         el.addEventListener('click', popupLink)
@@ -66,12 +67,13 @@ async function popupLink(event) {
     console.log('popupLink:', event)
     const { auth } = await chrome.storage.sync.get(['auth'])
     let url
-    if (event.target.dataset.location) {
-        url = auth?.url + event.target.dataset.location
-    } else if (event.target.dataset.href.startsWith('http')) {
-        url = event.target.dataset.href
+    const anchor = event.target.closest('a')
+    if (anchor?.dataset?.location) {
+        url = auth?.url + anchor.dataset.location
+    } else if (anchor?.dataset?.href.startsWith('http')) {
+        url = anchor.dataset.href
     } else {
-        url = chrome.runtime.getURL(event.target.dataset.href)
+        url = chrome.runtime.getURL(anchor.dataset.href)
     }
     console.log(`url: ${url}`)
     await chrome.tabs.create({ active: true, url })
