@@ -2,23 +2,28 @@
 <html lang="en" data-bs-theme="dark" class="h-100">
 <head>
     <title>Django Files Options</title>
-    <link rel="icon" href="../images/logo16.png" sizes="any">
+    <link rel="icon" href="../media/logo16.png" sizes="any">
     <link rel="stylesheet" type="text/css" href="../dist/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../dist/fontawesome/js/all.min.js">
     <link rel="stylesheet" type="text/css" href="../css/options.css">
 </head>
 <body class="h-100">
 
-<video poster="../images/loop.jpg" id="bgvid" playsinline autoplay muted loop>
-    <source src="../images/loop.webm" type="video/webm">
+<video poster="../media/loop.jpg" id="bgvid" playsinline autoplay muted loop>
+    <source src="../media/loop.webm" type="video/webm">
 </video>
 
 <div class="container-fluid p-2 h-100">
     <div class="d-flex align-items-center h-100">
-        <div class="col-md-6 col-12 m-auto">
+        <div class="col-xl-6 col-md-8 col-12 m-auto">
             <div class="card p-2 mb-3" >
-                <h1 class="text-center">Django Files Extension</h1>
-                <img src="../images/logo96.png" class="img-fluid m-auto d-block my-1" alt="Django Files" height="96" width="96">
+
+                <div class="justify-content-center align-items-center d-flex">
+                    <img src="../media/logo48.png" class="img-fluid float-start me-2" alt="Link Extractor" height="48" width="48">
+                    <h1 class="align-middle">Django Files Extension</h1>
+                </div>
+                <div class="clearfix"></div>
+                <p class="text-center lead mb-0">v<span id="version"></span></p>
                 <div class="card-body">
                     <table class="table table-sm table-borderless">
                         <caption class="visually-hidden">Keyboard Shortcuts</caption>
@@ -47,6 +52,10 @@
                         <div class="form-check form-switch mb-2">
                             <input class="form-check-input" type="checkbox" role="switch" id="contextMenu">
                             <label class="form-check-label" for="contextMenu" aria-describedby="contextMenuHelp">Enable Right Click Menu</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="showUpdate">
+                            <label class="form-check-label" for="showUpdate" aria-describedby="showUpdateHelp">Show Release Notes on Update</label>
                         </div>
                         <button id="submit" type="submit" class="btn btn-outline-success w-100">
                             Save Options <i class="fa-regular fa-floppy-disk ms-2"></i></button>

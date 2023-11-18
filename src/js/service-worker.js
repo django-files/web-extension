@@ -3,7 +3,6 @@
 import { createContextMenus } from './exports.js'
 
 chrome.runtime.onInstalled.addListener(onInstalled)
-
 chrome.contextMenus.onClicked.addListener(contextMenuClick)
 
 chrome.notifications.onClicked.addListener((notificationId) => {
@@ -14,16 +13,35 @@ chrome.notifications.onClicked.addListener((notificationId) => {
 /**
  * Init Context Menus and Options
  * @function onInstalled
+ * @param {InstalledDetails} details
  */
-export async function onInstalled() {
-    console.log('onInstalled')
+async function onInstalled(details) {
+    console.log('onInstalled:', details)
     let { options } = await chrome.storage.sync.get(['options'])
-    options = options || { contextMenu: true, recentFiles: '10' }
+    options = options || {
+        contextMenu: true,
+        recentFiles: '10',
+        showUpdate: false,
+    }
     console.log('options:', options)
     await chrome.storage.sync.set({ options })
     if (options.contextMenu) {
         createContextMenus()
     }
+    if (details.reason === 'install') {
+        const url = chrome.runtime.getURL('/html/options.html')
+        await chrome.tabs.create({ active: true, url })
+    } else if (options.showUpdate && details.reason === 'update') {
+        const manifest = chrome.runtime.getManifest()
+        if (manifest.version !== details.previousVersion) {
+            const url = `https://github.com/django-files/web-extension/releases/tag/${manifest.version}`
+            console.log(`url: ${url}`)
+            await chrome.tabs.create({ active: true, url })
+        }
+    }
+    chrome.runtime.setUninstallURL(
+        'https://github.com/django-files/web-extension/issues'
+    )
 }
 
 /**
@@ -108,7 +126,7 @@ async function sendNotification(title, text, id = '', timeout = 10) {
     console.log(`sendNotification: ${id || 'randomID'}: ${title} - ${text}`)
     const options = {
         type: 'basic',
-        iconUrl: chrome.runtime.getURL('images/logo128.png'),
+        iconUrl: chrome.runtime.getURL('media/logo96.png'),
         title: title,
         message: text,
     }

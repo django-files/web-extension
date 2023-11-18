@@ -3,7 +3,6 @@
 import { createContextMenus } from './exports.js'
 
 document.addEventListener('DOMContentLoaded', initOptions)
-
 document.getElementById('options-form').addEventListener('submit', saveOptions)
 
 /**
@@ -21,12 +20,15 @@ async function initOptions() {
         url_input.placeholder = 'https://example.com'
         url_input.focus()
     }
+    document.getElementById('version').textContent =
+        chrome.runtime.getManifest().version
     document.getElementById('token').value = auth?.token || ''
     document.getElementById('contextMenu').checked = options.contextMenu
+    document.getElementById('showUpdate').checked = options.showUpdate
     const commands = await chrome.commands.getAll()
     document.getElementById('mainKey').textContent =
         commands.find((x) => x.name === '_execute_action').shortcut || 'Not Set'
-    document.getElementById('recentFiles').value = options?.recentFiles || '10'
+    document.getElementById('recentFiles').value = options.recentFiles || '10'
 }
 
 /**
@@ -45,6 +47,7 @@ async function saveOptions(event) {
     let options = {}
     options.recentFiles = document.getElementById('recentFiles').value
     options.contextMenu = document.getElementById('contextMenu').checked
+    options.showUpdate = document.getElementById('showUpdate').checked
     if (options.contextMenu) {
         chrome.contextMenus.removeAll()
         createContextMenus()
