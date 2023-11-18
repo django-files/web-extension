@@ -3,7 +3,6 @@
 import { createContextMenus } from './exports.js'
 
 document.addEventListener('DOMContentLoaded', initOptions)
-
 document.getElementById('options-form').addEventListener('submit', saveOptions)
 
 /**
