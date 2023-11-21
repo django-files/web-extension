@@ -10,6 +10,8 @@ chrome.notifications.onClicked.addListener((notificationId) => {
     chrome.notifications.clear(notificationId)
 })
 
+const ghUrl = 'https://github.com/django-files/web-extension'
+
 /**
  * Init Context Menus and Options
  * @function onInstalled
@@ -17,14 +19,16 @@ chrome.notifications.onClicked.addListener((notificationId) => {
  */
 async function onInstalled(details) {
     console.log('onInstalled:', details)
-    let { options } = await chrome.storage.sync.get(['options'])
-    options = options || {
+    const defaultOptions = {
         contextMenu: true,
         recentFiles: '10',
-        showUpdate: false,
+        showUpdate: true,
     }
+    let { options } = await chrome.storage.sync.get(['options'])
+    options = setDefaults(options, defaultOptions)
     console.log('options:', options)
     await chrome.storage.sync.set({ options })
+
     if (options.contextMenu) {
         createContextMenus()
     }
@@ -34,14 +38,12 @@ async function onInstalled(details) {
     } else if (options.showUpdate && details.reason === 'update') {
         const manifest = chrome.runtime.getManifest()
         if (manifest.version !== details.previousVersion) {
-            const url = `https://github.com/django-files/web-extension/releases/tag/${manifest.version}`
+            const url = `${ghUrl}/releases/tag/${manifest.version}`
             console.log(`url: ${url}`)
             await chrome.tabs.create({ active: true, url })
         }
     }
-    chrome.runtime.setUninstallURL(
-        'https://github.com/django-files/web-extension/issues'
-    )
+    chrome.runtime.setUninstallURL(`${ghUrl}/issues`)
 }
 
 /**
@@ -159,4 +161,23 @@ async function clipboardWrite(value) {
             data: value,
         })
     }
+}
+
+/**
+ * Set Default Options
+ * @function setDefaults
+ * @param {Object} options
+ * @param {Object} defaultOptions
+ * @return {Object}
+ */
+function setDefaults(options, defaultOptions) {
+    options = options || {}
+    for (const [key, value] of Object.entries(defaultOptions)) {
+        // console.log(`${key}: default: ${value} current: ${options[key]}`)
+        if (options[key] === undefined) {
+            options[key] = value
+            console.log(`Set ${options[key]} to ${value}`)
+        }
+    }
+    return options
 }
