@@ -38,6 +38,8 @@ async function initPopup() {
     }
     console.log(`response.status: ${response.status}`, response, data)
 
+    document.getElementById('loading-spinner').classList.add('visually-hidden')
+
     if (!response.ok) {
         console.warn('error: ' + data['error'])
         return displayError(data['error'])
