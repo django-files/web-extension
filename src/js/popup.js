@@ -19,6 +19,13 @@ async function initPopup() {
         return displayError('Missing URL or Token.')
     }
     document.getElementById('django-files-links').style.display = 'flex'
+    console.log('options.recentFiles:', options.recentFiles)
+    if (options.recentFiles === '0') {
+        document
+            .getElementById('loading-spinner')
+            .classList.add('visually-hidden')
+        return console.log('Recent Files Disabled. Enable in Options.')
+    }
 
     let opts = {
         method: 'GET',
@@ -119,10 +126,29 @@ function updateTable(data) {
         copyBtn.setAttribute('role', 'button')
         copyBtn.classList.add('clip')
         copyBtn.dataset.clipboardText = value
-        copyBtn.innerHTML = '<i class="fa-regular fa-clipboard text-white"></i>'
+        copyBtn.innerHTML = '<i class="fa-regular fa-clipboard"></i>'
+        copyBtn.classList.add('link-body-emphasis')
+        copyBtn.onclick = clipClick
         const cell3 = row.insertCell()
         cell3.appendChild(copyBtn)
     })
+}
+
+/**
+ * Clipboard Click Callback
+ * @function clipClick
+ * @param {MouseEvent} event
+ */
+function clipClick(event) {
+    console.log('clipClick:', event)
+    const element = event.target.closest('a')
+    console.log('element:', element)
+    element.classList.add('link-success')
+    element.classList.remove('link-body-emphasis')
+    setTimeout(() => {
+        element.classList.add('link-body-emphasis')
+        element.classList.remove('link-success')
+    }, 500)
 }
 
 /**
