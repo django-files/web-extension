@@ -33,8 +33,7 @@ async function onInstalled(details) {
         createContextMenus()
     }
     if (details.reason === 'install') {
-        const url = chrome.runtime.getURL('/html/options.html')
-        await chrome.tabs.create({ active: true, url })
+        chrome.runtime.openOptionsPage()
     } else if (options.showUpdate && details.reason === 'update') {
         const manifest = chrome.runtime.getManifest()
         if (manifest.version !== details.previousVersion) {
@@ -68,8 +67,7 @@ async function contextMenuClick(ctx) {
             await processRemote('shorten', ctx.linkUrl, 'Short Created')
         }
     } else if (ctx.menuItemId === 'options') {
-        const url = chrome.runtime.getURL('/html/options.html')
-        await chrome.tabs.create({ active: true, url })
+        chrome.runtime.openOptionsPage()
     } else {
         console.warn('Action not handled.')
     }

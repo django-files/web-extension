@@ -3,7 +3,7 @@
 document.addEventListener('DOMContentLoaded', initPopup)
 
 document.querySelectorAll('[data-href]').forEach((el) => {
-    el.addEventListener('click', popupLink)
+    el.addEventListener('click', popLinks)
 })
 
 /**
@@ -62,31 +62,37 @@ async function initPopup() {
 
     const clipboard = new ClipboardJS('.clip') // eslint-disable-line
     document.querySelectorAll('[data-href]').forEach((el) => {
-        el.addEventListener('click', popupLink)
+        el.addEventListener('click', popLinks)
     })
 }
 
 /**
- * Popup Links Callback
- * because firefox needs us to call window.close() from the popup
- * @function popupLink
+ * Popup Links Click Callback
+ * Firefox requires a call to window.close()
+ * @function popLinks
  * @param {MouseEvent} event
  */
-async function popupLink(event) {
-    console.log('popupLink:', event)
-    const { auth } = await chrome.storage.sync.get(['auth'])
-    let url
+async function popLinks(event) {
+    console.log('popLinks:', event)
+    event.preventDefault()
     const anchor = event.target.closest('a')
+    let url
     if (anchor?.dataset?.location) {
+        const { auth } = await chrome.storage.sync.get(['auth'])
         url = auth?.url + anchor.dataset.location
-    } else if (anchor?.dataset?.href.startsWith('http')) {
+    } else if (anchor.dataset.href.startsWith('http')) {
         url = anchor.dataset.href
+    } else if (anchor.dataset.href === 'homepage') {
+        url = chrome.runtime.getManifest().homepage_url
+    } else if (anchor.dataset.href === 'options') {
+        chrome.runtime.openOptionsPage()
+        return window.close()
     } else {
         url = chrome.runtime.getURL(anchor.dataset.href)
     }
     console.log(`url: ${url}`)
     await chrome.tabs.create({ active: true, url })
-    window.close()
+    return window.close()
 }
 
 /**
