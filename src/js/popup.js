@@ -2,9 +2,8 @@
 
 document.addEventListener('DOMContentLoaded', initPopup)
 
-document.querySelectorAll('[data-href]').forEach((el) => {
-    el.addEventListener('click', popLinks)
-})
+const popupLinks = document.querySelectorAll('[data-href]')
+popupLinks.forEach((el) => el.addEventListener('click', popLinks))
 
 /**
  * Popup Init Function
@@ -64,6 +63,7 @@ async function initPopup() {
     updateTable(data)
 
     const clipboard = new ClipboardJS('.clip') // eslint-disable-line
+    // Re-Initialize data-href after updateTable
     document.querySelectorAll('[data-href]').forEach((el) => {
         el.addEventListener('click', popLinks)
     })
@@ -95,7 +95,7 @@ async function popLinks(event) {
     }
     console.log('url:', url)
     if (!url) {
-        return console.warn('No dataset.href for anchor:', anchor)
+        return console.error('No dataset.href for anchor:', anchor)
     }
     await chrome.tabs.create({ active: true, url })
     return window.close()
