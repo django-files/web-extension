@@ -2,9 +2,8 @@
 
 document.addEventListener('DOMContentLoaded', initPopup)
 
-document.querySelectorAll('[data-href]').forEach((el) => {
-    el.addEventListener('click', popupLink)
-})
+const popupLinks = document.querySelectorAll('[data-href]')
+popupLinks.forEach((el) => el.addEventListener('click', popLinks))
 
 /**
  * Popup Init Function
@@ -19,6 +18,16 @@ async function initPopup() {
         return displayError('Missing URL or Token.')
     }
     document.getElementById('django-files-links').style.display = 'flex'
+    console.log('options.recentFiles:', options.recentFiles)
+    if (options.recentFiles === '0') {
+        document
+            .getElementById('loading-spinner')
+            .classList.add('visually-hidden')
+        document
+            .getElementById('recent-uploads')
+            .classList.add('visually-hidden')
+        return console.log('Recent Files Disabled. Enable in Options.')
+    }
 
     let opts = {
         method: 'GET',
@@ -38,6 +47,8 @@ async function initPopup() {
     }
     console.log(`response.status: ${response.status}`, response, data)
 
+    document.getElementById('loading-spinner').classList.add('visually-hidden')
+
     if (!response.ok) {
         console.warn('error: ' + data['error'])
         return displayError(data['error'])
@@ -52,32 +63,42 @@ async function initPopup() {
     updateTable(data)
 
     const clipboard = new ClipboardJS('.clip') // eslint-disable-line
+    // Re-Initialize data-href after updateTable
     document.querySelectorAll('[data-href]').forEach((el) => {
-        el.addEventListener('click', popupLink)
+        el.addEventListener('click', popLinks)
     })
 }
 
 /**
- * Popup Links Callback
- * because firefox needs us to call window.close() from the popup
- * @function popupLink
+ * Popup Links Click Callback
+ * Firefox requires a call to window.close()
+ * @function popLinks
  * @param {MouseEvent} event
  */
-async function popupLink(event) {
-    console.log('popupLink:', event)
-    const { auth } = await chrome.storage.sync.get(['auth'])
-    let url
+async function popLinks(event) {
+    console.log('popLinks:', event)
+    event.preventDefault()
     const anchor = event.target.closest('a')
+    let url
     if (anchor?.dataset?.location) {
+        const { auth } = await chrome.storage.sync.get(['auth'])
         url = auth?.url + anchor.dataset.location
-    } else if (anchor?.dataset?.href.startsWith('http')) {
+    } else if (anchor.dataset.href.startsWith('http')) {
         url = anchor.dataset.href
-    } else {
+    } else if (anchor.dataset.href === 'homepage') {
+        url = chrome.runtime.getManifest().homepage_url
+    } else if (anchor.dataset.href === 'options') {
+        chrome.runtime.openOptionsPage()
+        return window.close()
+    } else if (anchor?.dataset?.href) {
         url = chrome.runtime.getURL(anchor.dataset.href)
     }
-    console.log(`url: ${url}`)
+    console.log('url:', url)
+    if (!url) {
+        return console.error('No dataset.href for anchor:', anchor)
+    }
     await chrome.tabs.create({ active: true, url })
-    window.close()
+    return window.close()
 }
 
 /**
@@ -117,10 +138,29 @@ function updateTable(data) {
         copyBtn.setAttribute('role', 'button')
         copyBtn.classList.add('clip')
         copyBtn.dataset.clipboardText = value
-        copyBtn.innerHTML = '<i class="fa-regular fa-clipboard text-white"></i>'
+        copyBtn.innerHTML = '<i class="fa-regular fa-clipboard"></i>'
+        copyBtn.classList.add('link-body-emphasis')
+        copyBtn.onclick = clipClick
         const cell3 = row.insertCell()
         cell3.appendChild(copyBtn)
     })
+}
+
+/**
+ * Clipboard Click Callback
+ * @function clipClick
+ * @param {MouseEvent} event
+ */
+function clipClick(event) {
+    console.log('clipClick:', event)
+    const element = event.target.closest('a')
+    console.log('element:', element)
+    element.classList.add('link-success')
+    element.classList.remove('link-body-emphasis')
+    setTimeout(() => {
+        element.classList.add('link-body-emphasis')
+        element.classList.remove('link-success')
+    }, 500)
 }
 
 /**
@@ -129,6 +169,7 @@ function updateTable(data) {
  * @param {String} message
  */
 function displayError(message) {
+    document.getElementById('loading-spinner').classList.add('visually-hidden')
     let div = document.getElementById('error-alert')
     div.innerHTML = message
     div.style.display = 'block'

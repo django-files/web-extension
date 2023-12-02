@@ -33,8 +33,7 @@ async function onInstalled(details) {
         createContextMenus()
     }
     if (details.reason === 'install') {
-        const url = chrome.runtime.getURL('/html/options.html')
-        await chrome.tabs.create({ active: true, url })
+        chrome.runtime.openOptionsPage()
     } else if (options.showUpdate && details.reason === 'update') {
         const manifest = chrome.runtime.getManifest()
         if (manifest.version !== details.previousVersion) {
@@ -68,8 +67,7 @@ async function contextMenuClick(ctx) {
             await processRemote('shorten', ctx.linkUrl, 'Short Created')
         }
     } else if (ctx.menuItemId === 'options') {
-        const url = chrome.runtime.getURL('/html/options.html')
-        await chrome.tabs.create({ active: true, url })
+        chrome.runtime.openOptionsPage()
     } else {
         console.warn('Action not handled.')
     }
@@ -102,17 +100,27 @@ async function processRemote(endpoint, url, message) {
     try {
         response = await postURL(endpoint, url)
     } catch (error) {
-        await sendNotification('Fetch Error', 'Error: ' + error.message)
+        console.log('error:', error)
+        return await sendNotification('Fetch Error', 'Error: ' + error.message)
     }
-    const data = await response.json()
-    console.log(data)
+    console.log('response:', response)
     if (response.ok) {
-        console.log(data['url'])
-        await clipboardWrite(data['url'])
-        await sendNotification(message, data['url'])
+        const data = await response.json()
+        console.log('data:', data)
+        await clipboardWrite(data.url)
+        await sendNotification(message, data.url)
     } else {
-        console.log(data['error'])
-        await sendNotification('Processing Error', 'Error: ' + data['error'])
+        try {
+            const data = await response.json()
+            console.log('data:', data)
+            await sendNotification('Processing Error', `Error: ${data.error}`)
+        } catch (error) {
+            console.log('error:', error)
+            await sendNotification(
+                'Processing Error',
+                `Error: Response Status: ${response.status}`
+            )
+        }
     }
 }
 
