@@ -90,10 +90,13 @@ async function popLinks(event) {
     } else if (anchor.dataset.href === 'options') {
         chrome.runtime.openOptionsPage()
         return window.close()
-    } else {
+    } else if (anchor?.dataset?.href) {
         url = chrome.runtime.getURL(anchor.dataset.href)
     }
-    console.log(`url: ${url}`)
+    console.log('url:', url)
+    if (!url) {
+        return console.warn('No dataset.href for anchor:', anchor)
+    }
     await chrome.tabs.create({ active: true, url })
     return window.close()
 }
