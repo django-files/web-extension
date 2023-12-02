@@ -24,6 +24,9 @@ async function initPopup() {
         document
             .getElementById('loading-spinner')
             .classList.add('visually-hidden')
+        document
+            .getElementById('recent-uploads')
+            .classList.add('visually-hidden')
         return console.log('Recent Files Disabled. Enable in Options.')
     }
 
@@ -163,6 +166,7 @@ function clipClick(event) {
  * @param {String} message
  */
 function displayError(message) {
+    document.getElementById('loading-spinner').classList.add('visually-hidden')
     let div = document.getElementById('error-alert')
     div.innerHTML = message
     div.style.display = 'block'
