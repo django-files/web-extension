@@ -1,7 +1,5 @@
 // JS for options.html
 
-import { createContextMenus } from './exports.js'
-
 document.addEventListener('DOMContentLoaded', initOptions)
 document.getElementById('options-form').addEventListener('submit', saveOptions)
 
@@ -48,12 +46,6 @@ async function saveOptions(event) {
     options.recentFiles = document.getElementById('recentFiles').value
     options.contextMenu = document.getElementById('contextMenu').checked
     options.showUpdate = document.getElementById('showUpdate').checked
-    if (options.contextMenu) {
-        chrome.contextMenus.removeAll()
-        createContextMenus()
-    } else {
-        chrome.contextMenus.removeAll()
-    }
     console.log('options:', options)
     await chrome.storage.sync.set({ auth, options })
     document.getElementById('url').value = auth.url
