@@ -1,4 +1,4 @@
-// Background Service Worker JS
+// JS Background Service Worker
 
 chrome.runtime.onInstalled.addListener(onInstalled)
 chrome.contextMenus.onClicked.addListener(contextMenuClick)

@@ -1,21 +1,23 @@
-// Content Script JS inject.js
-
-console.log('inject.js')
+// JS Content Script
 
 const openSidebarBtn = document.getElementById('openSidebar')
 const closeSidebarBtn = document.getElementById('closeSidebar')
 
-chrome.storage.sync.get(['options']).then((result) => {
-    console.log('result?.options:', result?.options)
-    if (result?.options?.previewSidebar) {
-        console.log('openSidebar.click')
-        openSidebarBtn.click()
-    } else {
-        console.log('closeSidebar.click')
-        closeSidebarBtn.click()
+chrome.storage.sync.get(['auth', 'options']).then((result) => {
+    // Check of Django Files Site
+    if (window.location.origin !== result?.auth?.url) {
+        return
     }
-    openSidebarBtn.addEventListener('click', toggleSidebar)
-    closeSidebarBtn.addEventListener('click', toggleSidebar)
+    // Check if on Preview Page
+    if (openSidebarBtn) {
+        if (result?.options?.previewSidebar) {
+            openSidebarBtn.click()
+        } else {
+            closeSidebarBtn.click()
+        }
+        openSidebarBtn.addEventListener('click', toggleSidebar)
+        closeSidebarBtn.addEventListener('click', toggleSidebar)
+    }
 })
 
 /**
@@ -25,8 +27,7 @@ chrome.storage.sync.get(['options']).then((result) => {
  */
 function toggleSidebar(event) {
     console.log('toggleSidebar:', event)
-    const close = event.target.id === 'closeSidebar'
-    saveOption(close)
+    saveOption(event.target.id === 'closeSidebar')
 }
 
 /**
@@ -36,12 +37,12 @@ function toggleSidebar(event) {
  */
 function saveOption(closeSidebar) {
     chrome.storage.sync.get(['options']).then((result) => {
-        console.log('result?.options:', result?.options)
         if (result?.options) {
             result.options.previewSidebar = !closeSidebar
             result.options.previewSidebar = browser.storage.sync.set({
                 options: result.options,
             })
+            console.log('result?.options:', result?.options)
         }
     })
 }
