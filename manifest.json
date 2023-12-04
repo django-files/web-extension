@@ -13,10 +13,20 @@
       "description": "Show Popup"
     }
   },
-  "permissions": ["clipboardWrite", "contextMenus", "notifications", "storage"],
-  "background": {
-    "type": "module"
-  },
+  "permissions": [
+    "clipboardWrite",
+    "contextMenus",
+    "notifications",
+    "scripting",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["js/inject.js"]
+    }
+  ],
+  "background": {},
   "options_ui": {
     "page": "html/options.html",
     "open_in_tab": true

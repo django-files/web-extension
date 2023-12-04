@@ -2,6 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', initOptions)
 document.getElementById('options-form').addEventListener('submit', saveOptions)
+document.getElementById('submit').addEventListener('click', saveOptions)
 
 /**
  * Options Init Function
@@ -21,12 +22,13 @@ async function initOptions() {
     document.getElementById('version').textContent =
         chrome.runtime.getManifest().version
     document.getElementById('token').value = auth?.token || ''
+    document.getElementById('recentFiles').value = options.recentFiles || '10'
     document.getElementById('contextMenu').checked = options.contextMenu
     document.getElementById('showUpdate').checked = options.showUpdate
+    document.getElementById('previewSidebar').checked = options.previewSidebar
     const commands = await chrome.commands.getAll()
     document.getElementById('mainKey').textContent =
         commands.find((x) => x.name === '_execute_action').shortcut || 'Not Set'
-    document.getElementById('recentFiles').value = options.recentFiles || '10'
 }
 
 /**
@@ -42,10 +44,20 @@ async function saveOptions(event) {
         token: document.getElementById('token').value,
     }
     console.log('auth:', auth)
+    chrome.permissions.request({
+        origins: [auth.url + '/*'],
+    })
+    const hasPerms = await chrome.permissions.contains({
+        origins: [auth.url + '/*'],
+    })
+    if (!hasPerms) {
+        console.log('Requesting Permissions...')
+    }
     let options = {}
     options.recentFiles = document.getElementById('recentFiles').value
     options.contextMenu = document.getElementById('contextMenu').checked
     options.showUpdate = document.getElementById('showUpdate').checked
+    options.previewSidebar = document.getElementById('previewSidebar').checked
     console.log('options:', options)
     await chrome.storage.sync.set({ auth, options })
     document.getElementById('url').value = auth.url

@@ -3,5 +3,6 @@
     "service_worker": "js/service-worker.js"
   },
   "permissions": ["offscreen"],
+  "optional_host_permissions": ["https://*/*", "http://*/*"],
   "minimum_chrome_version": "109"
 }
