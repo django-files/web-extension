@@ -2,47 +2,10 @@
 
 document.addEventListener('DOMContentLoaded', initPopup)
 
-chrome.runtime.onMessage.addListener(onMessage)
-
 const popupLinks = document.querySelectorAll('[data-href]')
 popupLinks.forEach((el) => el.addEventListener('click', popLinks))
 
-async function checkSite() {
-    const [tab] = await chrome.tabs.query({ currentWindow: true, active: true })
-    await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ['/js/check-site.js'],
-    })
-}
-
-/**
- * On Command Callback
- * @function onMessage
- * @param {Object} message
- * @param {MessageSender} sender
- * @param {Function} sendResponse
- */
-function onMessage(message, sender, sendResponse) {
-    console.log('message, sender, sendResponse:', message, sender, sendResponse)
-    console.log(`onMessage: message.action: ${message.action}`)
-    if (message.action === 'auth') {
-        console.log(`url: ${message.siteUrl}`)
-        console.log(`auth: ${message.authToken}`)
-        if (message.siteUrl && message.authToken) {
-            sendResponse('success')
-            const error = document.getElementById('error-alert')
-            console.log('error:', error)
-            error.classList.add('visually-hidden')
-            console.log(1)
-            const a = document.createElement('a')
-            a.classList.add('btn', 'btn-primary')
-            a.textContent = 'Test'
-            const div = document.getElementById('popup-buttons')
-            div.appendChild(a)
-            console.log(2)
-        }
-    }
-}
+chrome.runtime.onMessage.addListener(onMessage)
 
 /**
  * Popup Init Function
@@ -54,11 +17,16 @@ async function initPopup() {
     const { auth, options } = await chrome.storage.sync.get(['auth', 'options'])
     console.log('auth:', auth)
     if (!auth?.url || !auth?.token) {
-        // TODO: add custom error message
-        displayError(
-            '<strong>Missing URL or Token!</strong><br>Navigate to your Django Files site, login, and click this popup again...'
-        )
-        await checkSite()
+        displayError('Missing URL or Token.')
+        const [tab] = await chrome.tabs.query({
+            currentWindow: true,
+            active: true,
+        })
+        console.log('tab:', tab)
+        await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['/js/auth.js'],
+        })
         return
     }
 
@@ -143,6 +111,39 @@ async function popLinks(event) {
     }
     await chrome.tabs.create({ active: true, url })
     return window.close()
+}
+
+/**
+ * On Command Callback
+ * @function onMessage
+ * @param {Object} message
+ * @param {MessageSender} sender
+ * @param {Function} sendResponse
+ */
+async function onMessage(message, sender, sendResponse) {
+    console.log('message, sender, sendResponse:', message, sender, sendResponse)
+    if (message.siteUrl && message.authToken) {
+        console.log(`url: ${message.siteUrl}`)
+        console.log(`token: ${message.authToken}`)
+        const auth = { url: message.siteUrl, token: message.authToken }
+        await chrome.storage.local.set({ auth })
+        // document.getElementById('error-alert').classList.add('visually-hidden')
+        const btn = document.getElementById('auth-button')
+        btn.classList.remove('visually-hidden')
+        btn.addEventListener('click', authCredentials)
+    }
+}
+
+async function authCredentials(event) {
+    console.log('authCredentials:', event)
+    const { auth } = await chrome.storage.local.get(['auth'])
+    console.log('auth:', auth)
+    if (auth) {
+        await chrome.storage.sync.set({ auth })
+        document.getElementById('auth-button').classList.add('visually-hidden')
+        document.getElementById('error-alert').classList.add('visually-hidden')
+        await initPopup()
+    }
 }
 
 /**
