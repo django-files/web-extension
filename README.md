@@ -128,8 +128,7 @@ it is very useful to keep addon storage after uninstall/restart with `keepStorag
 1.  Navigate to the folder you extracted earlier, select `manifest.json` then click `Select File`.
 1.  Open `about:config` search for `extensions.webextensions.keepStorageOnUninstall` and set to `true`.
 
-> **Note**
->
+> [!WARNING]  
 > This method **does not** work on Release Firefox and is NOT recommended for development.
 > You must use [ESR](https://www.mozilla.org/en-CA/firefox/all/#product-desktop-esr), Development, or Nightly.
 
