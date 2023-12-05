@@ -1,5 +1,6 @@
 // JS auth.js
 
+// eslint-disable-next-line no-extra-semi
 ;(async () => {
     console.log('auth.js')
     const response = await chrome.runtime.sendMessage(getCredentials())
