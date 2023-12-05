@@ -122,12 +122,11 @@ async function popLinks(event) {
  */
 async function onMessage(message, sender, sendResponse) {
     console.log('message, sender, sendResponse:', message, sender, sendResponse)
-    if (message.siteUrl && message.authToken) {
+    if (message?.siteUrl && message?.authToken) {
         console.log(`url: ${message.siteUrl}`)
         console.log(`token: ${message.authToken}`)
         const auth = { url: message.siteUrl, token: message.authToken }
         await chrome.storage.local.set({ auth })
-        // document.getElementById('error-alert').classList.add('visually-hidden')
         const btn = document.getElementById('auth-button')
         btn.classList.remove('visually-hidden')
         btn.addEventListener('click', authCredentials)
