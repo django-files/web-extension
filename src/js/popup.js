@@ -2,8 +2,47 @@
 
 document.addEventListener('DOMContentLoaded', initPopup)
 
+chrome.runtime.onMessage.addListener(onMessage)
+
 const popupLinks = document.querySelectorAll('[data-href]')
 popupLinks.forEach((el) => el.addEventListener('click', popLinks))
+
+async function checkSite() {
+    const [tab] = await chrome.tabs.query({ currentWindow: true, active: true })
+    await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['/js/check-site.js'],
+    })
+}
+
+/**
+ * On Command Callback
+ * @function onMessage
+ * @param {Object} message
+ * @param {MessageSender} sender
+ * @param {Function} sendResponse
+ */
+function onMessage(message, sender, sendResponse) {
+    console.log('message, sender, sendResponse:', message, sender, sendResponse)
+    console.log(`onMessage: message.action: ${message.action}`)
+    if (message.action === 'auth') {
+        console.log(`url: ${message.siteUrl}`)
+        console.log(`auth: ${message.authToken}`)
+        if (message.siteUrl && message.authToken) {
+            sendResponse('success')
+            const error = document.getElementById('error-alert')
+            console.log('error:', error)
+            error.classList.add('visually-hidden')
+            console.log(1)
+            const a = document.createElement('a')
+            a.classList.add('btn', 'btn-primary')
+            a.textContent = 'Test'
+            const div = document.getElementById('popup-buttons')
+            div.appendChild(a)
+            console.log(2)
+        }
+    }
+}
 
 /**
  * Popup Init Function
@@ -15,19 +54,23 @@ async function initPopup() {
     const { auth, options } = await chrome.storage.sync.get(['auth', 'options'])
     console.log('auth:', auth)
     if (!auth?.url || !auth?.token) {
-        return displayError('Missing URL or Token.')
+        // TODO: add custom error message
+        displayError(
+            '<strong>Missing URL or Token!</strong><br>Navigate to your Django Files site, login, and click this popup again...'
+        )
+        await checkSite()
+        return
     }
+
     document.getElementById('django-files-links').style.display = 'flex'
-    console.log('options.recentFiles:', options.recentFiles)
+
     if (options.recentFiles === '0') {
-        document
-            .getElementById('loading-spinner')
-            .classList.add('visually-hidden')
-        document
-            .getElementById('recent-uploads')
-            .classList.add('visually-hidden')
         return console.log('Recent Files Disabled. Enable in Options.')
     }
+
+    document
+        .getElementById('loading-spinner')
+        .classList.remove('visually-hidden')
 
     let opts = {
         method: 'GET',
@@ -61,6 +104,7 @@ async function initPopup() {
     }
 
     updateTable(data)
+    document.getElementById('recent').classList.remove('visually-hidden')
 
     const clipboard = new ClipboardJS('.clip') // eslint-disable-line
     // Re-Initialize data-href after updateTable

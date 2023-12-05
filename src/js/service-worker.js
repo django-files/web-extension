@@ -21,7 +21,7 @@ async function onInstalled(details) {
         contextMenu: true,
         recentFiles: '10',
         showUpdate: true,
-        previewSidebar: true,
+        // previewSidebar: true,
     }
     let { options } = await chrome.storage.sync.get(['options'])
     options = setDefaults(options, defaultOptions)
