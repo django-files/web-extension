@@ -30,7 +30,9 @@ async function initPopup() {
         return
     }
 
-    document.getElementById('django-files-links').style.display = 'flex'
+    document
+        .getElementById('django-files-links')
+        .classList.remove('visually-hidden')
 
     if (options.recentFiles === '0') {
         return console.log('Recent Files Disabled. Enable in Options.')
