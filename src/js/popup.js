@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', initPopup)
 const popupLinks = document.querySelectorAll('[data-href]')
 popupLinks.forEach((el) => el.addEventListener('click', popLinks))
 
+chrome.runtime.onMessage.addListener(onMessage)
+
 /**
  * Popup Init Function
  * TODO: Overhaul this function
@@ -15,19 +17,28 @@ async function initPopup() {
     const { auth, options } = await chrome.storage.sync.get(['auth', 'options'])
     console.log('auth:', auth)
     if (!auth?.url || !auth?.token) {
-        return displayError('Missing URL or Token.')
+        displayError('Missing URL or Token.')
+        const [tab] = await chrome.tabs.query({
+            currentWindow: true,
+            active: true,
+        })
+        console.log('tab:', tab)
+        await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['/js/auth.js'],
+        })
+        return
     }
+
     document.getElementById('django-files-links').style.display = 'flex'
-    console.log('options.recentFiles:', options.recentFiles)
+
     if (options.recentFiles === '0') {
-        document
-            .getElementById('loading-spinner')
-            .classList.add('visually-hidden')
-        document
-            .getElementById('recent-uploads')
-            .classList.add('visually-hidden')
         return console.log('Recent Files Disabled. Enable in Options.')
     }
+
+    document
+        .getElementById('loading-spinner')
+        .classList.remove('visually-hidden')
 
     let opts = {
         method: 'GET',
@@ -61,6 +72,7 @@ async function initPopup() {
     }
 
     updateTable(data)
+    document.getElementById('recent').classList.remove('visually-hidden')
 
     const clipboard = new ClipboardJS('.clip') // eslint-disable-line
     // Re-Initialize data-href after updateTable
@@ -99,6 +111,38 @@ async function popLinks(event) {
     }
     await chrome.tabs.create({ active: true, url })
     return window.close()
+}
+
+/**
+ * On Command Callback
+ * @function onMessage
+ * @param {Object} message
+ * @param {MessageSender} sender
+ * @param {Function} sendResponse
+ */
+async function onMessage(message, sender, sendResponse) {
+    console.log('message, sender, sendResponse:', message, sender, sendResponse)
+    if (message?.siteUrl && message?.authToken) {
+        console.log(`url: ${message.siteUrl}`)
+        console.log(`token: ${message.authToken}`)
+        const auth = { url: message.siteUrl, token: message.authToken }
+        await chrome.storage.local.set({ auth })
+        const btn = document.getElementById('auth-button')
+        btn.classList.remove('visually-hidden')
+        btn.addEventListener('click', authCredentials)
+    }
+}
+
+async function authCredentials(event) {
+    console.log('authCredentials:', event)
+    const { auth } = await chrome.storage.local.get(['auth'])
+    console.log('auth:', auth)
+    if (auth) {
+        await chrome.storage.sync.set({ auth })
+        document.getElementById('auth-button').classList.add('visually-hidden')
+        document.getElementById('error-alert').classList.add('visually-hidden')
+        await initPopup()
+    }
 }
 
 /**

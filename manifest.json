@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "0.2.3",
+  "version": "0.2.4",
   "name": "Django Files",
   "description": "Django Files Web Extension designed to work with django-files/django-files.",
   "homepage_url": "https://github.com/django-files/web-extension",
@@ -13,10 +13,15 @@
       "description": "Show Popup"
     }
   },
-  "permissions": ["clipboardWrite", "contextMenus", "notifications", "storage"],
-  "background": {
-    "type": "module"
-  },
+  "permissions": [
+    "activeTab",
+    "clipboardWrite",
+    "contextMenus",
+    "notifications",
+    "scripting",
+    "storage"
+  ],
+  "background": {},
   "options_ui": {
     "page": "html/options.html",
     "open_in_tab": true

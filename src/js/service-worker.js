@@ -1,16 +1,13 @@
-// Background Service Worker JS
-
-import { createContextMenus } from './exports.js'
+// JS Background Service Worker
 
 chrome.runtime.onInstalled.addListener(onInstalled)
 chrome.contextMenus.onClicked.addListener(contextMenuClick)
+chrome.storage.onChanged.addListener(onChanged)
 
 chrome.notifications.onClicked.addListener((notificationId) => {
     console.log(`notifications.onClicked: ${notificationId}`)
     chrome.notifications.clear(notificationId)
 })
-
-const ghUrl = 'https://github.com/django-files/web-extension'
 
 /**
  * Init Context Menus and Options
@@ -19,6 +16,7 @@ const ghUrl = 'https://github.com/django-files/web-extension'
  */
 async function onInstalled(details) {
     console.log('onInstalled:', details)
+    const ghUrl = 'https://github.com/django-files/web-extension'
     const defaultOptions = {
         contextMenu: true,
         recentFiles: '10',
@@ -28,7 +26,6 @@ async function onInstalled(details) {
     options = setDefaults(options, defaultOptions)
     console.log('options:', options)
     await chrome.storage.sync.set({ options })
-
     if (options.contextMenu) {
         createContextMenus()
     }
@@ -71,6 +68,59 @@ async function contextMenuClick(ctx) {
     } else {
         console.warn('Action not handled.')
     }
+}
+
+/**
+ * On Changed Callback
+ * @function onChanged
+ * @param {Object} changes
+ * @param {String} namespace
+ */
+function onChanged(changes, namespace) {
+    console.log('onChanged:', changes, namespace)
+    if (namespace === 'sync') {
+        for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+            if (
+                key === 'options' &&
+                oldValue &&
+                newValue &&
+                oldValue.contextMenu !== newValue.contextMenu
+            ) {
+                if (newValue?.contextMenu) {
+                    console.log('Enabled contextMenu...')
+                    createContextMenus()
+                } else {
+                    console.log('Disabled contextMenu...')
+                    chrome.contextMenus.removeAll()
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Create Context Menus
+ * @function createContextMenus
+ */
+function createContextMenus() {
+    console.log('createContextMenus')
+    const ctx = ['link', 'image', 'video', 'audio']
+    const contexts = [
+        [['link'], 'short', 'normal', 'Create Short URL'],
+        [['image'], 'upload-image', 'normal', 'Upload Image'],
+        [['video'], 'upload-video', 'normal', 'Upload Video'],
+        [['audio'], 'upload-audio', 'normal', 'Upload Audio'],
+        [ctx, 'separator-1', 'separator', 'separator'],
+        [ctx, 'options', 'normal', 'Open Options'],
+    ]
+    contexts.forEach((context) => {
+        chrome.contextMenus.create({
+            contexts: context[0],
+            id: context[1],
+            type: context[2],
+            title: context[3],
+        })
+    })
 }
 
 async function postURL(endpoint, url) {

@@ -50,14 +50,15 @@ You can pin the Addon by clicking the `Puzzle Piece`, find the `Django Files ico
 **Firefox**, click the `Settings Wheel` and `Pin to Toolbar`.  
 **Chrome**, click the `Pin` icon.
 
-1.  Click on the `Django Files icon` and click on `Open Options`.
-1.  Log in to your Django Files instance, and select `Copy URL` from the menu in the top right.
-1.  Go back to the Django Files Options tab and paste the `URL` into the URL box.
-1.  Repeat #3 and #4 for Auth Token and then click `Save Settings`!
+To automatically configure the web extension to work with your Django Files instance do the following:
+
+-   Log in to your Django Files Instance
+-   Click the Popup Icon (from above)
+-   Click `Add Auth from Current Site`
 
 The addon should now be configured to work with your Django Files instance.
 
-Click the Django Files add-on icon to view your recent uploads.  
+You can now click the Django Files icon to view your recent uploads.  
 Right-click on any Image, Video, Audio, or URL upload to Django Files or Shorten URL.
 
 # Development
