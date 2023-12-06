@@ -2,9 +2,10 @@
 
 // eslint-disable-next-line no-extra-semi
 ;(async () => {
-    console.log('auth.js')
-    const response = await chrome.runtime.sendMessage(getCredentials())
-    console.log(response)
+    const credentials = getCredentials()
+    if (credentials) {
+        await chrome.runtime.sendMessage(credentials)
+    }
 })()
 
 /**
@@ -15,7 +16,7 @@
 function getCredentials() {
     const siteUrl = document.getElementById('site-url')
     const authToken = document.getElementById('auth-token')
-    if (siteUrl && authToken) {
+    if (siteUrl?.value && authToken?.value) {
         return {
             siteUrl: siteUrl.value,
             authToken: authToken.value,

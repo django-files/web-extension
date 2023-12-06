@@ -1,13 +1,9 @@
 // JS Background Service Worker
 
 chrome.runtime.onInstalled.addListener(onInstalled)
-chrome.contextMenus.onClicked.addListener(contextMenuClick)
+chrome.contextMenus.onClicked.addListener(contextMenusClicked)
+chrome.notifications.onClicked.addListener(notificationsClicked)
 chrome.storage.onChanged.addListener(onChanged)
-
-chrome.notifications.onClicked.addListener((notificationId) => {
-    console.log(`notifications.onClicked: ${notificationId}`)
-    chrome.notifications.clear(notificationId)
-})
 
 /**
  * Init Context Menus and Options
@@ -16,57 +12,79 @@ chrome.notifications.onClicked.addListener((notificationId) => {
  */
 async function onInstalled(details) {
     console.log('onInstalled:', details)
-    const ghUrl = 'https://github.com/django-files/web-extension'
-    const defaultOptions = {
-        contextMenu: true,
-        recentFiles: '10',
-        showUpdate: true,
-    }
-    let { options } = await chrome.storage.sync.get(['options'])
-    options = setDefaults(options, defaultOptions)
+    const githubURL = 'https://github.com/django-files/web-extension'
+    const options = await Promise.resolve(
+        setDefaultOptions({
+            siteUrl: '',
+            authToken: '',
+            recentFiles: '10',
+            contextMenu: true,
+            showUpdate: false,
+            checkAuth: false,
+        })
+    )
     console.log('options:', options)
-    await chrome.storage.sync.set({ options })
     if (options.contextMenu) {
         createContextMenus()
     }
+
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage()
-    } else if (options.showUpdate && details.reason === 'update') {
+    } else if (details.reason === 'update' && options.showUpdate) {
         const manifest = chrome.runtime.getManifest()
         if (manifest.version !== details.previousVersion) {
-            const url = `${ghUrl}/releases/tag/${manifest.version}`
-            console.log(`url: ${url}`)
-            await chrome.tabs.create({ active: true, url })
+            let { internal } = await chrome.storage.sync.get(['internal'])
+            internal = internal || {}
+            if (internal?.lastShownUpdate !== manifest.version) {
+                const url = `${githubURL}/releases/tag/${manifest.version}`
+                console.log(`url: ${url}`)
+                await chrome.tabs.create({ active: true, url })
+                internal.lastShownUpdate = manifest.version
+                console.log('internal:', internal)
+                await chrome.storage.sync.set({ internal })
+            }
         }
     }
-    chrome.runtime.setUninstallURL(`${ghUrl}/issues`)
+    chrome.runtime.setUninstallURL(`${githubURL}/issues`)
+
+    // Data Migrations
+    await migrate2to3(details, options)
 }
 
 /**
  * Context Menu Click Callback
- * @function contextMenuClick
+ * @function contextMenusClicked
  * @param {OnClickData} ctx
  */
-async function contextMenuClick(ctx) {
-    console.log('contextMenuClick:', ctx)
+async function contextMenusClicked(ctx) {
+    // console.log('contextMenusClicked:', ctx)
     console.log(`ctx.menuItemId: ${ctx.menuItemId}`)
     if (ctx.menuItemId.startsWith('upload')) {
         if (ctx.srcUrl) {
-            let mediaType =
+            const mediaType =
                 ctx.menuItemId.charAt(0).toUpperCase() + ctx.menuItemId.slice(1)
-            console.log('mediaType: ' + mediaType)
-            console.log('Processing URL: ' + ctx.srcUrl)
+            console.log(`mediaType: ${mediaType}`)
+            // console.log(`Processing URL: ${ctx.linkUrl}`)
             await processRemote('remote', ctx.srcUrl, `${mediaType} Uploaded`)
         }
     } else if (ctx.menuItemId === 'short') {
         if (ctx.linkUrl) {
-            console.log('Processing URL: ' + ctx.linkUrl)
+            console.log('mediaType: short')
+            // console.log(`Processing URL: ${ctx.linkUrl}`)
             await processRemote('shorten', ctx.linkUrl, 'Short Created')
         }
     } else if (ctx.menuItemId === 'options') {
         chrome.runtime.openOptionsPage()
     } else {
         console.warn('Action not handled.')
+    }
+}
+
+async function notificationsClicked(notificationId) {
+    console.log(`notifications.onClicked: ${notificationId}`)
+    chrome.notifications.clear(notificationId)
+    if (notificationId.startsWith('http')) {
+        await chrome.tabs.create({ active: true, url: notificationId })
     }
 }
 
@@ -77,15 +95,10 @@ async function contextMenuClick(ctx) {
  * @param {String} namespace
  */
 function onChanged(changes, namespace) {
-    console.log('onChanged:', changes, namespace)
-    if (namespace === 'sync') {
-        for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-            if (
-                key === 'options' &&
-                oldValue &&
-                newValue &&
-                oldValue.contextMenu !== newValue.contextMenu
-            ) {
+    // console.log('onChanged:', changes, namespace)
+    for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
+        if (key === 'options' && namespace === 'sync' && oldValue && newValue) {
+            if (oldValue.contextMenu !== newValue.contextMenu) {
                 if (newValue?.contextMenu) {
                     console.log('Enabled contextMenu...')
                     createContextMenus()
@@ -103,7 +116,7 @@ function onChanged(changes, namespace) {
  * @function createContextMenus
  */
 function createContextMenus() {
-    console.log('createContextMenus')
+    // console.log('createContextMenus')
     const ctx = ['link', 'image', 'video', 'audio']
     const contexts = [
         [['link'], 'short', 'normal', 'Create Short URL'],
@@ -123,42 +136,56 @@ function createContextMenus() {
     })
 }
 
+/**
+ * Post URL to endpoint
+ * @function postURL
+ * @param {String} endpoint
+ * @param {String} url
+ * @return {Response}
+ */
 async function postURL(endpoint, url) {
-    console.log('Processing URL: ' + url)
-    const { auth } = await chrome.storage.sync.get(['auth'])
-    console.log('auth:', auth)
-    if (!auth?.url || !auth?.token) {
+    console.log(`postURL: "${endpoint}", "${url}"`)
+    const { options } = await chrome.storage.sync.get(['options'])
+    console.log('options:', options)
+    if (!options?.siteUrl || !options?.authToken) {
         throw new Error('Missing URL or Token.')
     }
 
-    let headers = { Authorization: auth.token }
-    let body = JSON.stringify({ url: url })
-    let options = {
+    const headers = { Authorization: options.authToken }
+    const body = JSON.stringify({ url: url })
+    const opts = {
         method: 'POST',
         headers: headers,
         body: body,
     }
-    let response = await fetch(auth.url + '/api/' + endpoint + '/', options)
-    console.log('Status: ' + response.status)
-    console.log(response)
+    const apiUrl = `${options.siteUrl}/api/${endpoint}/`
+    const response = await fetch(apiUrl, opts)
+    console.log('response:', response)
     return response
 }
 
+/**
+ * Get response from postURL and Process
+ * @function processRemote
+ * @param {String} endpoint
+ * @param {String} url
+ * @param {String} message
+ */
 async function processRemote(endpoint, url, message) {
-    console.log('Processing URL: ' + url)
+    console.log(`processRemote: "${endpoint}", "${url}", "${message}"`)
     let response
     try {
         response = await postURL(endpoint, url)
     } catch (error) {
         console.log('error:', error)
-        return await sendNotification('Fetch Error', 'Error: ' + error.message)
+        return await sendNotification('Fetch Error', `Error: ${error.message}`)
     }
     console.log('response:', response)
     if (response.ok) {
         const data = await response.json()
         console.log('data:', data)
         await clipboardWrite(data.url)
-        await sendNotification(message, data.url)
+        await sendNotification(message, data.url, data.url)
     } else {
         try {
             const data = await response.json()
@@ -223,19 +250,49 @@ async function clipboardWrite(value) {
 
 /**
  * Set Default Options
- * @function setDefaults
- * @param {Object} options
+ * @function setDefaultOptions
  * @param {Object} defaultOptions
  * @return {Object}
  */
-function setDefaults(options, defaultOptions) {
+async function setDefaultOptions(defaultOptions) {
+    console.log('setDefaultOptions')
+    let { options } = await chrome.storage.sync.get(['options'])
     options = options || {}
+    let changed = false
     for (const [key, value] of Object.entries(defaultOptions)) {
         // console.log(`${key}: default: ${value} current: ${options[key]}`)
         if (options[key] === undefined) {
+            changed = true
             options[key] = value
-            console.log(`Set ${options[key]} to ${value}`)
+            console.log(`Set ${key}:`, value)
         }
     }
+    if (changed) {
+        await chrome.storage.sync.set({ options })
+        console.log('options:', options)
+    }
     return options
+}
+
+/**
+ * Migrate from 0.2.X to 0.3.X
+ * @function migrate2to3
+ * @param {Object} details
+ * @param {Object} options
+ */
+async function migrate2to3(details, options) {
+    if (details.reason === 'update') {
+        if (parseInt(details.previousVersion.split('.')[1]) < 3) {
+            console.log(`Migration from version: ${details.previousVersion}`)
+            let { auth } = await chrome.storage.sync.get(['auth'])
+            console.log('auth:', auth)
+            if (auth?.token && auth?.url) {
+                options.authToken = auth.token
+                options.siteUrl = auth.url
+                auth = null
+                await chrome.storage.sync.set({ auth, options })
+                console.warn('Migrated Data from auth to options...')
+            }
+        }
+    }
 }

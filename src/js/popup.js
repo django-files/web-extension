@@ -2,8 +2,9 @@
 
 document.addEventListener('DOMContentLoaded', initPopup)
 
-const popupLinks = document.querySelectorAll('[data-href]')
-popupLinks.forEach((el) => el.addEventListener('click', popLinks))
+document
+    .querySelectorAll('[data-href]')
+    .forEach((el) => el.addEventListener('click', popupLinks))
 
 chrome.runtime.onMessage.addListener(onMessage)
 
@@ -14,20 +15,34 @@ chrome.runtime.onMessage.addListener(onMessage)
  */
 async function initPopup() {
     console.log('initPopup')
-    const { auth, options } = await chrome.storage.sync.get(['auth', 'options'])
-    console.log('auth:', auth)
-    if (!auth?.url || !auth?.token) {
-        displayError('Missing URL or Token.')
-        const [tab] = await chrome.tabs.query({
-            currentWindow: true,
-            active: true,
-        })
-        console.log('tab:', tab)
-        await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ['/js/auth.js'],
-        })
-        return
+    const { options } = await chrome.storage.sync.get(['options'])
+    console.log('options:', options)
+
+    const missing = !options?.siteUrl || !options?.authToken
+    console.log('missing:', missing)
+    if (options.checkAuth || missing) {
+        if (missing) {
+            displayError('Missing URL or Token.')
+        }
+        try {
+            const [tab] = await chrome.tabs.query({
+                currentWindow: true,
+                active: true,
+            })
+            console.log('tab:', tab)
+            await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                files: ['/js/auth.js'],
+            })
+        } catch (error) {
+            console.warn(error)
+        }
+        if (missing) {
+            return
+        }
+        const authBtn = document.getElementById('auth-button')
+        authBtn.classList.remove('btn-lg', 'my-2')
+        authBtn.classList.add('btn-sm')
     }
 
     document
@@ -42,15 +57,15 @@ async function initPopup() {
         .getElementById('loading-spinner')
         .classList.remove('visually-hidden')
 
-    let opts = {
+    const opts = {
         method: 'GET',
-        headers: { Authorization: auth.token },
+        headers: { Authorization: options.authToken },
         cache: 'no-cache',
     }
     let response
     let data
     try {
-        const url = new URL(auth.url + '/api/recent/')
+        const url = new URL(`${options.siteUrl}/api/recent/`)
         url.searchParams.append('amount', options?.recentFiles || '10')
         response = await fetch(url, opts)
         data = await response.json()
@@ -63,7 +78,7 @@ async function initPopup() {
     document.getElementById('loading-spinner').classList.add('visually-hidden')
 
     if (!response.ok) {
-        console.warn('error: ' + data['error'])
+        console.warn(`error: ${data['error']}`)
         return displayError(data['error'])
     }
     if (data === undefined) {
@@ -79,24 +94,24 @@ async function initPopup() {
     const clipboard = new ClipboardJS('.clip') // eslint-disable-line
     // Re-Initialize data-href after updateTable
     document.querySelectorAll('[data-href]').forEach((el) => {
-        el.addEventListener('click', popLinks)
+        el.addEventListener('click', popupLinks)
     })
 }
 
 /**
  * Popup Links Click Callback
  * Firefox requires a call to window.close()
- * @function popLinks
+ * @function popupLinks
  * @param {MouseEvent} event
  */
-async function popLinks(event) {
-    console.log('popLinks:', event)
+async function popupLinks(event) {
+    console.log('popupLinks:', event)
     event.preventDefault()
     const anchor = event.target.closest('a')
     let url
     if (anchor?.dataset?.location) {
-        const { auth } = await chrome.storage.sync.get(['auth'])
-        url = auth?.url + anchor.dataset.location
+        const { options } = await chrome.storage.sync.get(['options'])
+        url = options?.siteUrl + anchor.dataset.location
     } else if (anchor.dataset.href.startsWith('http')) {
         url = anchor.dataset.href
     } else if (anchor.dataset.href === 'homepage') {
@@ -116,18 +131,16 @@ async function popLinks(event) {
 }
 
 /**
- * On Command Callback
+ * On Message Callback
  * @function onMessage
  * @param {Object} message
- * @param {MessageSender} sender
- * @param {Function} sendResponse
  */
-async function onMessage(message, sender, sendResponse) {
-    console.log('message, sender, sendResponse:', message, sender, sendResponse)
+async function onMessage(message) {
+    // console.log('onMessage: message, sender:', message, sender)
     if (message?.siteUrl && message?.authToken) {
         console.log(`url: ${message.siteUrl}`)
         console.log(`token: ${message.authToken}`)
-        const auth = { url: message.siteUrl, token: message.authToken }
+        const auth = { siteUrl: message.siteUrl, authToken: message.authToken }
         await chrome.storage.local.set({ auth })
         const btn = document.getElementById('auth-button')
         btn.classList.remove('visually-hidden')
@@ -135,15 +148,25 @@ async function onMessage(message, sender, sendResponse) {
     }
 }
 
+/**
+ * Add Site Auth Button Callback
+ * @function authCredentials
+ * @param {MouseEvent} event
+ */
 async function authCredentials(event) {
     console.log('authCredentials:', event)
     const { auth } = await chrome.storage.local.get(['auth'])
     console.log('auth:', auth)
     if (auth) {
-        await chrome.storage.sync.set({ auth })
+        const { options } = await chrome.storage.sync.get(['options'])
+        options.authToken = auth.authToken
+        options.siteUrl = auth.siteUrl
+        await chrome.storage.sync.set({ options })
+        console.warn('Auth Credentials Updated...')
         document.getElementById('auth-button').classList.add('visually-hidden')
         document.getElementById('error-alert').classList.add('visually-hidden')
         await initPopup()
+        await chrome.runtime.sendMessage('reload-options')
     }
 }
 
@@ -153,9 +176,10 @@ async function authCredentials(event) {
  * @param {Object} data
  */
 function updateTable(data) {
-    let tbodyRef = document
+    const tbodyRef = document
         .getElementById('recent')
         .getElementsByTagName('tbody')[0]
+    tbodyRef.innerHTML = ''
 
     data.forEach(function (value, i) {
         const name = String(value.split('/').reverse()[0])
@@ -200,7 +224,7 @@ function updateTable(data) {
 function clipClick(event) {
     console.log('clipClick:', event)
     const element = event.target.closest('a')
-    console.log('element:', element)
+    // console.log('element:', element)
     element.classList.add('link-success')
     element.classList.remove('link-body-emphasis')
     setTimeout(() => {
@@ -216,7 +240,7 @@ function clipClick(event) {
  */
 function displayError(message) {
     document.getElementById('loading-spinner').classList.add('visually-hidden')
-    let div = document.getElementById('error-alert')
-    div.innerHTML = message
-    div.style.display = 'block'
+    const element = document.getElementById('error-alert')
+    element.innerHTML = message
+    element.classList.remove('visually-hidden')
 }
