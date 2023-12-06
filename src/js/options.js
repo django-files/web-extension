@@ -2,7 +2,6 @@
 
 document.addEventListener('DOMContentLoaded', initOptions)
 document.getElementById('options-form').addEventListener('submit', saveOptions)
-document.getElementById('submit').addEventListener('click', saveOptions)
 
 /**
  * Options Init Function
@@ -10,21 +9,19 @@ document.getElementById('submit').addEventListener('click', saveOptions)
  */
 async function initOptions() {
     console.log('initOptions')
-    const { auth, options } = await chrome.storage.sync.get(['auth', 'options'])
-    console.log(auth, options)
-    const url_input = document.getElementById('url')
-    if (auth?.url) {
-        url_input.value = auth.url
-    } else {
-        url_input.placeholder = 'https://example.com'
-        url_input.focus()
-    }
     document.getElementById('version').textContent =
         chrome.runtime.getManifest().version
+    const { auth, options } = await chrome.storage.sync.get(['auth', 'options'])
+    console.log('auth, options:', auth, options)
+    const url = document.getElementById('url')
+    if (auth?.url) {
+        url.value = auth.url
+    } else {
+        url.placeholder = 'https://example.com'
+        url.focus()
+    }
     document.getElementById('token').value = auth?.token || ''
-    document.getElementById('recentFiles').value = options.recentFiles || '10'
-    document.getElementById('contextMenu').checked = options.contextMenu
-    document.getElementById('showUpdate').checked = options.showUpdate
+    updateOptions(options)
     const commands = await chrome.commands.getAll()
     document.getElementById('mainKey').textContent =
         commands.find((x) => x.name === '_execute_action').shortcut || 'Not Set'
@@ -43,14 +40,33 @@ async function saveOptions(event) {
         token: document.getElementById('token').value,
     }
     console.log('auth:', auth)
-    let options = {}
+    document.getElementById('url').value = auth.url
+    const { options } = await chrome.storage.sync.get(['options'])
     options.recentFiles = document.getElementById('recentFiles').value
     options.contextMenu = document.getElementById('contextMenu').checked
     options.showUpdate = document.getElementById('showUpdate').checked
     console.log('options:', options)
     await chrome.storage.sync.set({ auth, options })
-    document.getElementById('url').value = auth.url
     showToast('Options Saved')
+}
+
+/**
+ * Update Options
+ * @function initOptions
+ * @param {Object} options
+ */
+function updateOptions(options) {
+    for (const [key, value] of Object.entries(options)) {
+        // console.log(`${key}: ${value}`)
+        const el = document.getElementById(key)
+        if (el) {
+            if (typeof value === 'boolean') {
+                el.checked = value
+            } else if (typeof value === 'string') {
+                el.value = value
+            }
+        }
+    }
 }
 
 /**
@@ -61,7 +77,6 @@ async function saveOptions(event) {
  * @param {String} bsClass
  */
 function showToast(message, bsClass = 'success') {
-    // TODO: Remove jQuery Dependency
     const toastEl = $(
         '<div class="toast align-items-center border-0 my-3" role="alert" aria-live="assertive" aria-atomic="true">\n' +
             '    <div class="d-flex">\n' +
