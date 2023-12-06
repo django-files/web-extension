@@ -23,15 +23,19 @@ async function initPopup() {
         if (missing) {
             displayError('Missing URL or Token.')
         }
-        const [tab] = await chrome.tabs.query({
-            currentWindow: true,
-            active: true,
-        })
-        console.log('tab:', tab)
-        await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ['/js/auth.js'],
-        })
+        try {
+            const [tab] = await chrome.tabs.query({
+                currentWindow: true,
+                active: true,
+            })
+            console.log('tab:', tab)
+            await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                files: ['/js/auth.js'],
+            })
+        } catch (error) {
+            console.warn(error)
+        }
         if (missing) {
             return
         }
