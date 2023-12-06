@@ -22,7 +22,6 @@ async function onInstalled(details) {
         contextMenu: true,
         checkAuth: false,
         showUpdate: false,
-        lastShownUpdate: '',
     }
     const options = await setDefaultOptions(defaultOptions)
     console.log('options:', options)
@@ -31,15 +30,18 @@ async function onInstalled(details) {
     }
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage()
-    } else if (options.showUpdate && details.reason === 'update') {
+    } else if (details.reason === 'update' && options.showUpdate) {
+        let { internal } = await chrome.storage.sync.get(['internal'])
+        internal = internal || {}
         const manifest = chrome.runtime.getManifest()
-        if (options.lastShownUpdate !== manifest.version) {
+        if (internal?.lastShownUpdate !== manifest.version) {
             if (manifest.version !== details.previousVersion) {
                 const url = `${ghUrl}/releases/tag/${manifest.version}`
                 console.log(`url: ${url}`)
                 await chrome.tabs.create({ active: true, url })
-                options.lastShownUpdate = manifest.version
-                await chrome.storage.sync.set({ options })
+                internal.lastShownUpdate = manifest.version
+                console.log('internal:', internal)
+                await chrome.storage.sync.set({ internal })
             }
         }
     }
