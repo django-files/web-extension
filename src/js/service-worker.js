@@ -280,7 +280,7 @@ async function setDefaultOptions(defaultOptions) {
  */
 async function migrate2to3(details, options) {
     if (details.reason === 'update') {
-        if (parseInt(details.previousVersion.split('.')[1]) > 3) {
+        if (parseInt(details.previousVersion.split('.')[1]) < 3) {
             console.log(`Migration from version: ${details.previousVersion}`)
             let { auth } = await chrome.storage.sync.get(['auth'])
             console.log('auth:', auth)
