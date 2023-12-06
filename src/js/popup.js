@@ -15,9 +15,13 @@ chrome.runtime.onMessage.addListener(onMessage)
 async function initPopup() {
     console.log('initPopup')
     const { auth, options } = await chrome.storage.sync.get(['auth', 'options'])
-    console.log('auth:', auth)
-    if (!auth?.url || !auth?.token) {
-        displayError('Missing URL or Token.')
+    console.log('auth, options:', auth, options)
+
+    const missing = !auth?.url || !auth?.token
+    if (options.checkAuth || missing) {
+        if (missing) {
+            displayError('Missing URL or Token.')
+        }
         const [tab] = await chrome.tabs.query({
             currentWindow: true,
             active: true,
@@ -27,7 +31,12 @@ async function initPopup() {
             target: { tabId: tab.id },
             files: ['/js/auth.js'],
         })
-        return
+        if (missing) {
+            return
+        }
+        const authBtn = document.getElementById('auth-button')
+        authBtn.classList.remove('btn-lg', 'my-2')
+        authBtn.classList.add('btn-sm')
     }
 
     document

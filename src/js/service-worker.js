@@ -16,13 +16,13 @@ chrome.notifications.onClicked.addListener((notificationId) => {
  */
 async function onInstalled(details) {
     console.log('onInstalled:', details)
-    const manifest = chrome.runtime.getManifest()
     const ghUrl = 'https://github.com/django-files/web-extension'
     const defaultOptions = {
-        contextMenu: true,
         recentFiles: '10',
+        contextMenu: true,
+        checkAuth: false,
         showUpdate: false,
-        lastShownUpdate: manifest.version,
+        lastShownUpdate: '',
     }
     const options = await setDefaultOptions(defaultOptions)
     console.log('options:', options)
@@ -32,6 +32,7 @@ async function onInstalled(details) {
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage()
     } else if (options.showUpdate && details.reason === 'update') {
+        const manifest = chrome.runtime.getManifest()
         if (options.lastShownUpdate !== manifest.version) {
             if (manifest.version !== details.previousVersion) {
                 const url = `${ghUrl}/releases/tag/${manifest.version}`
@@ -233,7 +234,6 @@ async function setDefaultOptions(defaultOptions) {
     console.log('setDefaultOptions')
     let { options } = await chrome.storage.sync.get(['options'])
     options = options || {}
-    console.log(options)
     let changed = false
     for (const [key, value] of Object.entries(defaultOptions)) {
         // console.log(`${key}: default: ${value} current: ${options[key]}`)

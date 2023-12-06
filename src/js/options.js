@@ -45,6 +45,7 @@ async function saveOptions(event) {
     options.recentFiles = document.getElementById('recentFiles').value
     options.contextMenu = document.getElementById('contextMenu').checked
     options.showUpdate = document.getElementById('showUpdate').checked
+    options.checkAuth = document.getElementById('checkAuth').checked
     console.log('options:', options)
     await chrome.storage.sync.set({ auth, options })
     showToast('Options Saved')
