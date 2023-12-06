@@ -27,6 +27,7 @@ async function onInstalled(details) {
     if (options.contextMenu) {
         createContextMenus()
     }
+
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage()
     } else if (details.reason === 'update' && options.showUpdate) {
@@ -45,6 +46,7 @@ async function onInstalled(details) {
         }
     }
     chrome.runtime.setUninstallURL(`${githubURL}/issues`)
+
     // Data Migrations
     await migrate2to3(details, options)
 }

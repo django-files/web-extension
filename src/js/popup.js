@@ -131,12 +131,11 @@ async function popupLinks(event) {
 }
 
 /**
- * On Command Callback
+ * On Message Callback
  * @function onMessage
  * @param {Object} message
- * @param {MessageSender} sender
  */
-async function onMessage(message, sender) {
+async function onMessage(message) {
     // console.log('onMessage: message, sender:', message, sender)
     if (message?.siteUrl && message?.authToken) {
         console.log(`url: ${message.siteUrl}`)
