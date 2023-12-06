@@ -13,7 +13,7 @@
 function getCredentials() {
     const siteUrl = document.getElementById('site-url')
     const authToken = document.getElementById('auth-token')
-    if (siteUrl && authToken) {
+    if (siteUrl?.value && authToken?.value) {
         return {
             siteUrl: siteUrl.value,
             authToken: authToken.value,

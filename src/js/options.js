@@ -3,11 +3,11 @@
 document.addEventListener('DOMContentLoaded', initOptions)
 
 document
-    .getElementById('options-form')
-    .addEventListener('submit', (e) => e.preventDefault())
-document
     .querySelectorAll('input')
     .forEach((el) => el.addEventListener('change', saveOptions))
+document
+    .getElementById('options-form')
+    .addEventListener('submit', (e) => e.preventDefault())
 
 /**
  * Options Init Function
@@ -39,7 +39,7 @@ async function initOptions() {
  */
 async function saveOptions(event) {
     // console.log('saveOptions:', event)
-    let { options } = await chrome.storage.sync.get(['options'])
+    const { options } = await chrome.storage.sync.get(['options'])
     if (event.target.type === 'checkbox') {
         options[event.target.id] = event.target.checked
     } else if (event.target.id === 'siteUrl') {

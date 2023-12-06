@@ -66,7 +66,7 @@ async function contextMenuClick(ctx) {
     console.log(`ctx.menuItemId: ${ctx.menuItemId}`)
     if (ctx.menuItemId.startsWith('upload')) {
         if (ctx.srcUrl) {
-            let mediaType =
+            const mediaType =
                 ctx.menuItemId.charAt(0).toUpperCase() + ctx.menuItemId.slice(1)
             console.log('mediaType: ' + mediaType)
             console.log('Processing URL: ' + ctx.srcUrl)
@@ -92,15 +92,12 @@ async function contextMenuClick(ctx) {
  */
 function onChanged(changes, namespace) {
     // console.log('onChanged:', changes, namespace)
-    for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-        if (
-            key === 'options' &&
-            namespace === 'sync' &&
-            oldValue &&
-            newValue &&
-            oldValue.contextMenu !== newValue.contextMenu
-        ) {
-            if (newValue?.contextMenu) {
+    for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
+        if (key === 'options' && namespace === 'sync' && oldValue && newValue) {
+            if (
+                newValue.contextMenu &&
+                oldValue.contextMenu !== newValue.contextMenu
+            ) {
                 console.log('Enabled contextMenu...')
                 createContextMenus()
             } else {
@@ -144,19 +141,16 @@ async function postURL(endpoint, url) {
         throw new Error('Missing URL or Token.')
     }
 
-    let headers = { Authorization: options.authToken }
-    let body = JSON.stringify({ url: url })
-    let postOptions = {
+    const headers = { Authorization: options.authToken }
+    const body = JSON.stringify({ url: url })
+    const opts = {
         method: 'POST',
         headers: headers,
         body: body,
     }
-    let response = await fetch(
-        options.siteUrl + '/api/' + endpoint + '/',
-        postOptions
-    )
-    console.log('Status: ' + response.status)
-    console.log(response)
+    const apiUrl = options.siteUrl + '/api/' + endpoint + '/'
+    const response = await fetch(apiUrl, opts)
+    console.log('response:', response)
     return response
 }
 

@@ -2,8 +2,9 @@
 
 document.addEventListener('DOMContentLoaded', initPopup)
 
-const popupLinks = document.querySelectorAll('[data-href]')
-popupLinks.forEach((el) => el.addEventListener('click', popLinks))
+document
+    .querySelectorAll('[data-href]')
+    .forEach((el) => el.addEventListener('click', popupLinks))
 
 chrome.runtime.onMessage.addListener(onMessage)
 
@@ -51,7 +52,7 @@ async function initPopup() {
         .getElementById('loading-spinner')
         .classList.remove('visually-hidden')
 
-    let opts = {
+    const opts = {
         method: 'GET',
         headers: { Authorization: options.authToken },
         cache: 'no-cache',
@@ -88,18 +89,18 @@ async function initPopup() {
     const clipboard = new ClipboardJS('.clip') // eslint-disable-line
     // Re-Initialize data-href after updateTable
     document.querySelectorAll('[data-href]').forEach((el) => {
-        el.addEventListener('click', popLinks)
+        el.addEventListener('click', popupLinks)
     })
 }
 
 /**
  * Popup Links Click Callback
  * Firefox requires a call to window.close()
- * @function popLinks
+ * @function popupLinks
  * @param {MouseEvent} event
  */
-async function popLinks(event) {
-    console.log('popLinks:', event)
+async function popupLinks(event) {
+    console.log('popupLinks:', event)
     event.preventDefault()
     const anchor = event.target.closest('a')
     let url
@@ -143,6 +144,11 @@ async function onMessage(message, sender) {
     }
 }
 
+/**
+ * Add Site Auth Button Callback
+ * @function authCredentials
+ * @param {MouseEvent} event
+ */
 async function authCredentials(event) {
     console.log('authCredentials:', event)
     const { auth } = await chrome.storage.local.get(['auth'])
@@ -152,10 +158,10 @@ async function authCredentials(event) {
         options.authToken = auth.authToken
         options.siteUrl = auth.siteUrl
         await chrome.storage.sync.set({ options })
+        console.warn('Auth Credentials Updated...')
         document.getElementById('auth-button').classList.add('visually-hidden')
         document.getElementById('error-alert').classList.add('visually-hidden')
         await initPopup()
-        console.warn('Auth Credentials Updated...')
     }
 }
 
@@ -165,7 +171,7 @@ async function authCredentials(event) {
  * @param {Object} data
  */
 function updateTable(data) {
-    let tbodyRef = document
+    const tbodyRef = document
         .getElementById('recent')
         .getElementsByTagName('tbody')[0]
     tbodyRef.innerHTML = ''
@@ -229,7 +235,7 @@ function clipClick(event) {
  */
 function displayError(message) {
     document.getElementById('loading-spinner').classList.add('visually-hidden')
-    let element = document.getElementById('error-alert')
+    const element = document.getElementById('error-alert')
     element.innerHTML = message
     element.classList.remove('visually-hidden')
 }
