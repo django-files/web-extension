@@ -19,6 +19,7 @@ async function initPopup() {
     console.log('options:', options)
 
     const missing = !options?.siteUrl || !options?.authToken
+    console.log('missing:', missing)
     if (options.checkAuth || missing) {
         if (missing) {
             displayError('Missing URL or Token.')
@@ -64,7 +65,7 @@ async function initPopup() {
     let response
     let data
     try {
-        const url = new URL(options.siteUrl + '/api/recent/')
+        const url = new URL(`${options.siteUrl}/api/recent/`)
         url.searchParams.append('amount', options?.recentFiles || '10')
         response = await fetch(url, opts)
         data = await response.json()
@@ -77,7 +78,7 @@ async function initPopup() {
     document.getElementById('loading-spinner').classList.add('visually-hidden')
 
     if (!response.ok) {
-        console.warn('error: ' + data['error'])
+        console.warn(`error: ${data['error']}`)
         return displayError(data['error'])
     }
     if (data === undefined) {
@@ -136,7 +137,7 @@ async function popupLinks(event) {
  * @param {MessageSender} sender
  */
 async function onMessage(message, sender) {
-    console.log('onMessage: message, sender:', message, sender)
+    // console.log('onMessage: message, sender:', message, sender)
     if (message?.siteUrl && message?.authToken) {
         console.log(`url: ${message.siteUrl}`)
         console.log(`token: ${message.authToken}`)
@@ -166,6 +167,7 @@ async function authCredentials(event) {
         document.getElementById('auth-button').classList.add('visually-hidden')
         document.getElementById('error-alert').classList.add('visually-hidden')
         await initPopup()
+        await chrome.runtime.sendMessage('reload-options')
     }
 }
 

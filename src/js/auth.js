@@ -2,7 +2,10 @@
 
 // eslint-disable-next-line no-extra-semi
 ;(async () => {
-    await chrome.runtime.sendMessage(getCredentials())
+    const credentials = getCredentials()
+    if (credentials) {
+        await chrome.runtime.sendMessage(credentials)
+    }
 })()
 
 /**

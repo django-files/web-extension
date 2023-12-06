@@ -9,6 +9,8 @@ document
     .getElementById('options-form')
     .addEventListener('submit', (e) => e.preventDefault())
 
+chrome.runtime.onMessage.addListener(onMessage)
+
 /**
  * Options Init Function
  * @function initOptions
@@ -47,9 +49,13 @@ async function saveOptions(event) {
         options[event.target.id] = event.target.value
     } else if (event.target.id === 'recentFiles') {
         const number = parseFloat(event.target.value)
+        console.log('number:', number)
         if (!isNaN(number) && number <= 99) {
+            console.log('number.toString():', number.toString())
             event.target.value = number.toString()
             options[event.target.id] = event.target.value
+        } else {
+            event.target.value = options[event.target.id]
         }
     } else {
         options[event.target.id] = event.target.value
@@ -57,6 +63,19 @@ async function saveOptions(event) {
     console.log(`Set: "${event.target.id}" to target:`, event.target)
     console.log('options:', options)
     await chrome.storage.sync.set({ options })
+}
+
+/**
+ * On Command Callback
+ * @function onMessage
+ * @param {Object} message
+ * @param {MessageSender} sender
+ */
+async function onMessage(message, sender) {
+    // console.log('onMessage: message, sender:', message, sender)
+    if (message === 'reload-options') {
+        window.location.reload()
+    }
 }
 
 /**
