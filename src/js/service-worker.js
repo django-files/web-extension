@@ -94,15 +94,14 @@ function onChanged(changes, namespace) {
     // console.log('onChanged:', changes, namespace)
     for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
         if (key === 'options' && namespace === 'sync' && oldValue && newValue) {
-            if (
-                newValue.contextMenu &&
-                oldValue.contextMenu !== newValue.contextMenu
-            ) {
-                console.log('Enabled contextMenu...')
-                createContextMenus()
-            } else {
-                console.log('Disabled contextMenu...')
-                chrome.contextMenus.removeAll()
+            if (oldValue.contextMenu !== newValue.contextMenu) {
+                if (newValue?.contextMenu) {
+                    console.log('Enabled contextMenu...')
+                    createContextMenus()
+                } else {
+                    console.log('Disabled contextMenu...')
+                    chrome.contextMenus.removeAll()
+                }
             }
         }
     }
