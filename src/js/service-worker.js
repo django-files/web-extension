@@ -16,27 +16,30 @@ chrome.notifications.onClicked.addListener((notificationId) => {
  */
 async function onInstalled(details) {
     console.log('onInstalled:', details)
+    const manifest = chrome.runtime.getManifest()
     const ghUrl = 'https://github.com/django-files/web-extension'
     const defaultOptions = {
         contextMenu: true,
         recentFiles: '10',
-        showUpdate: true,
+        showUpdate: false,
+        lastShownUpdate: manifest.version,
     }
-    let { options } = await chrome.storage.sync.get(['options'])
-    options = setDefaults(options, defaultOptions)
+    const options = await setDefaultOptions(defaultOptions)
     console.log('options:', options)
-    await chrome.storage.sync.set({ options })
     if (options.contextMenu) {
         createContextMenus()
     }
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage()
     } else if (options.showUpdate && details.reason === 'update') {
-        const manifest = chrome.runtime.getManifest()
-        if (manifest.version !== details.previousVersion) {
-            const url = `${ghUrl}/releases/tag/${manifest.version}`
-            console.log(`url: ${url}`)
-            await chrome.tabs.create({ active: true, url })
+        if (options.lastShownUpdate !== manifest.version) {
+            if (manifest.version !== details.previousVersion) {
+                const url = `${ghUrl}/releases/tag/${manifest.version}`
+                console.log(`url: ${url}`)
+                await chrome.tabs.create({ active: true, url })
+                options.lastShownUpdate = manifest.version
+                await chrome.storage.sync.set({ options })
+            }
         }
     }
     chrome.runtime.setUninstallURL(`${ghUrl}/issues`)
@@ -78,21 +81,20 @@ async function contextMenuClick(ctx) {
  */
 function onChanged(changes, namespace) {
     console.log('onChanged:', changes, namespace)
-    if (namespace === 'sync') {
-        for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-            if (
-                key === 'options' &&
-                oldValue &&
-                newValue &&
-                oldValue.contextMenu !== newValue.contextMenu
-            ) {
-                if (newValue?.contextMenu) {
-                    console.log('Enabled contextMenu...')
-                    createContextMenus()
-                } else {
-                    console.log('Disabled contextMenu...')
-                    chrome.contextMenus.removeAll()
-                }
+    for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+        if (
+            key === 'options' &&
+            namespace === 'sync' &&
+            oldValue &&
+            newValue &&
+            oldValue.contextMenu !== newValue.contextMenu
+        ) {
+            if (newValue?.contextMenu) {
+                console.log('Enabled contextMenu...')
+                createContextMenus()
+            } else {
+                console.log('Disabled contextMenu...')
+                chrome.contextMenus.removeAll()
             }
         }
     }
@@ -223,19 +225,27 @@ async function clipboardWrite(value) {
 
 /**
  * Set Default Options
- * @function setDefaults
- * @param {Object} options
+ * @function setDefaultOptions
  * @param {Object} defaultOptions
  * @return {Object}
  */
-function setDefaults(options, defaultOptions) {
+async function setDefaultOptions(defaultOptions) {
+    console.log('setDefaultOptions')
+    let { options } = await chrome.storage.sync.get(['options'])
     options = options || {}
+    console.log(options)
+    let changed = false
     for (const [key, value] of Object.entries(defaultOptions)) {
         // console.log(`${key}: default: ${value} current: ${options[key]}`)
         if (options[key] === undefined) {
+            changed = true
             options[key] = value
-            console.log(`Set ${options[key]} to ${value}`)
+            console.log(`Set ${key}:`, value)
         }
+    }
+    if (changed) {
+        await chrome.storage.sync.set({ options })
+        console.log('options:', options)
     }
     return options
 }
