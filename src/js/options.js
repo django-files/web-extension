@@ -1,7 +1,17 @@
 // JS for options.html
 
 document.addEventListener('DOMContentLoaded', initOptions)
-document.getElementById('options-form').addEventListener('submit', saveOptions)
+// document.getElementById('options-form').addEventListener('submit', saveOptions)
+
+document
+    .getElementById('options-form')
+    .addEventListener('submit', (e) => e.preventDefault())
+document
+    .querySelectorAll('input')
+    .forEach((el) => el.addEventListener('change', saveOptions))
+// document
+//     .querySelectorAll('input[type="text"],input[type="password"],input[type="number"]')
+//     .forEach((el) => el.addEventListener('change', saveOptions))
 
 /**
  * Options Init Function
@@ -11,16 +21,16 @@ async function initOptions() {
     console.log('initOptions')
     document.getElementById('version').textContent =
         chrome.runtime.getManifest().version
-    const { auth, options } = await chrome.storage.sync.get(['auth', 'options'])
-    console.log('auth, options:', auth, options)
-    const url = document.getElementById('url')
-    if (auth?.url) {
-        url.value = auth.url
+    const { options } = await chrome.storage.sync.get(['options'])
+    console.log('options:', options)
+    const url = document.getElementById('siteUrl')
+    if (options?.authToken) {
+        url.value = options.siteUrl
     } else {
         url.placeholder = 'https://example.com'
         url.focus()
     }
-    document.getElementById('token').value = auth?.token || ''
+    document.getElementById('authToken').value = options?.authToken || ''
     updateOptions(options)
     const commands = await chrome.commands.getAll()
     document.getElementById('mainKey').textContent =
@@ -28,27 +38,26 @@ async function initOptions() {
 }
 
 /**
- * Save Options Submit Callback
+ * Save Options Callback
  * @function saveOptions
- * @param {SubmitEvent} event
+ * @param {FormDataEvent} event
  */
 async function saveOptions(event) {
     console.log('saveOptions:', event)
-    event.preventDefault()
-    let auth = {
-        url: document.getElementById('url').value.replace(/\/$/, ''),
-        token: document.getElementById('token').value,
+    if (event.type === 'submit') {
+        return event.preventDefault()
     }
-    console.log('auth:', auth)
-    document.getElementById('url').value = auth.url
-    const { options } = await chrome.storage.sync.get(['options'])
-    options.recentFiles = document.getElementById('recentFiles').value
-    options.contextMenu = document.getElementById('contextMenu').checked
-    options.showUpdate = document.getElementById('showUpdate').checked
-    options.checkAuth = document.getElementById('checkAuth').checked
-    console.log('options:', options)
-    await chrome.storage.sync.set({ auth, options })
-    showToast('Options Saved')
+    let { options } = await chrome.storage.sync.get(['options'])
+    if (event.target.type === 'checkbox') {
+        options[event.target.id] = event.target.checked
+    } else if (event.target.id === 'siteUrl') {
+        event.target.value = event.target.value.replace(/\/+$/, '')
+        options[event.target.id] = event.target.value
+    } else {
+        options[event.target.id] = event.target.value
+    }
+    console.log(`Set: "${event.target.id}" to target:`, event.target)
+    await chrome.storage.sync.set({ options })
 }
 
 /**

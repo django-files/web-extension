@@ -14,10 +14,10 @@ chrome.runtime.onMessage.addListener(onMessage)
  */
 async function initPopup() {
     console.log('initPopup')
-    const { auth, options } = await chrome.storage.sync.get(['auth', 'options'])
-    console.log('auth, options:', auth, options)
+    const { options } = await chrome.storage.sync.get(['options'])
+    console.log('options:', options)
 
-    const missing = !auth?.url || !auth?.token
+    const missing = !options?.siteUrl || !options?.authToken
     if (options.checkAuth || missing) {
         if (missing) {
             displayError('Missing URL or Token.')
@@ -53,13 +53,13 @@ async function initPopup() {
 
     let opts = {
         method: 'GET',
-        headers: { Authorization: auth.token },
+        headers: { Authorization: options.authToken },
         cache: 'no-cache',
     }
     let response
     let data
     try {
-        const url = new URL(auth.url + '/api/recent/')
+        const url = new URL(options.siteUrl + '/api/recent/')
         url.searchParams.append('amount', options?.recentFiles || '10')
         response = await fetch(url, opts)
         data = await response.json()
@@ -104,8 +104,8 @@ async function popLinks(event) {
     const anchor = event.target.closest('a')
     let url
     if (anchor?.dataset?.location) {
-        const { auth } = await chrome.storage.sync.get(['auth'])
-        url = auth?.url + anchor.dataset.location
+        const { options } = await chrome.storage.sync.get(['options'])
+        url = options?.siteUrl + anchor.dataset.location
     } else if (anchor.dataset.href.startsWith('http')) {
         url = anchor.dataset.href
     } else if (anchor.dataset.href === 'homepage') {
@@ -131,12 +131,12 @@ async function popLinks(event) {
  * @param {MessageSender} sender
  * @param {Function} sendResponse
  */
-async function onMessage(message, sender, sendResponse) {
-    console.log('message, sender, sendResponse:', message, sender, sendResponse)
+async function onMessage(message, sender) {
+    console.log('onMessage: message, sender:', message, sender)
     if (message?.siteUrl && message?.authToken) {
         console.log(`url: ${message.siteUrl}`)
         console.log(`token: ${message.authToken}`)
-        const auth = { url: message.siteUrl, token: message.authToken }
+        const auth = { siteUrl: message.siteUrl, authToken: message.authToken }
         await chrome.storage.local.set({ auth })
         const btn = document.getElementById('auth-button')
         btn.classList.remove('visually-hidden')
@@ -149,7 +149,10 @@ async function authCredentials(event) {
     const { auth } = await chrome.storage.local.get(['auth'])
     console.log('auth:', auth)
     if (auth) {
-        await chrome.storage.sync.set({ auth })
+        const { options } = await chrome.storage.sync.get(['options'])
+        options.authToken = auth.authToken
+        options.siteUrl = auth.siteUrl
+        await chrome.storage.sync.set({ options })
         document.getElementById('auth-button').classList.add('visually-hidden')
         document.getElementById('error-alert').classList.add('visually-hidden')
         await initPopup()
@@ -165,6 +168,7 @@ function updateTable(data) {
     let tbodyRef = document
         .getElementById('recent')
         .getElementsByTagName('tbody')[0]
+    tbodyRef.innerHTML = ''
 
     data.forEach(function (value, i) {
         const name = String(value.split('/').reverse()[0])

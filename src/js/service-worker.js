@@ -46,6 +46,14 @@ async function onInstalled(details) {
         }
     }
     chrome.runtime.setUninstallURL(`${ghUrl}/issues`)
+    // Data Migration from auth to options
+    const { auth } = await chrome.storage.sync.get(['auth'])
+    if (auth?.token && auth?.url) {
+        options.authToken = auth.token
+        options.siteUrl = auth.url
+        await chrome.storage.sync.set({ options })
+        console.warn('Data successfully migrated from auth to options...')
+    }
 }
 
 /**
@@ -130,20 +138,23 @@ function createContextMenus() {
 
 async function postURL(endpoint, url) {
     console.log('Processing URL: ' + url)
-    const { auth } = await chrome.storage.sync.get(['auth'])
-    console.log('auth:', auth)
-    if (!auth?.url || !auth?.token) {
+    const { options } = await chrome.storage.sync.get(['options'])
+    console.log('options:', options)
+    if (!options?.siteUrl || !options?.authToken) {
         throw new Error('Missing URL or Token.')
     }
 
-    let headers = { Authorization: auth.token }
+    let headers = { Authorization: options.authToken }
     let body = JSON.stringify({ url: url })
-    let options = {
+    let postOptions = {
         method: 'POST',
         headers: headers,
         body: body,
     }
-    let response = await fetch(auth.url + '/api/' + endpoint + '/', options)
+    let response = await fetch(
+        options.siteUrl + '/api/' + endpoint + '/',
+        postOptions
+    )
     console.log('Status: ' + response.status)
     console.log(response)
     return response
