@@ -91,7 +91,7 @@ async function contextMenuClick(ctx) {
  * @param {String} namespace
  */
 function onChanged(changes, namespace) {
-    console.log('onChanged:', changes, namespace)
+    // console.log('onChanged:', changes, namespace)
     for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
         if (
             key === 'options' &&
@@ -116,7 +116,7 @@ function onChanged(changes, namespace) {
  * @function createContextMenus
  */
 function createContextMenus() {
-    console.log('createContextMenus')
+    // console.log('createContextMenus')
     const ctx = ['link', 'image', 'video', 'audio']
     const contexts = [
         [['link'], 'short', 'normal', 'Create Short URL'],

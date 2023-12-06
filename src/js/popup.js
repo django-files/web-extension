@@ -129,7 +129,6 @@ async function popLinks(event) {
  * @function onMessage
  * @param {Object} message
  * @param {MessageSender} sender
- * @param {Function} sendResponse
  */
 async function onMessage(message, sender) {
     console.log('onMessage: message, sender:', message, sender)
@@ -156,6 +155,7 @@ async function authCredentials(event) {
         document.getElementById('auth-button').classList.add('visually-hidden')
         document.getElementById('error-alert').classList.add('visually-hidden')
         await initPopup()
+        console.warn('Auth Credentials Updated...')
     }
 }
 
@@ -213,7 +213,7 @@ function updateTable(data) {
 function clipClick(event) {
     console.log('clipClick:', event)
     const element = event.target.closest('a')
-    console.log('element:', element)
+    // console.log('element:', element)
     element.classList.add('link-success')
     element.classList.remove('link-body-emphasis')
     setTimeout(() => {
@@ -229,7 +229,7 @@ function clipClick(event) {
  */
 function displayError(message) {
     document.getElementById('loading-spinner').classList.add('visually-hidden')
-    let div = document.getElementById('error-alert')
-    div.innerHTML = message
-    div.style.display = 'block'
+    let element = document.getElementById('error-alert')
+    element.innerHTML = message
+    element.classList.remove('visually-hidden')
 }
