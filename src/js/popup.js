@@ -176,14 +176,12 @@ async function authCredentials(event) {
  * @param {Object} data
  */
 function updateTable(data) {
-    const tbodyRef = document
-        .getElementById('recent')
-        .getElementsByTagName('tbody')[0]
-    tbodyRef.innerHTML = ''
+    const tbody = document.querySelector('#recent tbody')
+    tbody.innerHTML = ''
 
     data.forEach(function (value, i) {
         const name = String(value.split('/').reverse()[0])
-        const row = tbodyRef.insertRow()
+        const row = tbody.insertRow()
 
         const copyLink = document.createTextNode(i + 1)
         const cell1 = row.insertCell()
