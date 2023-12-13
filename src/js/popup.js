@@ -91,8 +91,7 @@ async function initPopup() {
     updateTable(data)
     document.getElementById('recent').classList.remove('visually-hidden')
 
-    const clipboard = new ClipboardJS('.clip') // eslint-disable-line
-    // Re-Initialize data-href after updateTable
+    new ClipboardJS('.clip') // eslint-disable-line
     document.querySelectorAll('[data-href]').forEach((el) => {
         el.addEventListener('click', popupLinks)
     })
@@ -183,34 +182,34 @@ function updateTable(data) {
         const name = String(value.split('/').reverse()[0])
         const row = tbody.insertRow()
 
-        const copyLink = document.createTextNode(i + 1)
+        const count = document.createTextNode(i + 1)
         const cell1 = row.insertCell()
-        cell1.appendChild(copyLink)
+        cell1.appendChild(count)
 
-        const fileLink = document.createElement('a')
-        fileLink.text = name
-        fileLink.title = name
-        fileLink.dataset.href = value
-        fileLink.setAttribute('role', 'button')
-        fileLink.classList.add(
+        const link = document.createElement('a')
+        link.text = name
+        link.title = name
+        link.dataset.href = value
+        link.setAttribute('role', 'button')
+        link.classList.add(
             'link-underline',
             'link-underline-opacity-0',
             'link-underline-opacity-75-hover'
         )
-        fileLink.target = '_blank'
+        link.target = '_blank'
         const cell2 = row.insertCell()
-        cell2.appendChild(fileLink)
+        cell2.appendChild(link)
 
-        const copyBtn = document.createElement('a')
-        copyBtn.title = 'Copy'
-        copyBtn.setAttribute('role', 'button')
-        copyBtn.classList.add('clip')
-        copyBtn.dataset.clipboardText = value
-        copyBtn.innerHTML = '<i class="fa-regular fa-clipboard"></i>'
-        copyBtn.classList.add('link-body-emphasis')
-        copyBtn.onclick = clipClick
+        const copy = document.createElement('a')
+        copy.title = 'Copy'
+        copy.setAttribute('role', 'button')
+        copy.classList.add('clip')
+        copy.dataset.clipboardText = value
+        copy.innerHTML = '<i class="fa-regular fa-clipboard"></i>'
+        copy.classList.add('link-body-emphasis')
+        copy.onclick = clipClick
         const cell3 = row.insertCell()
-        cell3.appendChild(copyBtn)
+        cell3.appendChild(copy)
     })
 }
 
