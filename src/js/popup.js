@@ -45,17 +45,11 @@ async function initPopup() {
         authBtn.classList.add('btn-sm')
     }
 
-    document
-        .getElementById('django-files-links')
-        .classList.remove('visually-hidden')
+    document.getElementById('django-files-links').style.display = ''
 
     if (options.recentFiles === '0') {
         return console.log('Recent Files Disabled. Enable in Options.')
     }
-
-    document
-        .getElementById('loading-spinner')
-        .classList.remove('visually-hidden')
 
     const opts = {
         method: 'GET',
@@ -75,26 +69,23 @@ async function initPopup() {
     }
     console.log(`response.status: ${response.status}`, response, data)
 
-    document.getElementById('loading-spinner').classList.add('visually-hidden')
-
     if (!response.ok) {
-        console.warn(`error: ${data['error']}`)
-        return displayError(data['error'])
-    }
-    if (data === undefined) {
+        console.warn(`error: ${data.error}`)
+        return displayError(data.error)
+    } else if (data === undefined) {
         return displayError('Response Data Undefined.')
-    }
-    if (data.length === 0) {
+    } else if (data.length === 0) {
         return displayError('No Files Returned.')
     }
 
+    document.getElementById('loading-spinner').style.display = 'none'
     updateTable(data)
-    document.getElementById('recent').classList.remove('visually-hidden')
+    document.getElementById('files-table').style.display = ''
 
     new ClipboardJS('.clip') // eslint-disable-line
-    document.querySelectorAll('[data-href]').forEach((el) => {
-        el.addEventListener('click', popupLinks)
-    })
+    document
+        .querySelectorAll('[data-href]')
+        .forEach((el) => el.addEventListener('click', popupLinks))
 }
 
 /**
@@ -142,7 +133,7 @@ async function onMessage(message) {
         const auth = { siteUrl: message.siteUrl, authToken: message.authToken }
         await chrome.storage.local.set({ auth })
         const btn = document.getElementById('auth-button')
-        btn.classList.remove('visually-hidden')
+        btn.style.display = ''
         btn.addEventListener('click', authCredentials)
     }
 }
@@ -162,8 +153,8 @@ async function authCredentials(event) {
         options.siteUrl = auth.siteUrl
         await chrome.storage.sync.set({ options })
         console.warn('Auth Credentials Updated...')
-        document.getElementById('auth-button').classList.add('visually-hidden')
-        document.getElementById('error-alert').classList.add('visually-hidden')
+        document.getElementById('auth-button').style.display = 'none'
+        document.getElementById('error-alert').style.display = 'none'
         await initPopup()
         await chrome.runtime.sendMessage('reload-options')
     }
@@ -175,7 +166,7 @@ async function authCredentials(event) {
  * @param {Object} data
  */
 function updateTable(data) {
-    const tbody = document.querySelector('#recent tbody')
+    const tbody = document.querySelector('#files-table tbody')
     tbody.innerHTML = ''
 
     data.forEach(function (value, i) {
@@ -236,8 +227,8 @@ function clipClick(event) {
  * @param {String} message
  */
 function displayError(message) {
-    document.getElementById('loading-spinner').classList.add('visually-hidden')
+    document.getElementById('loading-spinner').style.display = 'none'
     const element = document.getElementById('error-alert')
     element.innerHTML = message
-    element.classList.remove('visually-hidden')
+    element.style.display = ''
 }
