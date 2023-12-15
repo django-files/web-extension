@@ -20,7 +20,7 @@ async function initPopup() {
 
     const missing = !options?.siteUrl || !options?.authToken
     console.log('missing:', missing)
-    if (options.checkAuth || missing) {
+    if (options?.checkAuth || missing) {
         if (missing) {
             displayError('Missing URL or Token.')
         }
@@ -35,7 +35,7 @@ async function initPopup() {
                 files: ['/js/auth.js'],
             })
         } catch (error) {
-            console.warn(error)
+            console.log(error)
         }
         if (missing) {
             return
@@ -114,7 +114,7 @@ async function popupLinks(event) {
     }
     console.log('url:', url)
     if (!url) {
-        return console.error('No dataset.href for anchor:', anchor)
+        return console.warn('No dataset.href for anchor:', anchor)
     }
     await chrome.tabs.create({ active: true, url })
     return window.close()
@@ -152,7 +152,7 @@ async function authCredentials(event) {
         options.authToken = auth.authToken
         options.siteUrl = auth.siteUrl
         await chrome.storage.sync.set({ options })
-        console.warn('Auth Credentials Updated...')
+        console.log('Auth Credentials Updated...')
         document.getElementById('auth-button').style.display = 'none'
         document.getElementById('error-alert').style.display = 'none'
         await initPopup()
@@ -169,13 +169,27 @@ function updateTable(data) {
     const tbody = document.querySelector('#files-table tbody')
     tbody.innerHTML = ''
 
+    // console.log('data:', data)
     data.forEach(function (value, i) {
-        const name = String(value.split('/').reverse()[0])
+        const url = new URL(value)
+        const name = url.pathname.replace(/^\/u\//, '')
         const row = tbody.insertRow()
 
-        const count = document.createTextNode(i + 1)
+        // const count = document.createTextNode(i + 1)
+        // const cell1 = row.insertCell()
+        // cell1.appendChild(count)
+
+        const copy = document.createElement('a')
+        copy.title = 'Copy'
+        copy.setAttribute('role', 'button')
+        copy.classList.add('clip')
+        copy.dataset.clipboardText = value
+        copy.innerHTML = '<i class="fa-regular fa-clipboard"></i>'
+        copy.classList.add('link-body-emphasis')
+        copy.onclick = clipClick
         const cell1 = row.insertCell()
-        cell1.appendChild(count)
+        // cell1.classList.add('align-middle')
+        cell1.appendChild(copy)
 
         const link = document.createElement('a')
         link.text = name
@@ -189,18 +203,8 @@ function updateTable(data) {
         )
         link.target = '_blank'
         const cell2 = row.insertCell()
+        cell2.classList.add('text-break')
         cell2.appendChild(link)
-
-        const copy = document.createElement('a')
-        copy.title = 'Copy'
-        copy.setAttribute('role', 'button')
-        copy.classList.add('clip')
-        copy.dataset.clipboardText = value
-        copy.innerHTML = '<i class="fa-regular fa-clipboard"></i>'
-        copy.classList.add('link-body-emphasis')
-        copy.onclick = clipClick
-        const cell3 = row.insertCell()
-        cell3.appendChild(copy)
     })
 }
 
