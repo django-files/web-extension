@@ -170,7 +170,7 @@ async function authCredentials(event) {
         await initPopup()
         try {
             await chrome.runtime.sendMessage('reload-options')
-        } catch (error) {}
+        } catch (_) {} // eslint-disable-line no-empty
     } else {
         displayAlert({ message: 'Error Getting or Setting Credentials.' })
     }
