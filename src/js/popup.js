@@ -25,27 +25,11 @@ async function initPopup() {
     console.log('options:', options)
 
     // If missing auth data or options.checkAuth check current site for auth
-    const missing = !options?.siteUrl || !options?.authToken
-    if (missing || options?.checkAuth) {
-        console.log('missing, checkAuth:', missing, options?.checkAuth)
-        try {
-            const [tab] = await chrome.tabs.query({
-                currentWindow: true,
-                active: true,
-            })
-            console.log('tab:', tab)
-            await chrome.scripting.executeScript({
-                target: { tabId: tab.id },
-                files: ['/js/auth.js'],
-            })
-        } catch (error) {
-            console.log(error)
-        }
-        if (missing || !options) {
-            authButton.classList.remove('btn-sm')
-            authButton.classList.add('btn-lg', 'my-2')
-            return displayAlert('Missing URL or Token.')
-        }
+    if (!options?.siteUrl || !options?.authToken) {
+        console.log('siteUrl, authToken:', options?.siteUrl, options?.authToken)
+        authButton.classList.remove('btn-sm')
+        authButton.classList.add('btn-lg', 'my-2')
+        return displayAlert({ message: 'Missing URL or Token.', auth: true })
     }
 
     // URL set in options, so show Django Files site link buttons
@@ -53,8 +37,10 @@ async function initPopup() {
 
     // If recent files disabled, do nothing
     if (options.recentFiles === '0') {
-        console.log('Recent Files Disabled. Enable in Options.')
-        return displayAlert('Recent Files are Disabled in Options.', 'success')
+        return displayAlert({
+            message: 'Recent Files Disabled in Options.',
+            type: 'success',
+        })
     }
 
     // Check Django Files API for recent files
@@ -72,18 +58,27 @@ async function initPopup() {
         data = await response.json()
     } catch (error) {
         console.warn(error)
-        return displayAlert(error.message, 'danger')
+        return displayAlert({
+            message: error.message,
+            type: 'danger',
+            auth: true,
+        })
     }
     console.log(`response.status: ${response.status}`, response, data)
 
     // Check response data is valid and has files
-    if (!response.ok) {
+    if (!response?.ok) {
         console.warn(`error: ${data.error}`)
-        return displayAlert(data.error, 'danger')
+        return displayAlert({ message: data.error, type: 'danger', auth: true })
     } else if (data === undefined) {
-        return displayAlert('Response Data Undefined.')
+        return displayAlert({ message: 'Response Data Undefined.', auth: true })
     } else if (!data.length) {
-        return displayAlert('No Files Returned.')
+        return displayAlert({ message: 'No Files Returned.' })
+    }
+
+    // Check auth if checkAuth is enabled in options
+    if (options.checkAuth) {
+        await checkSiteAuth()
     }
 
     // Hide loading display table, update table
@@ -141,7 +136,10 @@ async function onMessage(message) {
         console.log(`url: ${message.siteUrl}`)
         console.log(`token: ${message.authToken}`)
         const { options } = await chrome.storage.sync.get(['options'])
-        if (options?.siteUrl !== message.siteUrl) {
+        if (
+            options?.siteUrl !== message.siteUrl ||
+            options?.authToken !== message.authToken
+        ) {
             const auth = {
                 siteUrl: message.siteUrl,
                 authToken: message.authToken,
@@ -244,10 +242,30 @@ function clipClick(event) {
  * @function displayAlert
  * @param {String} message
  * @param {String} type
+ * @param {Boolean} auth
  */
-function displayAlert(message, type = 'warning') {
+function displayAlert({ message, type = 'warning', auth = false } = {}) {
     loadingSpinner.classList.add('d-none')
     errorAlert.innerHTML = message
     errorAlert.classList.add(`alert-${type}`)
     errorAlert.classList.remove('d-none')
+    if (auth) {
+        checkSiteAuth().then()
+    }
+}
+
+async function checkSiteAuth() {
+    try {
+        const [tab] = await chrome.tabs.query({
+            currentWindow: true,
+            active: true,
+        })
+        console.log('tab:', tab)
+        await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['/js/auth.js'],
+        })
+    } catch (error) {
+        console.log(error)
+    }
 }
