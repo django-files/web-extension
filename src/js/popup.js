@@ -8,6 +8,12 @@ document
 
 chrome.runtime.onMessage.addListener(onMessage)
 
+const loadingSpinner = document.getElementById('loading-spinner')
+const errorAlert = document.getElementById('error-alert')
+const authButton = document.getElementById('auth-button')
+
+authButton.addEventListener('click', authCredentials)
+
 /**
  * Popup Init Function
  * TODO: Overhaul this function
@@ -18,12 +24,10 @@ async function initPopup() {
     const { options } = await chrome.storage.sync.get(['options'])
     console.log('options:', options)
 
+    // If missing auth data or options.checkAuth check current site for auth
     const missing = !options?.siteUrl || !options?.authToken
-    console.log('missing:', missing)
-    if (options?.checkAuth || missing) {
-        if (missing) {
-            displayError('Missing URL or Token.')
-        }
+    if (missing || options?.checkAuth) {
+        console.log('missing, checkAuth:', missing, options?.checkAuth)
         try {
             const [tab] = await chrome.tabs.query({
                 currentWindow: true,
@@ -37,20 +41,23 @@ async function initPopup() {
         } catch (error) {
             console.log(error)
         }
-        if (missing) {
-            return
+        if (missing || !options) {
+            authButton.classList.remove('btn-sm')
+            authButton.classList.add('btn-lg', 'my-2')
+            return displayAlert('Missing URL or Token.')
         }
-        const authBtn = document.getElementById('auth-button')
-        authBtn.classList.remove('btn-lg', 'my-2')
-        authBtn.classList.add('btn-sm')
     }
 
+    // URL set in options, so show Django Files site link buttons
     document.getElementById('django-files-links').classList.remove('d-none')
 
+    // If recent files disabled, do nothing
     if (options.recentFiles === '0') {
-        return console.log('Recent Files Disabled. Enable in Options.')
+        console.log('Recent Files Disabled. Enable in Options.')
+        return displayAlert('Recent Files are Disabled in Options.', 'success')
     }
 
+    // Check Django Files API for recent files
     const opts = {
         method: 'GET',
         headers: { Authorization: options.authToken },
@@ -60,28 +67,31 @@ async function initPopup() {
     let data
     try {
         const url = new URL(`${options.siteUrl}/api/recent/`)
-        url.searchParams.append('amount', options?.recentFiles || '10')
+        url.searchParams.append('amount', options.recentFiles || '10')
         response = await fetch(url, opts)
         data = await response.json()
     } catch (error) {
         console.warn(error)
-        return displayError(error.message)
+        return displayAlert(error.message, 'danger')
     }
     console.log(`response.status: ${response.status}`, response, data)
 
+    // Check response data is valid and has files
     if (!response.ok) {
         console.warn(`error: ${data.error}`)
-        return displayError(data.error)
+        return displayAlert(data.error, 'danger')
     } else if (data === undefined) {
-        return displayError('Response Data Undefined.')
-    } else if (data.length === 0) {
-        return displayError('No Files Returned.')
+        return displayAlert('Response Data Undefined.')
+    } else if (!data.length) {
+        return displayAlert('No Files Returned.')
     }
 
-    document.getElementById('loading-spinner').classList.add('d-none')
-    updateTable(data)
+    // Hide loading display table, update table
+    loadingSpinner.classList.add('d-none')
     document.getElementById('files-table').classList.remove('d-none')
+    updateTable(data)
 
+    // Re-init clipboardJS and popupLinks after updateTable
     new ClipboardJS('.clip') // eslint-disable-line
     document
         .querySelectorAll('[data-href]')
@@ -130,11 +140,15 @@ async function onMessage(message) {
     if (message?.siteUrl && message?.authToken) {
         console.log(`url: ${message.siteUrl}`)
         console.log(`token: ${message.authToken}`)
-        const auth = { siteUrl: message.siteUrl, authToken: message.authToken }
-        await chrome.storage.local.set({ auth })
-        const btn = document.getElementById('auth-button')
-        btn.classList.remove('d-none')
-        btn.addEventListener('click', authCredentials)
+        const { options } = await chrome.storage.sync.get(['options'])
+        if (options?.siteUrl !== message.siteUrl) {
+            const auth = {
+                siteUrl: message.siteUrl,
+                authToken: message.authToken,
+            }
+            await chrome.storage.local.set({ auth })
+            authButton.classList.remove('d-none')
+        }
     }
 }
 
@@ -147,14 +161,14 @@ async function authCredentials(event) {
     console.log('authCredentials:', event)
     const { auth } = await chrome.storage.local.get(['auth'])
     console.log('auth:', auth)
-    if (auth) {
+    if (auth?.authToken && auth?.siteUrl) {
         const { options } = await chrome.storage.sync.get(['options'])
         options.authToken = auth.authToken
         options.siteUrl = auth.siteUrl
         await chrome.storage.sync.set({ options })
         console.log('Auth Credentials Updated...')
-        document.getElementById('auth-button').classList.add('d-none')
-        document.getElementById('error-alert').classList.add('d-none')
+        authButton.classList.add('d-none')
+        errorAlert.classList.add('d-none')
         await initPopup()
         await chrome.runtime.sendMessage('reload-options')
     }
@@ -227,12 +241,13 @@ function clipClick(event) {
 
 /**
  * Display Popup Error Message
- * @function displayError
+ * @function displayAlert
  * @param {String} message
+ * @param {String} type
  */
-function displayError(message) {
-    document.getElementById('loading-spinner').classList.add('d-none')
-    const element = document.getElementById('error-alert')
-    element.innerHTML = message
-    element.classList.remove('d-none')
+function displayAlert(message, type = 'warning') {
+    loadingSpinner.classList.add('d-none')
+    errorAlert.innerHTML = message
+    errorAlert.classList.add(`alert-${type}`)
+    errorAlert.classList.remove('d-none')
 }
