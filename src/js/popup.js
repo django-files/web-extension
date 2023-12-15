@@ -170,7 +170,7 @@ function updateTable(data) {
     tbody.innerHTML = ''
 
     // console.log('data:', data)
-    data.forEach(function (value, i) {
+    data.forEach(function (value) {
         const url = new URL(value)
         const name = url.pathname.replace(/^\/u\//, '')
         const row = tbody.insertRow()
