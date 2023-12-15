@@ -169,6 +169,8 @@ async function authCredentials(event) {
         errorAlert.classList.add('d-none')
         await initPopup()
         await chrome.runtime.sendMessage('reload-options')
+    } else {
+        displayAlert({ message: 'Error Getting or Setting Credentials.' })
     }
 }
 
