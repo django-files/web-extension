@@ -1,11 +1,4 @@
 body {
-    width: 360px;
+    width: 380px;
     overflow-x: hidden;
-}
-
-a {
-    white-space: -moz-pre-wrap !important;
-    word-wrap: break-word;
-    word-break: break-all;
-    white-space: normal;
 }

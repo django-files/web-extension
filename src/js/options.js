@@ -48,10 +48,8 @@ async function saveOptions(event) {
         event.target.value = event.target.value.replace(/\/+$/, '')
         options[event.target.id] = event.target.value
     } else if (event.target.id === 'recentFiles') {
-        const number = parseFloat(event.target.value)
-        console.log('number:', number)
-        if (!isNaN(number) && number <= 99) {
-            console.log('number.toString():', number.toString())
+        const number = parseInt(event.target.value)
+        if (!isNaN(number) && number >= 0 && number <= 99) {
             event.target.value = number.toString()
             options[event.target.id] = event.target.value
         } else {

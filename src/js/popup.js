@@ -8,6 +8,12 @@ document
 
 chrome.runtime.onMessage.addListener(onMessage)
 
+const loadingSpinner = document.getElementById('loading-spinner')
+const errorAlert = document.getElementById('error-alert')
+const authButton = document.getElementById('auth-button')
+
+authButton.addEventListener('click', authCredentials)
+
 /**
  * Popup Init Function
  * TODO: Overhaul this function
@@ -18,45 +24,26 @@ async function initPopup() {
     const { options } = await chrome.storage.sync.get(['options'])
     console.log('options:', options)
 
-    const missing = !options?.siteUrl || !options?.authToken
-    console.log('missing:', missing)
-    if (options.checkAuth || missing) {
-        if (missing) {
-            displayError('Missing URL or Token.')
-        }
-        try {
-            const [tab] = await chrome.tabs.query({
-                currentWindow: true,
-                active: true,
-            })
-            console.log('tab:', tab)
-            await chrome.scripting.executeScript({
-                target: { tabId: tab.id },
-                files: ['/js/auth.js'],
-            })
-        } catch (error) {
-            console.warn(error)
-        }
-        if (missing) {
-            return
-        }
-        const authBtn = document.getElementById('auth-button')
-        authBtn.classList.remove('btn-lg', 'my-2')
-        authBtn.classList.add('btn-sm')
+    // If missing auth data or options.checkAuth check current site for auth
+    if (!options?.siteUrl || !options?.authToken) {
+        console.log('siteUrl, authToken:', options?.siteUrl, options?.authToken)
+        authButton.classList.remove('btn-sm')
+        authButton.classList.add('btn-lg', 'my-2')
+        return displayAlert({ message: 'Missing URL or Token.', auth: true })
     }
 
-    document
-        .getElementById('django-files-links')
-        .classList.remove('visually-hidden')
+    // URL set in options, so show Django Files site link buttons
+    document.getElementById('django-files-links').classList.remove('d-none')
 
+    // If recent files disabled, do nothing
     if (options.recentFiles === '0') {
-        return console.log('Recent Files Disabled. Enable in Options.')
+        return displayAlert({
+            message: 'Recent Files Disabled in Options.',
+            type: 'success',
+        })
     }
 
-    document
-        .getElementById('loading-spinner')
-        .classList.remove('visually-hidden')
-
+    // Check Django Files API for recent files
     const opts = {
         method: 'GET',
         headers: { Authorization: options.authToken },
@@ -66,36 +53,44 @@ async function initPopup() {
     let data
     try {
         const url = new URL(`${options.siteUrl}/api/recent/`)
-        url.searchParams.append('amount', options?.recentFiles || '10')
+        url.searchParams.append('amount', options.recentFiles || '10')
         response = await fetch(url, opts)
         data = await response.json()
     } catch (error) {
         console.warn(error)
-        return displayError(error.message)
+        return displayAlert({
+            message: error.message,
+            type: 'danger',
+            auth: true,
+        })
     }
     console.log(`response.status: ${response.status}`, response, data)
 
-    document.getElementById('loading-spinner').classList.add('visually-hidden')
-
-    if (!response.ok) {
-        console.warn(`error: ${data['error']}`)
-        return displayError(data['error'])
-    }
-    if (data === undefined) {
-        return displayError('Response Data Undefined.')
-    }
-    if (data.length === 0) {
-        return displayError('No Files Returned.')
+    // Check response data is valid and has files
+    if (!response?.ok) {
+        console.warn(`error: ${data.error}`)
+        return displayAlert({ message: data.error, type: 'danger', auth: true })
+    } else if (data === undefined) {
+        return displayAlert({ message: 'Response Data Undefined.', auth: true })
+    } else if (!data.length) {
+        return displayAlert({ message: 'No Files Returned.' })
     }
 
+    // Check auth if checkAuth is enabled in options
+    if (options.checkAuth) {
+        await checkSiteAuth()
+    }
+
+    // Hide loading display table, update table
+    loadingSpinner.classList.add('d-none')
+    document.getElementById('files-table').classList.remove('d-none')
     updateTable(data)
-    document.getElementById('recent').classList.remove('visually-hidden')
 
-    const clipboard = new ClipboardJS('.clip') // eslint-disable-line
-    // Re-Initialize data-href after updateTable
-    document.querySelectorAll('[data-href]').forEach((el) => {
-        el.addEventListener('click', popupLinks)
-    })
+    // Re-init clipboardJS and popupLinks after updateTable
+    new ClipboardJS('.clip') // eslint-disable-line
+    document
+        .querySelectorAll('[data-href]')
+        .forEach((el) => el.addEventListener('click', popupLinks))
 }
 
 /**
@@ -124,7 +119,7 @@ async function popupLinks(event) {
     }
     console.log('url:', url)
     if (!url) {
-        return console.error('No dataset.href for anchor:', anchor)
+        return console.warn('No dataset.href for anchor:', anchor)
     }
     await chrome.tabs.create({ active: true, url })
     return window.close()
@@ -140,11 +135,18 @@ async function onMessage(message) {
     if (message?.siteUrl && message?.authToken) {
         console.log(`url: ${message.siteUrl}`)
         console.log(`token: ${message.authToken}`)
-        const auth = { siteUrl: message.siteUrl, authToken: message.authToken }
-        await chrome.storage.local.set({ auth })
-        const btn = document.getElementById('auth-button')
-        btn.classList.remove('visually-hidden')
-        btn.addEventListener('click', authCredentials)
+        const { options } = await chrome.storage.sync.get(['options'])
+        if (
+            options?.siteUrl !== message.siteUrl ||
+            options?.authToken !== message.authToken
+        ) {
+            const auth = {
+                siteUrl: message.siteUrl,
+                authToken: message.authToken,
+            }
+            await chrome.storage.local.set({ auth })
+            authButton.classList.remove('d-none')
+        }
     }
 }
 
@@ -157,16 +159,18 @@ async function authCredentials(event) {
     console.log('authCredentials:', event)
     const { auth } = await chrome.storage.local.get(['auth'])
     console.log('auth:', auth)
-    if (auth) {
+    if (auth?.authToken && auth?.siteUrl) {
         const { options } = await chrome.storage.sync.get(['options'])
         options.authToken = auth.authToken
         options.siteUrl = auth.siteUrl
         await chrome.storage.sync.set({ options })
-        console.warn('Auth Credentials Updated...')
-        document.getElementById('auth-button').classList.add('visually-hidden')
-        document.getElementById('error-alert').classList.add('visually-hidden')
+        console.log('Auth Credentials Updated...')
+        authButton.classList.add('d-none')
+        errorAlert.classList.add('d-none')
         await initPopup()
         await chrome.runtime.sendMessage('reload-options')
+    } else {
+        displayAlert({ message: 'Error Getting or Setting Credentials.' })
     }
 }
 
@@ -176,43 +180,45 @@ async function authCredentials(event) {
  * @param {Object} data
  */
 function updateTable(data) {
-    const tbodyRef = document
-        .getElementById('recent')
-        .getElementsByTagName('tbody')[0]
-    tbodyRef.innerHTML = ''
+    const tbody = document.querySelector('#files-table tbody')
+    tbody.innerHTML = ''
 
-    data.forEach(function (value, i) {
-        const name = String(value.split('/').reverse()[0])
-        const row = tbodyRef.insertRow()
+    // console.log('data:', data)
+    data.forEach(function (value) {
+        const url = new URL(value)
+        const name = url.pathname.replace(/^\/u\//, '')
+        const row = tbody.insertRow()
 
-        const copyLink = document.createTextNode(i + 1)
+        // const count = document.createTextNode(i + 1)
+        // const cell1 = row.insertCell()
+        // cell1.appendChild(count)
+
+        const copy = document.createElement('a')
+        copy.title = 'Copy'
+        copy.setAttribute('role', 'button')
+        copy.classList.add('clip')
+        copy.dataset.clipboardText = value
+        copy.innerHTML = '<i class="fa-regular fa-clipboard"></i>'
+        copy.classList.add('link-body-emphasis')
+        copy.onclick = clipClick
         const cell1 = row.insertCell()
-        cell1.appendChild(copyLink)
+        // cell1.classList.add('align-middle')
+        cell1.appendChild(copy)
 
-        const fileLink = document.createElement('a')
-        fileLink.text = name
-        fileLink.title = name
-        fileLink.dataset.href = value
-        fileLink.setAttribute('role', 'button')
-        fileLink.classList.add(
+        const link = document.createElement('a')
+        link.text = name
+        link.title = name
+        link.dataset.href = value
+        link.setAttribute('role', 'button')
+        link.classList.add(
             'link-underline',
             'link-underline-opacity-0',
             'link-underline-opacity-75-hover'
         )
-        fileLink.target = '_blank'
+        link.target = '_blank'
         const cell2 = row.insertCell()
-        cell2.appendChild(fileLink)
-
-        const copyBtn = document.createElement('a')
-        copyBtn.title = 'Copy'
-        copyBtn.setAttribute('role', 'button')
-        copyBtn.classList.add('clip')
-        copyBtn.dataset.clipboardText = value
-        copyBtn.innerHTML = '<i class="fa-regular fa-clipboard"></i>'
-        copyBtn.classList.add('link-body-emphasis')
-        copyBtn.onclick = clipClick
-        const cell3 = row.insertCell()
-        cell3.appendChild(copyBtn)
+        cell2.classList.add('text-break')
+        cell2.appendChild(link)
     })
 }
 
@@ -235,12 +241,33 @@ function clipClick(event) {
 
 /**
  * Display Popup Error Message
- * @function displayError
+ * @function displayAlert
  * @param {String} message
+ * @param {String} type
+ * @param {Boolean} auth
  */
-function displayError(message) {
-    document.getElementById('loading-spinner').classList.add('visually-hidden')
-    const element = document.getElementById('error-alert')
-    element.innerHTML = message
-    element.classList.remove('visually-hidden')
+function displayAlert({ message, type = 'warning', auth = false } = {}) {
+    loadingSpinner.classList.add('d-none')
+    errorAlert.innerHTML = message
+    errorAlert.classList.add(`alert-${type}`)
+    errorAlert.classList.remove('d-none')
+    if (auth) {
+        checkSiteAuth().then()
+    }
+}
+
+async function checkSiteAuth() {
+    try {
+        const [tab] = await chrome.tabs.query({
+            currentWindow: true,
+            active: true,
+        })
+        console.log('tab:', tab)
+        await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['/js/auth.js'],
+        })
+    } catch (error) {
+        console.log(error)
+    }
 }

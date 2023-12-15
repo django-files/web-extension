@@ -16,7 +16,7 @@
         <h2>Django Files Extension</h2>
     </div>
     <div class="d-grid g-2" id="popup-buttons">
-        <div id="django-files-links" class="btn-group btn-group-sm visually-hidden" role="group" aria-label="Django Files Links">
+        <div id="django-files-links" class="btn-group btn-group-sm d-none" role="group" aria-label="Django Files Links">
             <a role="button" class="btn btn-outline-success" data-href="" data-location="/files/">
                 <i class="fa-regular fa-folder-open me-2"></i> Files</a>
             <a role="button" class="btn btn-outline-success" data-href="" data-location="/gallery/">
@@ -26,22 +26,21 @@
             <i class="fa-solid fa-gear me-2"></i> Open Options</a>
     </div>
 
-    <a role="button" class="btn btn-lg btn-success w-100 my-2 visually-hidden" id="auth-button">
-        <i class="fa-solid fa-key"></i>
-        Add Auth from Current Site</a>
+    <a id="auth-button" class="btn btn-sm btn-success w-100 d-none" role="button">
+        <i class="fa-solid fa-key"></i> Add Auth from Current Site</a>
 
-    <div class="d-flex justify-content-center mt-2 visually-hidden" id="loading-spinner">
-        <span class="visually-hidden">Loading...</span>
-        <div class="spinner-grow mx-1" role="status"></div>
-        <div class="spinner-grow mx-1" role="status"></div>
-        <div class="spinner-grow mx-1" role="status"></div>
+    <div id="loading-spinner" class="text-center mt-3">
+        <i class="fa-solid fa-sync fa-spin fa-3x"></i>
+        <p>Loading...</p>
     </div>
-    <table id="recent" class="table table-striped table-sm mt-2 mb-0 visually-hidden">
+
+    <div id="error-alert" class="alert text-center my-2 d-none" role="alert"></div>
+
+    <table id="files-table" class="table table-striped table-hover table-sm small align-middle mt-1 mb-0 d-none">
         <caption class="visually-hidden">Recent Uploads</caption>
         <thead class="visually-hidden"><tr><th>Number</th><th>File URL</th></tr></thead>
         <tbody></tbody>
     </table>
-    <div id="error-alert" class="alert alert-warning mt-2 mb-0 visually-hidden" role="alert"></div>
 </div>
 
 <script type="text/javascript" src="../dist/polyfill/browser-polyfill.min.js"></script>
