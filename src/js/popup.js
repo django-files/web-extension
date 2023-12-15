@@ -168,7 +168,9 @@ async function authCredentials(event) {
         authButton.classList.add('d-none')
         errorAlert.classList.add('d-none')
         await initPopup()
-        await chrome.runtime.sendMessage('reload-options')
+        try {
+            await chrome.runtime.sendMessage('reload-options')
+        } catch (error) {}
     } else {
         displayAlert({ message: 'Error Getting or Setting Credentials.' })
     }
