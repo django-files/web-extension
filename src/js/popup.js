@@ -45,7 +45,7 @@ async function initPopup() {
         authBtn.classList.add('btn-sm')
     }
 
-    document.getElementById('django-files-links').style.display = ''
+    document.getElementById('django-files-links').classList.remove('d-none')
 
     if (options.recentFiles === '0') {
         return console.log('Recent Files Disabled. Enable in Options.')
@@ -78,9 +78,9 @@ async function initPopup() {
         return displayError('No Files Returned.')
     }
 
-    document.getElementById('loading-spinner').style.display = 'none'
+    document.getElementById('loading-spinner').classList.add('d-none')
     updateTable(data)
-    document.getElementById('files-table').style.display = ''
+    document.getElementById('files-table').classList.remove('d-none')
 
     new ClipboardJS('.clip') // eslint-disable-line
     document
@@ -133,7 +133,7 @@ async function onMessage(message) {
         const auth = { siteUrl: message.siteUrl, authToken: message.authToken }
         await chrome.storage.local.set({ auth })
         const btn = document.getElementById('auth-button')
-        btn.style.display = ''
+        btn.classList.remove('d-none')
         btn.addEventListener('click', authCredentials)
     }
 }
@@ -153,8 +153,8 @@ async function authCredentials(event) {
         options.siteUrl = auth.siteUrl
         await chrome.storage.sync.set({ options })
         console.log('Auth Credentials Updated...')
-        document.getElementById('auth-button').style.display = 'none'
-        document.getElementById('error-alert').style.display = 'none'
+        document.getElementById('auth-button').classList.add('d-none')
+        document.getElementById('error-alert').classList.add('d-none')
         await initPopup()
         await chrome.runtime.sendMessage('reload-options')
     }
@@ -231,8 +231,8 @@ function clipClick(event) {
  * @param {String} message
  */
 function displayError(message) {
-    document.getElementById('loading-spinner').style.display = 'none'
+    document.getElementById('loading-spinner').classList.add('d-none')
     const element = document.getElementById('error-alert')
     element.innerHTML = message
-    element.style.display = ''
+    element.classList.remove('d-none')
 }
