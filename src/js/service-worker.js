@@ -116,7 +116,8 @@ function onChanged(changes, namespace) {
  * @function createContextMenus
  */
 function createContextMenus() {
-    // console.log('createContextMenus')
+    console.log('createContextMenus')
+    chrome.contextMenus.removeAll()
     const ctx = ['link', 'image', 'video', 'audio']
     const contexts = [
         [['link'], 'short', 'normal', 'Create Short URL'],
