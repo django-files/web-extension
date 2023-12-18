@@ -20,8 +20,8 @@ gulp.task('fontawesome', () => {
         .src(
             [
                 'node_modules/@fortawesome/fontawesome-free/css/all.min.css',
-                'node_modules/@fortawesome/fontawesome-free/js/all.min.js',
-                'node_modules/@fortawesome/fontawesome-free/webfonts/**/*',
+                'node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-*',
+                'node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-*',
             ],
             { base: 'node_modules/@fortawesome/fontawesome-free' }
         )
