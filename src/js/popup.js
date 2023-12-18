@@ -59,10 +59,10 @@ async function initPopup() {
         url.searchParams.append('amount', options.recentFiles || '10')
         response = await fetch(url, opts)
         data = await response.json()
-    } catch (error) {
-        console.warn(error)
+    } catch (e) {
+        console.warn(e)
         return displayAlert({
-            message: error.message,
+            message: e.message,
             type: 'danger',
             auth: true,
         })
@@ -90,7 +90,7 @@ async function initPopup() {
     updateTable(data)
 
     // Re-init clipboardJS and popupLinks after updateTable
-    new ClipboardJS('.clip') // eslint-disable-line
+    new ClipboardJS('.clip')
     document
         .querySelectorAll('a[href]')
         .forEach((el) => el.addEventListener('click', popupLinks))
@@ -166,7 +166,7 @@ async function authCredentials(event) {
         await initPopup()
         try {
             await chrome.runtime.sendMessage('reload-options')
-        } catch (_) {} // eslint-disable-line no-empty
+        } catch (e) {}
     } else {
         displayAlert({ message: 'Error Getting or Setting Credentials.' })
     }
@@ -265,7 +265,5 @@ async function checkSiteAuth() {
             target: { tabId: tab.id },
             files: ['/js/auth.js'],
         })
-    } catch (error) {
-        console.log(error)
-    }
+    } catch (e) {}
 }

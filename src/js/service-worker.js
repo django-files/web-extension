@@ -177,8 +177,8 @@ async function processRemote(endpoint, url, message) {
     let response
     try {
         response = await postURL(endpoint, url)
-    } catch (error) {
-        console.log('error:', error)
+    } catch (e) {
+        console.log('error:', e)
         return await sendNotification('Fetch Error', `Error: ${error.message}`)
     }
     console.log('response:', response)
@@ -192,8 +192,8 @@ async function processRemote(endpoint, url, message) {
             const data = await response.json()
             console.log('data:', data)
             await sendNotification('Processing Error', `Error: ${data.error}`)
-        } catch (error) {
-            console.log('error:', error)
+        } catch (e) {
+            console.log('error:', e)
             await sendNotification(
                 'Processing Error',
                 `Error: Response Status: ${response.status}`
