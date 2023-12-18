@@ -5,7 +5,9 @@
     <link rel="icon" href="../media/logo16.png" sizes="any">
     <link rel="stylesheet" type="text/css" href="../dist/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../dist/fontawesome/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/main.css">
     <link rel="stylesheet" type="text/css" href="../css/options.css">
+    <script type="text/javascript" src="../js/theme.js"></script>
 </head>
 <body class="h-100">
 
@@ -16,11 +18,12 @@
 <div class="container-fluid p-2 h-100">
 <div class="d-flex align-items-center h-100">
 <div class="col-xl-6 col-md-8 col-12 m-auto">
-<div class="card p-2 mb-3" >
+<div class="card p-2" >
 <div class="card-body">
-    <div class="justify-content-center align-items-center d-flex">
-        <img src="../media/logo48.png" class="img-fluid float-start me-2" alt="Link Extractor" height="48" width="48">
-        <h1 class="align-middle">Django Files Extension</h1>
+    <div class="d-flex justify-content-center align-items-center">
+        <img src="../media/logo48.png" class="me-2" height="48" width="48"
+             alt="Django Files Extension" title="Django Files Extension">
+        <h1>Django Files Extension</h1>
     </div>
     <div class="clearfix"></div>
     <p class="text-center lead">v<span id="version"></span></p>
@@ -78,13 +81,14 @@
             </div>
         </div>
     </form>
+    <hr>
     <div class="text-center">
         <a class="link-body-emphasis text-decoration-none" target="_blank" rel="noopener"
            href="https://github.com/django-files/chrome-extension#readme">Get Help</a>
-        <i class="fa-solid fa-circle fa-2xs mx-2"></i>
+        <svg><use xlink:href="#bi-dot" /></svg>
         <a class="link-body-emphasis text-decoration-none" target="_blank" rel="noopener"
            href="https://github.com/django-files/chrome-extension">View Source</a>
-        <i class="fa-solid fa-circle fa-2xs mx-2"></i>
+        <svg><use xlink:href="#bi-dot" /></svg>
         <a class="link-body-emphasis text-decoration-none" target="_blank" rel="noopener"
            href="https://django-files.github.io/">Django Files</a>
     </div>
@@ -93,6 +97,12 @@
 </div> <!-- col -->
 </div> <!-- flex -->
 </div> <!-- container -->
+
+<div class="d-none">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" id="bi-dot" viewBox="0 0 16 16">
+        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+    </svg>
+</div>
 
 <script type="text/javascript" src="../dist/polyfill/browser-polyfill.min.js"></script>
 <script type="text/javascript" src="../dist/jquery/jquery.min.js"></script>

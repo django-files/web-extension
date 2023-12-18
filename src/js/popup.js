@@ -166,7 +166,7 @@ async function authCredentials(event) {
         await initPopup()
         try {
             await chrome.runtime.sendMessage('reload-options')
-        } catch (e) {}
+        } catch (e) {} // eslint-disable-line no-empty
     } else {
         displayAlert({ message: 'Error Getting or Setting Credentials.' })
     }
@@ -265,5 +265,5 @@ async function checkSiteAuth() {
             target: { tabId: tab.id },
             files: ['/js/auth.js'],
         })
-    } catch (e) {}
+    } catch (e) {} // eslint-disable-line no-empty
 }
