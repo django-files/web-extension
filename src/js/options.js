@@ -10,6 +10,9 @@ document
 document
     .getElementById('options-form')
     .addEventListener('submit', (e) => e.preventDefault())
+document
+    .querySelectorAll('[data-bs-toggle="tooltip"]')
+    .forEach((el) => new bootstrap.Tooltip(el))
 
 /**
  * Options Init Function

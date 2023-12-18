@@ -1,3 +1,5 @@
+/* CSS for options.html */
+
 body {
     margin: 0;
     background: #000;
@@ -16,6 +18,10 @@ video {
     background: url("../media/loop.jpg") no-repeat;
     background-size: cover;
     transition: 1s opacity;
+}
+
+.card {
+    min-width: 380px;
 }
 
 .card,
