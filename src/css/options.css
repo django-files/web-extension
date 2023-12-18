@@ -28,9 +28,3 @@ video {
 table tr {
     background: rgba(0 0 0 / 30%);
 }
-
-svg {
-    height: 1em;
-    width: 1em;
-    margin-bottom: 0.15em;
-}
