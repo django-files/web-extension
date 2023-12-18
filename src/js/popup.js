@@ -3,7 +3,7 @@
 document.addEventListener('DOMContentLoaded', initPopup)
 
 document
-    .querySelectorAll('[href]')
+    .querySelectorAll('a[href]')
     .forEach((el) => el.addEventListener('click', popupLinks))
 
 chrome.runtime.onMessage.addListener(onMessage)
@@ -92,7 +92,7 @@ async function initPopup() {
     // Re-init clipboardJS and popupLinks after updateTable
     new ClipboardJS('.clip') // eslint-disable-line
     document
-        .querySelectorAll('[href]')
+        .querySelectorAll('a[href]')
         .forEach((el) => el.addEventListener('click', popupLinks))
 }
 
