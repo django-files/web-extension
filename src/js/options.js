@@ -12,7 +12,7 @@ document
     .addEventListener('submit', (e) => e.preventDefault())
 document
     .querySelectorAll('[data-bs-toggle="tooltip"]')
-    .forEach((el) => new bootstrap.Tooltip(el)) // eslint-disable-line no-undef
+    .forEach((el) => new bootstrap.Tooltip(el))
 
 /**
  * Options Init Function
