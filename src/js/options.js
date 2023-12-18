@@ -2,14 +2,17 @@
 
 document.addEventListener('DOMContentLoaded', initOptions)
 
+chrome.runtime.onMessage.addListener(onMessage)
+
 document
     .querySelectorAll('input')
     .forEach((el) => el.addEventListener('change', saveOptions))
 document
     .getElementById('options-form')
     .addEventListener('submit', (e) => e.preventDefault())
-
-chrome.runtime.onMessage.addListener(onMessage)
+document
+    .querySelectorAll('[data-bs-toggle="tooltip"]')
+    .forEach((el) => new bootstrap.Tooltip(el))
 
 /**
  * Options Init Function
@@ -32,6 +35,18 @@ async function initOptions() {
     const commands = await chrome.commands.getAll()
     document.getElementById('mainKey').textContent =
         commands.find((x) => x.name === '_execute_action').shortcut || 'Not Set'
+}
+
+/**
+ * On Message Callback
+ * @function onMessage
+ * @param {Object} message
+ */
+async function onMessage(message) {
+    // console.log('onMessage: message, sender:', message, sender)
+    if (message === 'reload-options') {
+        window.location.reload()
+    }
 }
 
 /**
@@ -61,18 +76,6 @@ async function saveOptions(event) {
     console.log(`Set: "${event.target.id}" to target:`, event.target)
     console.log('options:', options)
     await chrome.storage.sync.set({ options })
-}
-
-/**
- * On Message Callback
- * @function onMessage
- * @param {Object} message
- */
-async function onMessage(message) {
-    // console.log('onMessage: message, sender:', message, sender)
-    if (message === 'reload-options') {
-        window.location.reload()
-    }
 }
 
 /**

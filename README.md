@@ -7,7 +7,7 @@
 [![Build](https://github.com/django-files/web-extension/actions/workflows/build.yaml/badge.svg)](https://github.com/django-files/web-extension/actions/workflows/build.yaml)
 [![Test](https://github.com/django-files/web-extension/actions/workflows/test.yaml/badge.svg)](https://github.com/django-files/web-extension/actions/workflows/test.yaml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/7842944ada6b4c7ebb4f9dc83ed6a654)](https://app.codacy.com/gh/django-files/web-extension/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=django-files_django-files&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=django-files_django-files)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=django-files_web-extension&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=django-files_web-extension)
 # Django Files Web Extension
 
 [Chrome](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej) Web Extension and

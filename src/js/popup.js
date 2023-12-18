@@ -3,7 +3,7 @@
 document.addEventListener('DOMContentLoaded', initPopup)
 
 document
-    .querySelectorAll('[data-href]')
+    .querySelectorAll('a[href]')
     .forEach((el) => el.addEventListener('click', popupLinks))
 
 chrome.runtime.onMessage.addListener(onMessage)
@@ -33,6 +33,9 @@ async function initPopup() {
     }
 
     // URL set in options, so show Django Files site link buttons
+    document
+        .querySelectorAll('[data-location]')
+        .forEach((el) => (el.href = options.siteUrl + el.dataset.location))
     document.getElementById('django-files-links').classList.remove('d-none')
 
     // If recent files disabled, do nothing
@@ -56,10 +59,10 @@ async function initPopup() {
         url.searchParams.append('amount', options.recentFiles || '10')
         response = await fetch(url, opts)
         data = await response.json()
-    } catch (error) {
-        console.warn(error)
+    } catch (e) {
+        console.warn(e)
         return displayAlert({
-            message: error.message,
+            message: e.message,
             type: 'danger',
             auth: true,
         })
@@ -87,9 +90,9 @@ async function initPopup() {
     updateTable(data)
 
     // Re-init clipboardJS and popupLinks after updateTable
-    new ClipboardJS('.clip') // eslint-disable-line
+    new ClipboardJS('.clip')
     document
-        .querySelectorAll('[data-href]')
+        .querySelectorAll('a[href]')
         .forEach((el) => el.addEventListener('click', popupLinks))
 }
 
@@ -103,24 +106,17 @@ async function popupLinks(event) {
     console.log('popupLinks:', event)
     event.preventDefault()
     const anchor = event.target.closest('a')
+    console.log(`anchor.href: ${anchor.href}`)
     let url
-    if (anchor?.dataset?.location) {
-        const { options } = await chrome.storage.sync.get(['options'])
-        url = options?.siteUrl + anchor.dataset.location
-    } else if (anchor.dataset.href.startsWith('http')) {
-        url = anchor.dataset.href
-    } else if (anchor.dataset.href === 'homepage') {
-        url = chrome.runtime.getManifest().homepage_url
-    } else if (anchor.dataset.href === 'options') {
+    if (anchor.href.endsWith('html/options.html')) {
         chrome.runtime.openOptionsPage()
         return window.close()
-    } else if (anchor?.dataset?.href) {
-        url = chrome.runtime.getURL(anchor.dataset.href)
+    } else if (anchor.href.startsWith('http')) {
+        url = anchor.href
+    } else {
+        url = chrome.runtime.getURL(anchor.href)
     }
     console.log('url:', url)
-    if (!url) {
-        return console.warn('No dataset.href for anchor:', anchor)
-    }
     await chrome.tabs.create({ active: true, url })
     return window.close()
 }
@@ -170,7 +166,7 @@ async function authCredentials(event) {
         await initPopup()
         try {
             await chrome.runtime.sendMessage('reload-options')
-        } catch (_) {} // eslint-disable-line no-empty
+        } catch (e) {}
     } else {
         displayAlert({ message: 'Error Getting or Setting Credentials.' })
     }
@@ -210,7 +206,7 @@ function updateTable(data) {
         const link = document.createElement('a')
         link.text = name
         link.title = name
-        link.dataset.href = value
+        link.href = value
         link.setAttribute('role', 'button')
         link.classList.add(
             'link-underline',
@@ -269,7 +265,5 @@ async function checkSiteAuth() {
             target: { tabId: tab.id },
             files: ['/js/auth.js'],
         })
-    } catch (error) {
-        console.log(error)
-    }
+    } catch (e) {}
 }
