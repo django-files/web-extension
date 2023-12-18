@@ -1,6 +1,5 @@
 // JS auth.js
 
-// eslint-disable-next-line no-extra-semi
 ;(async () => {
     const credentials = getCredentials()
     if (credentials) {
