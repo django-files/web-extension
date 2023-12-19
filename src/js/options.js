@@ -66,7 +66,7 @@ async function saveOptions(event) {
         const number = parseInt(event.target.value)
         if (!isNaN(number) && number >= 0 && number <= 99) {
             event.target.value = number.toString()
-            options[event.target.id] = event.target.value
+            options[event.target.id] = number
         } else {
             event.target.value = options[event.target.id]
         }

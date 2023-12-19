@@ -8,7 +8,8 @@ document
 
 chrome.runtime.onMessage.addListener(onMessage)
 
-const loadingSpinner = document.getElementById('loading-spinner')
+// const loadingSpinner = document.getElementById('loading-spinner')
+const loadingTable = document.getElementById('loading-table')
 const errorAlert = document.getElementById('error-alert')
 const authButton = document.getElementById('auth-button')
 
@@ -39,12 +40,13 @@ async function initPopup() {
     document.getElementById('django-files-links').classList.remove('d-none')
 
     // If recent files disabled, do nothing
-    if (options.recentFiles === '0') {
+    if (!parseInt(options.recentFiles)) {
         return displayAlert({
             message: 'Recent Files Disabled in Options.',
             type: 'success',
         })
     }
+    genLoadingTable(options.recentFiles)
 
     // Check Django Files API for recent files
     const opts = {
@@ -85,7 +87,7 @@ async function initPopup() {
     }
 
     // Hide loading display table, update table
-    loadingSpinner.classList.add('d-none')
+    loadingTable.classList.add('d-none')
     document.getElementById('files-table').classList.remove('d-none')
     updateTable(data)
 
@@ -173,6 +175,25 @@ async function authCredentials(event) {
 }
 
 /**
+ * Generate Loading Table
+ * @function genLoadingTable
+ * @param {Number} rows
+ */
+function genLoadingTable(rows) {
+    const number = parseInt(rows)
+    if (number) {
+        console.log('number:', number)
+        loadingTable.classList.remove('d-none')
+        const tbody = loadingTable.querySelector('tbody')
+        for (let i = 0; i < number; i++) {
+            console.log(`Iteration ${i + 1}`)
+            const row = document.querySelector('.loading-row').cloneNode(true)
+            tbody.appendChild(row)
+        }
+    }
+}
+
+/**
  * Update Popup Table with Data
  * @function updateTable
  * @param {Object} data
@@ -246,7 +267,7 @@ function clipClick(event) {
  * @param {Boolean} auth
  */
 function displayAlert({ message, type = 'warning', auth = false } = {}) {
-    loadingSpinner.classList.add('d-none')
+    loadingTable.classList.add('d-none')
     errorAlert.innerHTML = message
     errorAlert.classList.add(`alert-${type}`)
     errorAlert.classList.remove('d-none')
