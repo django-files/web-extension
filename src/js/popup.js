@@ -211,16 +211,29 @@ function updateTable(data) {
     console.log('updateTable:', data)
     const tbody = filesTable.querySelector('tbody')
     const length = tbody.rows.length
+    // console.log(`data.length: ${data.length}`)
+    // console.log(`tbody.rows.length: ${tbody.rows.length}`)
     for (let i = 0; i < length; i++) {
+        // console.log(`i: ${i}`)
         let row = tbody.rows[i]
         if (!row) {
             row = tbody.insertRow()
         }
+        if (data.length === i) {
+            console.log('End of data. Removing remaining rows...')
+            const rowsToRemove = length - i
+            for (let j = 0; j < rowsToRemove; j++) {
+                tbody.deleteRow(tbody.rows.length - 1)
+            }
+            break
+        }
         const value = data[i]
+        // TODO: This should not happen because of above condition
         if (!value) {
-            row.parentNode.removeChild(row)
+            console.warn(`No Data Value at Index: ${i}`, row)
             continue
         }
+        // TODO: This throws an error if value is not valid URL
         const url = new URL(value)
         const name = url.pathname.replace(/^\/u\//, '')
 
