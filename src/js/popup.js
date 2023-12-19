@@ -304,13 +304,12 @@ function initPopupMouseover() {
         const str = event.target.innerText
         const imageExtensions = /\.(jpeg|jpg|gif|png|bmp|svg|webp)$/i
         if (str.match(imageExtensions)) {
-            mediaImage.src = event.target.dataset.raw
             mediaContainer.classList.remove('d-none')
+            mediaImage.src = event.target.dataset.raw
         } else {
             mediaContainer.classList.add('d-none')
             mediaImage.src = ''
             if (timeoutID) {
-                mediaImage.src = ''
                 clearTimeout(timeoutID)
             }
         }
@@ -323,6 +322,7 @@ function initPopupMouseover() {
     function onMouseOut() {
         timeoutID = setTimeout(function () {
             mediaContainer.classList.add('d-none')
+            mediaImage.src = ''
             timeoutID = undefined
         }, 3000)
     }
