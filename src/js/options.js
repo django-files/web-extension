@@ -90,7 +90,7 @@ function updateOptions(options) {
         if (element) {
             if (typeof value === 'boolean') {
                 element.checked = value
-            } else if (typeof value === 'string') {
+            } else {
                 element.value = value
             }
         }
