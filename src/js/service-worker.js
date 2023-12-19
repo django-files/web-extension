@@ -19,6 +19,7 @@ async function onInstalled(details) {
             authToken: '',
             recentFiles: '10',
             contextMenu: true,
+            popupPreview: true,
             showUpdate: false,
             checkAuth: false,
         })

@@ -94,6 +94,12 @@ async function initPopup() {
     document
         .querySelectorAll('a[href]')
         .forEach((el) => el.addEventListener('click', popupLinks))
+
+    // Enable Popup Mouseover Preview if popupPreview
+    if (options.popupPreview) {
+        console.log('Enabling Mouseover Preview')
+        initPopupMouseover()
+    }
 }
 
 /**
@@ -208,6 +214,7 @@ function updateTable(data) {
             'link-underline-opacity-75-hover'
         )
         link.target = '_blank'
+        link.dataset.raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
         const cell2 = row.insertCell()
         cell2.classList.add('text-break')
         cell2.appendChild(link)
@@ -260,4 +267,63 @@ async function checkSiteAuth() {
             files: ['/js/auth.js'],
         })
     } catch (e) {} // eslint-disable-line no-empty
+}
+
+/**
+ * Initialize Popup Mouseover Preview
+ */
+function initPopupMouseover() {
+    const mediaContainer = document.getElementById('media-container')
+    const mediaImage = document.getElementById('media-image')
+    let timeoutID
+
+    mediaContainer.addEventListener('mouseover', () => {
+        mediaContainer.classList.add('d-none')
+        mediaImage.src = ''
+        if (timeoutID) {
+            clearTimeout(timeoutID)
+        }
+    })
+
+    document.querySelectorAll('.link-underline').forEach((el) => {
+        el.addEventListener('mouseover', onMouseOver)
+        el.addEventListener('mouseout', onMouseOut)
+    })
+
+    function onMouseOver(event) {
+        // console.log('onMouseOver:', event)
+        if (event.pageY < window.innerHeight / 2) {
+            mediaContainer.classList.remove('top-0')
+            mediaContainer.classList.add('bottom-0')
+        } else {
+            mediaContainer.classList.remove('bottom-0')
+            mediaContainer.classList.add('top-0')
+        }
+        // console.log('name:', event.target.innerText)
+        // console.log('raw:', event.target.dataset.raw)
+        const str = event.target.innerText
+        const imageExtensions = /\.(jpeg|jpg|gif|png|bmp|svg|webp)$/i
+        if (str.match(imageExtensions)) {
+            mediaImage.src = event.target.dataset.raw
+            mediaContainer.classList.remove('d-none')
+        } else {
+            mediaContainer.classList.add('d-none')
+            mediaImage.src = ''
+            if (timeoutID) {
+                clearTimeout(timeoutID)
+            }
+        }
+        // console.log('timeoutID:', timeoutID)
+        if (timeoutID) {
+            clearTimeout(timeoutID)
+        }
+    }
+
+    function onMouseOut() {
+        timeoutID = setTimeout(function () {
+            mediaContainer.classList.add('d-none')
+            mediaImage.src = ''
+            timeoutID = undefined
+        }, 3000)
+    }
 }
