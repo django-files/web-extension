@@ -279,8 +279,8 @@ function initPopupMouseover() {
 
     mediaContainer.addEventListener('mouseover', () => {
         mediaContainer.classList.add('d-none')
+        mediaImage.src = ''
         if (timeoutID) {
-            mediaImage.src = ''
             clearTimeout(timeoutID)
         }
     })
