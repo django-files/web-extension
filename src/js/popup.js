@@ -304,8 +304,8 @@ function initPopupMouseover() {
         const str = event.target.innerText
         const imageExtensions = /\.(jpeg|jpg|gif|png|bmp|svg|webp)$/i
         if (str.match(imageExtensions)) {
-            mediaContainer.classList.remove('d-none')
             mediaImage.src = event.target.dataset.raw
+            mediaContainer.classList.remove('d-none')
         } else {
             mediaContainer.classList.add('d-none')
             mediaImage.src = ''
