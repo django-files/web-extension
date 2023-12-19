@@ -9,7 +9,7 @@ document
 chrome.runtime.onMessage.addListener(onMessage)
 
 // const loadingSpinner = document.getElementById('loading-spinner')
-const loadingTable = document.getElementById('loading-table')
+const filesTable = document.getElementById('files-table')
 const errorAlert = document.getElementById('error-alert')
 const authButton = document.getElementById('auth-button')
 
@@ -46,7 +46,10 @@ async function initPopup() {
             type: 'success',
         })
     }
-    genLoadingTable(options.recentFiles)
+    // if (filesTable.classList.contains('d-none')) {
+    filesTable.classList.remove('d-none')
+    genLoadingData(options.recentFiles)
+    // }
 
     // Check Django Files API for recent files
     const opts = {
@@ -87,8 +90,7 @@ async function initPopup() {
     }
 
     // Hide loading display table, update table
-    loadingTable.classList.add('d-none')
-    document.getElementById('files-table').classList.remove('d-none')
+    // loadingTable.classList.add('d-none')
     updateTable(data)
 
     // Re-init clipboardJS and popupLinks after updateTable
@@ -175,19 +177,22 @@ async function authCredentials(event) {
 }
 
 /**
- * Generate Loading Table
- * @function genLoadingTable
+ * Generate Loading Data for filesTable
+ * @function genLoadingData
  * @param {Number} rows
  */
-function genLoadingTable(rows) {
+function genLoadingData(rows) {
     const number = parseInt(rows)
-    if (number) {
+    if (number > 0) {
         console.log('number:', number)
-        loadingTable.classList.remove('d-none')
-        const tbody = loadingTable.querySelector('tbody')
+        filesTable.classList.remove('d-none')
+        const tbody = filesTable.querySelector('tbody')
+        const tr = tbody.querySelector('tr')
         for (let i = 0; i < number; i++) {
-            console.log(`Iteration ${i + 1}`)
-            const row = document.querySelector('.loading-row').cloneNode(true)
+            // console.log(`Iteration ${i + 1}`)
+            const row = tr.cloneNode(true)
+            const rand = Math.floor(40 + Math.random() * 61)
+            row.querySelector('.placeholder').style.width = `${rand}%`
             tbody.appendChild(row)
         }
     }
@@ -196,21 +201,24 @@ function genLoadingTable(rows) {
 /**
  * Update Popup Table with Data
  * @function updateTable
- * @param {Object} data
+ * @param {Array} data
  */
 function updateTable(data) {
-    const tbody = document.querySelector('#files-table tbody')
-    tbody.innerHTML = ''
+    console.log('updateTable:', data)
+    const tbody = filesTable.querySelector('tbody')
+    const length = tbody.rows.length
+    // tbody.innerHTML = ''
+    console.log('length:', length)
+    for (let i = 0; i < length; i++) {
+        const row = tbody.rows[i]
+        const value = data[i]
+        if (!value) {
+            row.parentNode.removeChild(row)
+            continue
+        }
 
-    // console.log('data:', data)
-    data.forEach(function (value) {
         const url = new URL(value)
         const name = url.pathname.replace(/^\/u\//, '')
-        const row = tbody.insertRow()
-
-        // const count = document.createTextNode(i + 1)
-        // const cell1 = row.insertCell()
-        // cell1.appendChild(count)
 
         const copy = document.createElement('a')
         copy.title = 'Copy'
@@ -220,9 +228,11 @@ function updateTable(data) {
         copy.innerHTML = '<i class="fa-regular fa-clipboard"></i>'
         copy.classList.add('link-body-emphasis')
         copy.onclick = clipClick
-        const cell1 = row.insertCell()
-        // cell1.classList.add('align-middle')
-        cell1.appendChild(copy)
+        const cell0 = row.cells[0]
+        cell0.classList.add('align-middle')
+        cell0.innerHTML = ''
+        cell0.style.width = '20px'
+        cell0.appendChild(copy)
 
         const link = document.createElement('a')
         link.text = name
@@ -236,10 +246,11 @@ function updateTable(data) {
         )
         link.target = '_blank'
         link.dataset.raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
-        const cell2 = row.insertCell()
-        cell2.classList.add('text-break')
-        cell2.appendChild(link)
-    })
+        const cell1 = row.cells[1]
+        cell0.classList.add('text-break')
+        cell1.innerHTML = ''
+        cell1.appendChild(link)
+    }
 }
 
 /**
@@ -267,7 +278,7 @@ function clipClick(event) {
  * @param {Boolean} auth
  */
 function displayAlert({ message, type = 'warning', auth = false } = {}) {
-    loadingTable.classList.add('d-none')
+    filesTable.classList.add('d-none')
     errorAlert.innerHTML = message
     errorAlert.classList.add(`alert-${type}`)
     errorAlert.classList.remove('d-none')
@@ -277,6 +288,7 @@ function displayAlert({ message, type = 'warning', auth = false } = {}) {
 }
 
 async function checkSiteAuth() {
+    console.log('checkSiteAuth')
     try {
         const [tab] = await chrome.tabs.query({
             currentWindow: true,
@@ -323,7 +335,7 @@ function initPopupMouseover() {
         // console.log('name:', event.target.innerText)
         // console.log('raw:', event.target.dataset.raw)
         const str = event.target.innerText
-        const imageExtensions = /\.(jpeg|jpg|gif|png|bmp|svg|webp)$/i
+        const imageExtensions = /\.(gif|ico|jpeg|jpg|png|svg|webp)$/i
         if (str.match(imageExtensions)) {
             mediaImage.src = event.target.dataset.raw
             mediaContainer.classList.remove('d-none')
