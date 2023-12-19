@@ -182,18 +182,22 @@ async function authCredentials(event) {
  * @param {Number} rows
  */
 function genLoadingData(rows) {
+    console.log('genLoadingData:', rows)
     const number = parseInt(rows)
     if (number > 0) {
-        console.log('number:', number)
         filesTable.classList.remove('d-none')
         const tbody = filesTable.querySelector('tbody')
-        const tr = tbody.querySelector('tr')
+        const tr = filesTable.querySelector('tfoot tr')
         for (let i = 0; i < number; i++) {
-            // console.log(`Iteration ${i + 1}`)
             const row = tr.cloneNode(true)
+            row.classList.remove('d-none')
             const rand = Math.floor(40 + Math.random() * 61)
             row.querySelector('.placeholder').style.width = `${rand}%`
-            tbody.appendChild(row)
+            if (tbody.rows[i]) {
+                tbody.replaceChild(row, tbody.rows[i])
+            } else {
+                tbody.appendChild(row)
+            }
         }
     }
 }
@@ -207,16 +211,16 @@ function updateTable(data) {
     console.log('updateTable:', data)
     const tbody = filesTable.querySelector('tbody')
     const length = tbody.rows.length
-    // tbody.innerHTML = ''
-    console.log('length:', length)
     for (let i = 0; i < length; i++) {
-        const row = tbody.rows[i]
+        let row = tbody.rows[i]
+        if (!row) {
+            row = tbody.insertRow()
+        }
         const value = data[i]
         if (!value) {
             row.parentNode.removeChild(row)
             continue
         }
-
         const url = new URL(value)
         const name = url.pathname.replace(/^\/u\//, '')
 
@@ -230,8 +234,8 @@ function updateTable(data) {
         copy.onclick = clipClick
         const cell0 = row.cells[0]
         cell0.classList.add('align-middle')
-        cell0.innerHTML = ''
         cell0.style.width = '20px'
+        cell0.innerHTML = ''
         cell0.appendChild(copy)
 
         const link = document.createElement('a')
@@ -247,7 +251,7 @@ function updateTable(data) {
         link.target = '_blank'
         link.dataset.raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
         const cell1 = row.cells[1]
-        cell0.classList.add('text-break')
+        cell1.classList.add('text-break')
         cell1.innerHTML = ''
         cell1.appendChild(link)
     }
@@ -278,6 +282,7 @@ function clipClick(event) {
  * @param {Boolean} auth
  */
 function displayAlert({ message, type = 'warning', auth = false } = {}) {
+    console.log(`displayAlert: ${type}:`, message)
     filesTable.classList.add('d-none')
     errorAlert.innerHTML = message
     errorAlert.classList.add(`alert-${type}`)
@@ -288,7 +293,6 @@ function displayAlert({ message, type = 'warning', auth = false } = {}) {
 }
 
 async function checkSiteAuth() {
-    console.log('checkSiteAuth')
     try {
         const [tab] = await chrome.tabs.query({
             currentWindow: true,
