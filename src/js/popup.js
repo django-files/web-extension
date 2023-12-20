@@ -2,20 +2,23 @@
 
 document.addEventListener('DOMContentLoaded', initPopup)
 
+chrome.runtime.onMessage.addListener(onMessage)
+
 document
     .querySelectorAll('a[href]')
     .forEach((el) => el.addEventListener('click', popupLinks))
+document
+    .querySelectorAll('.add-auth')
+    .forEach((el) => el.addEventListener('click', authCredentials))
 
-chrome.runtime.onMessage.addListener(onMessage)
-
-// const loadingSpinner = document.getElementById('loading-spinner')
 const filesTable = document.getElementById('files-table')
 const errorAlert = document.getElementById('error-alert')
 const authButton = document.getElementById('auth-button')
 const mediaImage = document.getElementById('media-image')
 const mediaOuter = document.getElementById('media-outer')
+const smallAuth = document.getElementById('small-auth')
 
-authButton.addEventListener('click', authCredentials)
+let authError = false
 
 /**
  * Popup Init Function
@@ -27,11 +30,17 @@ async function initPopup() {
     const { options } = await chrome.storage.sync.get(['options'])
     console.log('options:', options)
 
+    authError = false
+    // Check auth if checkAuth is enabled in options
+    if (options.checkAuth) {
+        smallAuth.classList.remove('d-none')
+    }
+
     // If missing auth data or options.checkAuth check current site for auth
     if (!options?.siteUrl || !options?.authToken) {
         console.log('siteUrl, authToken:', options?.siteUrl, options?.authToken)
-        authButton.classList.remove('btn-sm')
-        authButton.classList.add('btn-lg', 'my-2')
+        // authButton.classList.remove('btn-sm')
+        // authButton.classList.add('btn-lg', 'my-2')
         return displayAlert({ message: 'Missing URL or Token.', auth: true })
     }
 
@@ -48,10 +57,8 @@ async function initPopup() {
             type: 'success',
         })
     }
-    // if (filesTable.classList.contains('d-none')) {
     filesTable.classList.remove('d-none')
     genLoadingData(options.recentFiles)
-    // }
 
     // Check Django Files API for recent files
     const opts = {
@@ -88,6 +95,7 @@ async function initPopup() {
 
     // Check auth if checkAuth is enabled in options
     if (options.checkAuth) {
+        smallAuth.classList.remove('d-none')
         await checkSiteAuth()
     }
 
@@ -147,7 +155,14 @@ async function onMessage(message) {
                 authToken: message.authToken,
             }
             await chrome.storage.local.set({ auth })
-            authButton.classList.remove('d-none')
+            console.log('New Authentication Found.')
+            if (options.checkAuth) {
+                smallAuth.classList.remove('disabled', 'btn-outline-secondary')
+                smallAuth.classList.add('btn-warning')
+            }
+            if (authError) {
+                authButton.classList.remove('d-none')
+            }
         }
     }
 }
@@ -169,6 +184,7 @@ async function authCredentials(event) {
         console.log('Auth Credentials Updated...')
         authButton.classList.add('d-none')
         errorAlert.classList.add('d-none')
+        smallAuth.classList.add('disabled', 'btn-outline-secondary')
         await initPopup()
         try {
             await chrome.runtime.sendMessage('reload-options')
@@ -303,6 +319,7 @@ function displayAlert({ message, type = 'warning', auth = false } = {}) {
     errorAlert.classList.add(`alert-${type}`)
     errorAlert.classList.remove('d-none')
     if (auth) {
+        authError = true
         checkSiteAuth().then()
     }
 }
