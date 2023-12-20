@@ -14,13 +14,12 @@ const errorAlert = document.getElementById('error-alert')
 const authButton = document.getElementById('auth-button')
 const mediaImage = document.getElementById('media-image')
 const mediaOuter = document.getElementById('media-outer')
-const smallAuth = document.getElementById('small-auth')
+const alwaysAuth = document.getElementById('always-auth')
 
-const loadingImage = '../media/loading.gif'
 let authError = false
 
 /**
- * Popup Init Function
+ * Initialize Popup
  * TODO: Overhaul this function
  * @function initPopup
  */
@@ -32,7 +31,7 @@ async function initPopup() {
     authError = false
     // Check auth if checkAuth is enabled in options
     if (options.checkAuth) {
-        smallAuth.classList.remove('d-none')
+        alwaysAuth.classList.remove('d-none')
     }
 
     // If missing auth data or options.checkAuth check current site for auth
@@ -94,7 +93,7 @@ async function initPopup() {
 
     // Check auth if checkAuth is enabled in options
     if (options.checkAuth) {
-        smallAuth.classList.remove('d-none')
+        alwaysAuth.classList.remove('d-none')
         await checkSiteAuth()
     }
 
@@ -156,8 +155,8 @@ async function onMessage(message) {
             await chrome.storage.local.set({ auth })
             console.log('New Authentication Found.')
             if (options.checkAuth) {
-                smallAuth.classList.remove('disabled', 'btn-outline-secondary')
-                smallAuth.classList.add('btn-warning')
+                alwaysAuth.classList.remove('disabled', 'btn-outline-secondary')
+                alwaysAuth.classList.add('btn-warning')
             }
             if (authError) {
                 authButton.classList.remove('d-none')
@@ -183,7 +182,7 @@ async function authCredentials(event) {
         console.log('Auth Credentials Updated...')
         authButton.classList.add('d-none')
         errorAlert.classList.add('d-none')
-        smallAuth.classList.add('disabled', 'btn-outline-secondary')
+        alwaysAuth.classList.add('disabled', 'btn-outline-secondary')
         await initPopup()
         try {
             await chrome.runtime.sendMessage('reload-options')
@@ -344,6 +343,7 @@ async function checkSiteAuth() {
 function initPopupMouseover(timeout) {
     timeout = timeout * 1000 || 1
     console.log('initPopupMouseover: timeout:', timeout)
+    const loadingImage = '../media/loading.gif'
 
     let timeoutID
 

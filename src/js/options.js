@@ -13,7 +13,7 @@ document
     .forEach((el) => new bootstrap.Tooltip(el))
 
 /**
- * Options Init Function
+ * Initialize Options
  * @function initOptions
  */
 async function initOptions() {
