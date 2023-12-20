@@ -12,6 +12,8 @@ chrome.runtime.onMessage.addListener(onMessage)
 const filesTable = document.getElementById('files-table')
 const errorAlert = document.getElementById('error-alert')
 const authButton = document.getElementById('auth-button')
+const mediaImage = document.getElementById('media-image')
+const mediaOuter = document.getElementById('media-outer')
 
 authButton.addEventListener('click', authCredentials)
 
@@ -102,7 +104,7 @@ async function initPopup() {
     // Enable Popup Mouseover Preview if popupPreview
     if (options.popupPreview) {
         console.log('Enabling Mouseover Preview')
-        initPopupMouseover()
+        initPopupMouseover(options.popupTimeout)
     }
 }
 
@@ -321,18 +323,24 @@ async function checkSiteAuth() {
 
 /**
  * Initialize Popup Mouseover Preview
+ * @param {Number} timeout
  */
-function initPopupMouseover() {
-    const mediaContainer = document.getElementById('media-container')
-    const mediaImage = document.getElementById('media-image')
+function initPopupMouseover(timeout) {
+    timeout = timeout * 1000 || 1
+    console.log('initPopupMouseover: timeout:', timeout)
+
     let timeoutID
 
-    mediaContainer.addEventListener('mouseover', () => {
-        mediaContainer.classList.add('d-none')
-        mediaImage.src = ''
+    mediaOuter.addEventListener('mouseover', () => {
+        mediaOuter.classList.add('d-none')
+        mediaImage.src = '../media/loading.webp'
         if (timeoutID) {
             clearTimeout(timeoutID)
         }
+    })
+    mediaImage.addEventListener('error', (event) => {
+        console.log('mediaError:', event)
+        mediaImage.src = '../media/error.png'
     })
 
     document.querySelectorAll('.link-underline').forEach((el) => {
@@ -343,25 +351,23 @@ function initPopupMouseover() {
     function onMouseOver(event) {
         // console.log('onMouseOver:', event)
         if (event.pageY < window.innerHeight / 2) {
-            mediaContainer.classList.remove('top-0')
-            mediaContainer.classList.add('bottom-0')
+            mediaOuter.classList.remove('top-0')
+            mediaOuter.classList.add('bottom-0')
         } else {
-            mediaContainer.classList.remove('bottom-0')
-            mediaContainer.classList.add('top-0')
+            mediaOuter.classList.remove('bottom-0')
+            mediaOuter.classList.add('top-0')
         }
         // console.log('name:', event.target.innerText)
         // console.log('raw:', event.target.dataset.raw)
         const str = event.target.innerText
         const imageExtensions = /\.(gif|ico|jpeg|jpg|png|svg|webp)$/i
         if (str.match(imageExtensions)) {
+            mediaImage.src = '../media/loading.webp'
             mediaImage.src = event.target.dataset.raw
-            mediaContainer.classList.remove('d-none')
+            mediaOuter.classList.remove('d-none')
         } else {
-            mediaContainer.classList.add('d-none')
-            mediaImage.src = ''
-            if (timeoutID) {
-                clearTimeout(timeoutID)
-            }
+            mediaOuter.classList.add('d-none')
+            mediaImage.src = '../media/loading.webp'
         }
         // console.log('timeoutID:', timeoutID)
         if (timeoutID) {
@@ -371,9 +377,14 @@ function initPopupMouseover() {
 
     function onMouseOut() {
         timeoutID = setTimeout(function () {
-            mediaContainer.classList.add('d-none')
-            mediaImage.src = ''
+            mediaOuter.classList.add('d-none')
+            mediaImage.src = '../media/loading.webp'
             timeoutID = undefined
-        }, 3000)
+        }, timeout)
     }
 }
+
+// function mediaError(event) {
+//     console.log('mediaError:', event)
+//     mediaImage.src = '../media/error.png'
+// }

@@ -17,7 +17,8 @@ async function onInstalled(details) {
         setDefaultOptions({
             siteUrl: '',
             authToken: '',
-            recentFiles: 10,
+            recentFiles: 12,
+            popupTimeout: 3,
             contextMenu: true,
             popupPreview: true,
             showUpdate: false,

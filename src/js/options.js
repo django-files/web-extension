@@ -62,7 +62,7 @@ async function saveOptions(event) {
     } else if (event.target.id === 'siteUrl') {
         event.target.value = event.target.value.replace(/\/+$/, '')
         options[event.target.id] = event.target.value
-    } else if (event.target.id === 'recentFiles') {
+    } else if (event.target.type === 'number') {
         const number = parseInt(event.target.value)
         if (!isNaN(number) && number >= 0 && number <= 99) {
             event.target.value = number.toString()

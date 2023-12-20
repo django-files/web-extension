@@ -12,7 +12,7 @@
 <body class="h-100">
 
 <video poster="../media/loop.jpg" id="bgvid" playsinline autoplay muted loop>
-    <source src="../media/loop.webm" type="video/webm">
+    <source src="../media/loop.mp4" type="video/mp4">
 </video>
 
 <div class="container-fluid p-2 h-100">
@@ -36,20 +36,27 @@
         </tr></tbody>
     </table>
     <form id="options-form" class="options">
-        <div class="mb-2">
-            <label for="siteUrl" class="form-label"><i class="fa-solid fa-globe me-2"></i> Django Files URL</label>
-            <input id="siteUrl" aria-describedby="siteUrlHelp" type="text" class="form-control" autocomplete="off">
-            <div class="form-text" id="siteUrlHelp" >The Full URL to your Django Files server.</div>
-        </div>
-        <div class="mb-2">
-            <label for="authToken" class="form-label"><i class="fa-solid fa-key me-2"></i> Auth Token</label>
-            <input id="authToken" aria-describedby="authTokenHelp" type="password" class="form-control" autocomplete="off">
-            <div class="form-text" id="authTokenHelp">Token From Django Files Settings.</div>
-        </div>
-        <div class="mb-2">
-            <label for="recentFiles" class="form-label"><i class="fa-solid fa-list-ol me-2"></i> Recent Files</label>
-            <input id="recentFiles" aria-describedby="recentFilesHelp" type="number" class="form-control" autocomplete="off">
-            <div class="form-text" id="recentFilesHelp">Recent Files (0-99) in Popup (0 to disable).</div>
+        <div class="row">
+            <div class="col-12 mb-2">
+                <label for="siteUrl" class="form-label"><i class="fa-solid fa-globe me-2"></i> Django Files URL</label>
+                <input id="siteUrl" aria-describedby="siteUrlHelp" type="text" class="form-control" autocomplete="off">
+                <div class="form-text" id="siteUrlHelp" >The Full URL to your Django Files server.</div>
+            </div>
+            <div class="col-12 mb-2">
+                <label for="authToken" class="form-label"><i class="fa-solid fa-key me-2"></i> Auth Token</label>
+                <input id="authToken" aria-describedby="authTokenHelp" type="password" class="form-control" autocomplete="off">
+                <div class="form-text" id="authTokenHelp">Token From Django Files Settings.</div>
+            </div>
+            <div class="col-sm-6 col-12 mb-2">
+                <label for="recentFiles" class="form-label"><i class="fa-solid fa-list-ol me-2"></i> Recent Files</label>
+                <input id="recentFiles" aria-describedby="recentFilesHelp" type="number" class="form-control" autocomplete="off">
+                <div class="form-text" id="recentFilesHelp">Recent Files in Popup, 0 Disabled.</div>
+            </div>
+            <div class="col-sm-6 col-12 mb-2">
+                <label for="popupTimeout" class="form-label"><i class="fa-solid fa-clock-rotate-left me-2"></i> Preview Timeout</label>
+                <input id="popupTimeout" aria-describedby="popupTimeoutHelp" type="number" class="form-control" autocomplete="off">
+                <div class="form-text" id="popupTimeoutHelp">Timeout Seconds to Hide Preview.</div>
+            </div>
         </div>
         <div class="my-3">
             <div class="form-check form-switch mb-2">
