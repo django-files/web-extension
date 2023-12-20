@@ -224,9 +224,6 @@ async function authCredentials(event) {
         errorAlert.classList.add('d-none')
         alwaysAuth.classList.add('disabled', 'btn-outline-secondary')
         await initPopup()
-        try {
-            await chrome.runtime.sendMessage('reload-options')
-        } catch (e) {} // eslint-disable-line no-empty
     } else {
         displayAlert({ message: 'Error Getting or Setting Credentials.' })
     }

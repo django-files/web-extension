@@ -1,7 +1,7 @@
 // JS for options.html
 
 document.addEventListener('DOMContentLoaded', initOptions)
-chrome.runtime.onMessage.addListener(onMessage)
+chrome.storage.onChanged.addListener(onChanged)
 document
     .querySelectorAll('input')
     .forEach((el) => el.addEventListener('change', saveOptions))
@@ -36,14 +36,18 @@ async function initOptions() {
 }
 
 /**
- * On Message Callback
- * @function onMessage
- * @param {Object} message
+ * On Changed Callback
+ * @function onChanged
+ * @param {Object} changes
+ * @param {String} namespace
  */
-async function onMessage(message) {
-    // console.log('onMessage: message, sender:', message, sender)
-    if (message === 'reload-options') {
-        window.location.reload()
+function onChanged(changes, namespace) {
+    // console.log('onChanged:', changes, namespace)
+    for (const [key, { newValue }] of Object.entries(changes)) {
+        if (namespace === 'sync' && key === 'options') {
+            console.log('newValue:', newValue)
+            updateOptions(newValue)
+        }
     }
 }
 
