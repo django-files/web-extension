@@ -21,8 +21,8 @@ async function onInstalled(details) {
             popupTimeout: 3,
             contextMenu: true,
             popupPreview: true,
+            checkAuth: true,
             showUpdate: false,
-            checkAuth: false,
         })
     )
     console.log('options:', options)

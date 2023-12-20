@@ -34,16 +34,20 @@ let timeout
  */
 async function initPopup() {
     console.log('initPopup')
+
+    // Get options
     const { options } = await chrome.storage.sync.get(['options'])
     console.log('options:', options)
 
-    // Set Options (since this is the only one)
+    // Set Options (this is currently the only one in the popup)
     document.getElementById('popupPreview').checked = options.popupPreview
 
+    // Ensure authError is set to false
     authError = false
+
     // Check auth if checkAuth is enabled in options
     if (options.checkAuth) {
-        alwaysAuth.classList.remove('d-none')
+        await checkSiteAuth()
     }
 
     // If missing auth data or options.checkAuth check current site for auth
@@ -103,14 +107,7 @@ async function initPopup() {
         return displayAlert({ message: 'No Files Returned.' })
     }
 
-    // Check auth if checkAuth is enabled in options
-    if (options.checkAuth) {
-        alwaysAuth.classList.remove('d-none')
-        await checkSiteAuth()
-    }
-
-    // Hide loading display table, update table
-    // loadingTable.classList.add('d-none')
+    // Update table should only be called here, changes should use initPopup()
     updateTable(data)
 
     // Re-init clipboardJS and popupLinks after updateTable
@@ -168,8 +165,7 @@ async function onMessage(message) {
             await chrome.storage.local.set({ auth })
             console.log('New Authentication Found.')
             if (options.checkAuth) {
-                alwaysAuth.classList.remove('disabled', 'btn-outline-secondary')
-                alwaysAuth.classList.add('btn-warning')
+                alwaysAuth.classList.remove('d-none')
             }
             if (authError) {
                 authButton.classList.remove('d-none')
@@ -222,7 +218,7 @@ async function authCredentials(event) {
         console.log('Auth Credentials Updated...')
         authButton.classList.add('d-none')
         errorAlert.classList.add('d-none')
-        alwaysAuth.classList.add('disabled', 'btn-outline-secondary')
+        alwaysAuth.classList.add('d-none')
         await initPopup()
     } else {
         displayAlert({ message: 'Error Getting or Setting Credentials.' })
