@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+    <meta charset="utf-8">
     <title>Django Files</title>
     <link rel="icon" href="../media/logo16.png" sizes="any">
     <link rel="stylesheet" type="text/css" href="../dist/bootstrap/bootstrap.min.css">
@@ -17,13 +18,13 @@
 
 <div class="container-fluid p-2">
     <div class=" mb-1">
-        <a id="always-auth" class="d-none btn btn-sm btn-outline-secondary disabled float-start me-3 add-auth" role="button">
-            <i class="fa-solid fa-key"></i></a>
-        <div class="form-check form-switch float-start form-select-lg" style="padding-top: 1px; padding-bottom: 0;"
+        <div class="form-check form-switch float-start form-select-lg me-2" style="padding-top: 1px; padding-bottom: 0;"
              data-bs-title="Disable/Enable Mouseover Preview." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
             <input class="form-check-input" id="popupPreview" type="checkbox" role="switch">
             <label class="form-check-label visually-hidden" for="popupPreview" aria-describedby="popupPreviewHelp"></label>
         </div>
+        <a id="always-auth" class="d-none btn btn-sm btn-outline-warning float-start add-auth" role="button">
+            <i class="fa-solid fa-key"></i></a>
         <a class="btn btn-sm btn-outline-primary float-end" role="button" href="../html/options.html" title="Options">
             <i class="fa-solid fa-gears"></i></a>
         <div class="d-flex align-items-center justify-content-center">

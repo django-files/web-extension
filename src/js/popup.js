@@ -42,9 +42,9 @@ async function initPopup() {
 
     authError = false
     // Check auth if checkAuth is enabled in options
-    if (options.checkAuth) {
-        alwaysAuth.classList.remove('d-none')
-    }
+    // if (options.checkAuth) {
+    //     alwaysAuth.classList.remove('d-none')
+    // }
 
     // If missing auth data or options.checkAuth check current site for auth
     if (!options?.siteUrl || !options?.authToken) {
@@ -105,7 +105,7 @@ async function initPopup() {
 
     // Check auth if checkAuth is enabled in options
     if (options.checkAuth) {
-        alwaysAuth.classList.remove('d-none')
+        // alwaysAuth.classList.remove('d-none')
         await checkSiteAuth()
     }
 
@@ -168,8 +168,7 @@ async function onMessage(message) {
             await chrome.storage.local.set({ auth })
             console.log('New Authentication Found.')
             if (options.checkAuth) {
-                alwaysAuth.classList.remove('disabled', 'btn-outline-secondary')
-                alwaysAuth.classList.add('btn-warning')
+                alwaysAuth.classList.remove('d-none')
             }
             if (authError) {
                 authButton.classList.remove('d-none')
@@ -222,7 +221,7 @@ async function authCredentials(event) {
         console.log('Auth Credentials Updated...')
         authButton.classList.add('d-none')
         errorAlert.classList.add('d-none')
-        alwaysAuth.classList.add('disabled', 'btn-outline-secondary')
+        alwaysAuth.classList.add('d-none')
         await initPopup()
     } else {
         displayAlert({ message: 'Error Getting or Setting Credentials.' })
