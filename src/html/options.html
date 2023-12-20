@@ -7,7 +7,6 @@
     <link rel="stylesheet" type="text/css" href="../dist/fontawesome/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="../css/main.css">
     <link rel="stylesheet" type="text/css" href="../css/options.css">
-    <script type="text/javascript" src="../js/theme.js"></script>
 </head>
 <body class="h-100">
 
@@ -27,6 +26,7 @@
     </div>
     <div class="clearfix"></div>
     <p class="text-center lead">v<span id="version"></span></p>
+
     <table class="table table-sm table-borderless">
         <caption class="visually-hidden">Keyboard Shortcuts</caption>
         <thead class="visually-hidden"><tr><th>Description</th><th>Shortcut</th></tr></thead>
@@ -35,6 +35,7 @@
             <td class="bg-transparent text-end" title="Keyboard Shortcut"><kbd id="mainKey">Unknown</kbd></td>
         </tr></tbody>
     </table>
+
     <form id="options-form" class="options">
         <div class="row">
             <div class="col-12 mb-2">
@@ -50,14 +51,15 @@
             <div class="col-sm-6 col-12 mb-2">
                 <label for="recentFiles" class="form-label"><i class="fa-solid fa-list-ol me-2"></i> Recent Files</label>
                 <input id="recentFiles" aria-describedby="recentFilesHelp" type="number" class="form-control" autocomplete="off">
-                <div class="form-text" id="recentFilesHelp">Recent Files in Popup, 0 Disabled.</div>
+                <div class="form-text" id="recentFilesHelp">Popup Recent Files. 0 to Disable.</div>
             </div>
             <div class="col-sm-6 col-12 mb-2">
-                <label for="popupTimeout" class="form-label"><i class="fa-solid fa-clock-rotate-left me-2"></i> Preview Timeout</label>
+                <label for="popupTimeout" class="form-label"><i class="fa-solid fa-stopwatch me-2"></i> Preview Timeout</label>
                 <input id="popupTimeout" aria-describedby="popupTimeoutHelp" type="number" class="form-control" autocomplete="off">
-                <div class="form-text" id="popupTimeoutHelp">Timeout Seconds to Hide Preview.</div>
+                <div class="form-text" id="popupTimeoutHelp">Popup Preview Timeout Seconds.</div>
             </div>
         </div>
+
         <div class="my-3">
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="contextMenu" type="checkbox" role="switch">
@@ -97,6 +99,7 @@
             </div>
         </div>
     </form>
+
     <hr>
     <div class="text-center">
         <a class="link-body-emphasis text-decoration-none" target="_blank" rel="noopener"

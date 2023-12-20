@@ -16,12 +16,17 @@
 </div>
 
 <div class="container-fluid p-2">
-    <div>
-        <a id="small-auth" class="d-none btn btn-sm btn-outline-secondary disabled float-start add-auth" role="button">
+    <div class=" mb-1">
+        <a id="always-auth" class="d-none btn btn-sm btn-outline-secondary disabled float-start me-3 add-auth" role="button">
             <i class="fa-solid fa-key"></i></a>
+        <div class="form-check form-switch float-start form-select-lg" style="padding-top: 1px; padding-bottom: 0;"
+             data-bs-title="Disable/Enable Mouseover Preview." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
+            <input class="form-check-input" id="popupPreview" type="checkbox" role="switch">
+            <label class="form-check-label visually-hidden" for="popupPreview" aria-describedby="popupPreviewHelp"></label>
+        </div>
         <a class="btn btn-sm btn-outline-primary float-end" role="button" href="../html/options.html" title="Options">
             <i class="fa-solid fa-gears"></i></a>
-        <div class="d-flex align-items-center justify-content-center mb-1">
+        <div class="d-flex align-items-center justify-content-center">
             <img src="../media/logo32.png" class="me-2" height="32" width="32" alt="Django Files" title="Django Files">
             <h3 class="my-0">Django Files</h3>
         </div>
@@ -36,16 +41,9 @@
             <a role="button" class="btn btn-outline-success" href="" data-location="/uppy/">
                 <i class="fa-solid fa-upload me-2"></i> Upload</a>
         </div>
-<!--        <a class="btn btn-outline-primary btn-sm" role="button" href="../html/options.html">-->
-<!--            <i class="fa-solid fa-sliders me-2"></i> Open Options</a>-->
         <a id="auth-button" class="d-none btn btn-lg btn-success w-100 my-2 add-auth" role="button">
             <i class="fa-solid fa-key"></i> Add Auth from Current Site</a>
     </div>
-
-<!--    <div id="loading-spinner" class="text-center my-3">-->
-<!--        <i class="fa-solid fa-sync fa-spin fa-3x"></i>-->
-<!--        <p>Loading...</p>-->
-<!--    </div>-->
 
     <div id="error-alert" class="d-none alert text-center my-2" role="alert"></div>
 

@@ -6,7 +6,7 @@ chrome.notifications.onClicked.addListener(notificationsClicked)
 chrome.storage.onChanged.addListener(onChanged)
 
 /**
- * Init Context Menus and Options
+ * On Installed Callback
  * @function onInstalled
  * @param {InstalledDetails} details
  */
@@ -29,9 +29,10 @@ async function onInstalled(details) {
     if (options.contextMenu) {
         createContextMenus()
     }
-
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage()
+        const url = 'https://django-files.github.io/'
+        await chrome.tabs.create({ active: false, url })
     } else if (details.reason === 'update' && options.showUpdate) {
         const manifest = chrome.runtime.getManifest()
         if (manifest.version !== details.previousVersion) {
@@ -40,7 +41,7 @@ async function onInstalled(details) {
             if (internal?.lastShownUpdate !== manifest.version) {
                 const url = `${githubURL}/releases/tag/${manifest.version}`
                 console.log(`url: ${url}`)
-                await chrome.tabs.create({ active: true, url })
+                await chrome.tabs.create({ active: false, url })
                 internal.lastShownUpdate = manifest.version
                 console.log('internal:', internal)
                 await chrome.storage.sync.set({ internal })
@@ -48,13 +49,10 @@ async function onInstalled(details) {
         }
     }
     chrome.runtime.setUninstallURL(`${githubURL}/issues`)
-
-    // Data Migrations
-    await migrate2to3(details, options)
 }
 
 /**
- * Context Menu Click Callback
+ * Context Menus On Clicked Callback
  * @function contextMenusClicked
  * @param {OnClickData} ctx
  */
@@ -63,25 +61,26 @@ async function contextMenusClicked(ctx) {
     console.log(`ctx.menuItemId: ${ctx.menuItemId}`)
     if (ctx.menuItemId.startsWith('upload')) {
         if (ctx.srcUrl) {
-            const mediaType =
-                ctx.menuItemId.charAt(0).toUpperCase() + ctx.menuItemId.slice(1)
-            console.log(`mediaType: ${mediaType}`)
-            // console.log(`Processing URL: ${ctx.linkUrl}`)
-            await processRemote('remote', ctx.srcUrl, `${mediaType} Uploaded`)
+            let type = ctx.menuItemId.split('-').at(-1)
+            type = type.charAt(0).toUpperCase() + type.slice(1)
+            await processRemote('remote', ctx.srcUrl, `${type} Uploaded`)
         }
     } else if (ctx.menuItemId === 'short') {
         if (ctx.linkUrl) {
-            console.log('mediaType: short')
-            // console.log(`Processing URL: ${ctx.linkUrl}`)
             await processRemote('shorten', ctx.linkUrl, 'Short Created')
         }
     } else if (ctx.menuItemId === 'options') {
         chrome.runtime.openOptionsPage()
     } else {
-        console.warn('Action not handled.')
+        console.warn('Unknown ctx.menuItemId:', ctx.menuItemId)
     }
 }
 
+/**
+ * Notifications On Clicked Callback
+ * @function notificationsClicked
+ * @param {String} notificationId
+ */
 async function notificationsClicked(notificationId) {
     console.log(`notifications.onClicked: ${notificationId}`)
     chrome.notifications.clear(notificationId)
@@ -168,7 +167,7 @@ async function postURL(endpoint, url) {
 }
 
 /**
- * Get response from postURL and Process
+ * Process Remote Requests using postURL
  * @function processRemote
  * @param {String} endpoint
  * @param {String} url
@@ -183,7 +182,7 @@ async function processRemote(endpoint, url, message) {
         console.log('error:', e)
         return await sendNotification('Fetch Error', `Error: ${error.message}`)
     }
-    console.log('response:', response)
+    // console.log('response:', response)
     if (response.ok) {
         const data = await response.json()
         console.log('data:', data)
@@ -205,7 +204,7 @@ async function processRemote(endpoint, url, message) {
 }
 
 /**
- * Send Browser Notification
+ * Send Notification
  * @function sendNotification
  * @param {String} title
  * @param {String} text
@@ -275,27 +274,4 @@ async function setDefaultOptions(defaultOptions) {
         console.log('options:', options)
     }
     return options
-}
-
-/**
- * Migrate from 0.2.X to 0.3.X
- * @function migrate2to3
- * @param {Object} details
- * @param {Object} options
- */
-async function migrate2to3(details, options) {
-    if (details.reason === 'update') {
-        if (parseInt(details.previousVersion.split('.')[1], 10) < 3) {
-            console.log(`Migration from version: ${details.previousVersion}`)
-            let { auth } = await chrome.storage.sync.get(['auth'])
-            console.log('auth:', auth)
-            if (auth?.token && auth?.url) {
-                options.authToken = auth.token
-                options.siteUrl = auth.url
-                auth = null
-                await chrome.storage.sync.set({ auth, options })
-                console.warn('Migrated Data from auth to options...')
-            }
-        }
-    }
 }

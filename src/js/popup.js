@@ -6,21 +6,29 @@ document
     .querySelectorAll('a[href]')
     .forEach((el) => el.addEventListener('click', popupLinks))
 document
+    .querySelectorAll('input')
+    .forEach((el) => el.addEventListener('change', saveOptions))
+document
     .querySelectorAll('.add-auth')
     .forEach((el) => el.addEventListener('click', authCredentials))
+document
+    .querySelectorAll('[data-bs-toggle="tooltip"]')
+    .forEach((el) => new bootstrap.Tooltip(el))
 
 const filesTable = document.getElementById('files-table')
 const errorAlert = document.getElementById('error-alert')
 const authButton = document.getElementById('auth-button')
 const mediaImage = document.getElementById('media-image')
 const mediaOuter = document.getElementById('media-outer')
-const smallAuth = document.getElementById('small-auth')
+const alwaysAuth = document.getElementById('always-auth')
 
 const loadingImage = '../media/loading.gif'
 let authError = false
+let timeoutID
+let timeout
 
 /**
- * Popup Init Function
+ * Initialize Popup
  * TODO: Overhaul this function
  * @function initPopup
  */
@@ -29,10 +37,13 @@ async function initPopup() {
     const { options } = await chrome.storage.sync.get(['options'])
     console.log('options:', options)
 
+    // Set Options (since this is the only one)
+    document.getElementById('popupPreview').checked = options.popupPreview
+
     authError = false
     // Check auth if checkAuth is enabled in options
     if (options.checkAuth) {
-        smallAuth.classList.remove('d-none')
+        alwaysAuth.classList.remove('d-none')
     }
 
     // If missing auth data or options.checkAuth check current site for auth
@@ -94,7 +105,7 @@ async function initPopup() {
 
     // Check auth if checkAuth is enabled in options
     if (options.checkAuth) {
-        smallAuth.classList.remove('d-none')
+        alwaysAuth.classList.remove('d-none')
         await checkSiteAuth()
     }
 
@@ -111,7 +122,8 @@ async function initPopup() {
     // Enable Popup Mouseover Preview if popupPreview
     if (options.popupPreview) {
         console.log('Enabling Mouseover Preview')
-        initPopupMouseover(options.popupTimeout)
+        timeout = options.popupTimeout * 1000
+        initPopupMouseover()
     }
 }
 
@@ -156,12 +168,39 @@ async function onMessage(message) {
             await chrome.storage.local.set({ auth })
             console.log('New Authentication Found.')
             if (options.checkAuth) {
-                smallAuth.classList.remove('disabled', 'btn-outline-secondary')
-                smallAuth.classList.add('btn-warning')
+                alwaysAuth.classList.remove('disabled', 'btn-outline-secondary')
+                alwaysAuth.classList.add('btn-warning')
             }
             if (authError) {
                 authButton.classList.remove('d-none')
             }
+        }
+    }
+}
+
+/**
+ * Save Options Callback
+ * @function saveOptions
+ * @param {FormDataEvent} event
+ */
+async function saveOptions(event) {
+    // console.log('saveOptions:', event)
+    const { options } = await chrome.storage.sync.get(['options'])
+    options[event.target.id] = event.target.checked
+    console.log(`Set: "${event.target.id}" to target:`, event.target)
+    console.log('options:', options)
+    await chrome.storage.sync.set({ options })
+    if (event.target.id === 'popupPreview') {
+        if (event.target.checked) {
+            console.log('popupPreview Enabled. Running initPopupMouseover...')
+            initPopupMouseover()
+        } else {
+            console.log('popupPreview Disabled. Removing Event Listeners...')
+            document.querySelectorAll('.link-underline').forEach((el) => {
+                el.removeEventListener('mouseover', onMouseOver)
+                el.removeEventListener('mouseout', onMouseOut)
+            })
+            mediaOuter.classList.add('d-none')
         }
     }
 }
@@ -183,11 +222,8 @@ async function authCredentials(event) {
         console.log('Auth Credentials Updated...')
         authButton.classList.add('d-none')
         errorAlert.classList.add('d-none')
-        smallAuth.classList.add('disabled', 'btn-outline-secondary')
+        alwaysAuth.classList.add('disabled', 'btn-outline-secondary')
         await initPopup()
-        try {
-            await chrome.runtime.sendMessage('reload-options')
-        } catch (e) {} // eslint-disable-line no-empty
     } else {
         displayAlert({ message: 'Error Getting or Setting Credentials.' })
     }
@@ -337,16 +373,8 @@ async function checkSiteAuth() {
     } catch (e) {} // eslint-disable-line no-empty
 }
 
-/**
- * Initialize Popup Mouseover Preview
- * @param {Number} timeout
- */
-function initPopupMouseover(timeout) {
-    timeout = timeout * 1000 || 1
-    console.log('initPopupMouseover: timeout:', timeout)
-
-    let timeoutID
-
+function initPopupMouseover() {
+    console.log('initPopupMouseover')
     mediaOuter.addEventListener('mouseover', () => {
         mediaOuter.classList.add('d-none')
         mediaImage.src = loadingImage
@@ -358,49 +386,43 @@ function initPopupMouseover(timeout) {
         console.log('mediaError:', event)
         mediaImage.src = '../media/error.png'
     })
-
     document.querySelectorAll('.link-underline').forEach((el) => {
         el.addEventListener('mouseover', onMouseOver)
         el.addEventListener('mouseout', onMouseOut)
     })
+}
 
-    function onMouseOver(event) {
-        // console.log('onMouseOver:', event)
-        if (event.pageY < window.innerHeight / 2) {
-            mediaOuter.classList.remove('top-0')
-            mediaOuter.classList.add('bottom-0')
-        } else {
-            mediaOuter.classList.remove('bottom-0')
-            mediaOuter.classList.add('top-0')
-        }
-        // console.log('name:', event.target.innerText)
-        // console.log('raw:', event.target.dataset.raw)
-        const str = event.target.innerText
-        const imageExtensions = /\.(gif|ico|jpeg|jpg|png|svg|webp)$/i
-        if (str.match(imageExtensions)) {
-            mediaImage.src = loadingImage
-            mediaImage.src = event.target.dataset.raw
-            mediaOuter.classList.remove('d-none')
-        } else {
-            mediaOuter.classList.add('d-none')
-            mediaImage.src = loadingImage
-        }
-        // console.log('timeoutID:', timeoutID)
-        if (timeoutID) {
-            clearTimeout(timeoutID)
-        }
+function onMouseOver(event) {
+    // console.log('onMouseOver:', event)
+    if (event.pageY < window.innerHeight / 2) {
+        mediaOuter.classList.remove('top-0')
+        mediaOuter.classList.add('bottom-0')
+    } else {
+        mediaOuter.classList.remove('bottom-0')
+        mediaOuter.classList.add('top-0')
     }
-
-    function onMouseOut() {
-        timeoutID = setTimeout(function () {
-            mediaOuter.classList.add('d-none')
-            mediaImage.src = loadingImage
-            timeoutID = undefined
-        }, timeout)
+    // console.log('name:', event.target.innerText)
+    // console.log('raw:', event.target.dataset.raw)
+    const str = event.target.innerText
+    const imageExtensions = /\.(gif|ico|jpeg|jpg|png|svg|webp)$/i
+    if (str.match(imageExtensions)) {
+        mediaImage.src = loadingImage
+        mediaImage.src = event.target.dataset.raw
+        mediaOuter.classList.remove('d-none')
+    } else {
+        mediaOuter.classList.add('d-none')
+        mediaImage.src = loadingImage
+    }
+    // console.log('timeoutID:', timeoutID)
+    if (timeoutID) {
+        clearTimeout(timeoutID)
     }
 }
 
-// function mediaError(event) {
-//     console.log('mediaError:', event)
-//     mediaImage.src = '../media/error.png'
-// }
+function onMouseOut() {
+    timeoutID = setTimeout(function () {
+        mediaOuter.classList.add('d-none')
+        mediaImage.src = loadingImage
+        timeoutID = undefined
+    }, timeout)
+}
