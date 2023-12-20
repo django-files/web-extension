@@ -11,39 +11,54 @@
 </head>
 <body>
 
-<div id="media-container" class="position-fixed top-0 p-1 w-100 d-none">
-    <img id="media-image" src="" alt="" class="img-thumbnail mw-100 rounded mx-auto d-block border-white">
+<div id="media-outer" class="d-none position-fixed top-0 p-1 w-100">
+    <img id="media-image" src="../media/loading.gif" alt="" class="d-block img-thumbnail rounded border-white mx-auto mw-100">
 </div>
 
 <div class="container-fluid p-2">
-    <div class="d-flex align-items-center justify-content-center mb-1">
-        <img src="../media/logo32.png" class="me-2" height="32" width="32" alt="Django Files" title="Django Files">
-        <h2>Django Files Extension</h2>
+    <div>
+        <a id="small-auth" class="d-none btn btn-sm btn-outline-secondary disabled float-start add-auth" role="button">
+            <i class="fa-solid fa-key"></i></a>
+        <a class="btn btn-sm btn-outline-primary float-end" role="button" href="../html/options.html" title="Options">
+            <i class="fa-solid fa-gears"></i></a>
+        <div class="d-flex align-items-center justify-content-center mb-1">
+            <img src="../media/logo32.png" class="me-2" height="32" width="32" alt="Django Files" title="Django Files">
+            <h3 class="my-0">Django Files</h3>
+        </div>
     </div>
+
     <div class="d-grid g-2 gap-1 mb-1">
         <div id="django-files-links" class="d-none btn-group btn-group-sm" role="group" aria-label="Django Files Links">
             <a role="button" class="btn btn-outline-success" href="" data-location="/files/">
                 <i class="fa-regular fa-folder-open me-2"></i> Files</a>
             <a role="button" class="btn btn-outline-success" href="" data-location="/gallery/">
                 <i class="fa-regular fa-images me-2"></i> Gallery</a>
+            <a role="button" class="btn btn-outline-success" href="" data-location="/uppy/">
+                <i class="fa-solid fa-upload me-2"></i> Upload</a>
         </div>
-        <a class="btn btn-outline-primary btn-sm" role="button" href="../html/options.html">
-            <i class="fa-solid fa-sliders me-2"></i> Open Options</a>
-        <a id="auth-button" class="d-none btn btn-sm btn-success w-100" role="button">
+<!--        <a class="btn btn-outline-primary btn-sm" role="button" href="../html/options.html">-->
+<!--            <i class="fa-solid fa-sliders me-2"></i> Open Options</a>-->
+        <a id="auth-button" class="d-none btn btn-lg btn-success w-100 my-2 add-auth" role="button">
             <i class="fa-solid fa-key"></i> Add Auth from Current Site</a>
     </div>
 
-    <div id="loading-spinner" class="text-center my-3">
-        <i class="fa-solid fa-sync fa-spin fa-3x"></i>
-        <p>Loading...</p>
-    </div>
+<!--    <div id="loading-spinner" class="text-center my-3">-->
+<!--        <i class="fa-solid fa-sync fa-spin fa-3x"></i>-->
+<!--        <p>Loading...</p>-->
+<!--    </div>-->
 
     <div id="error-alert" class="d-none alert text-center my-2" role="alert"></div>
 
     <table id="files-table" class="d-none table table-striped table-hover table-sm small align-middle mb-0">
         <caption class="visually-hidden">Recent Uploads</caption>
-        <thead class="visually-hidden"><tr><th>Number</th><th>File URL</th></tr></thead>
+        <thead class="visually-hidden"><tr><th>Options</th><th>File URL</th></tr></thead>
         <tbody></tbody>
+        <tfoot class="d-none">
+        <tr>
+            <td colspan="align-middle" style="width: 20px;"><i class="fa-solid fa-spinner fa-spin"></i></td>
+            <td class="placeholder-glow"><span class="placeholder" style="width: 100%;"></span></td>
+        </tr>
+        </tfoot>
     </table>
 </div>
 

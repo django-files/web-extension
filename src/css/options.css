@@ -17,7 +17,7 @@ video {
     transform: translateX(-50%) translateY(-50%);
     background: url("../media/loop.jpg") no-repeat;
     background-size: cover;
-    transition: 1s opacity;
+    filter: blur(150px);
 }
 
 .card {

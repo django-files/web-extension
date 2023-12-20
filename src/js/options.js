@@ -1,9 +1,7 @@
 // JS for options.html
 
 document.addEventListener('DOMContentLoaded', initOptions)
-
 chrome.runtime.onMessage.addListener(onMessage)
-
 document
     .querySelectorAll('input')
     .forEach((el) => el.addEventListener('change', saveOptions))
@@ -62,11 +60,11 @@ async function saveOptions(event) {
     } else if (event.target.id === 'siteUrl') {
         event.target.value = event.target.value.replace(/\/+$/, '')
         options[event.target.id] = event.target.value
-    } else if (event.target.id === 'recentFiles') {
-        const number = parseInt(event.target.value)
+    } else if (event.target.type === 'number') {
+        const number = parseInt(event.target.value, 10)
         if (!isNaN(number) && number >= 0 && number <= 99) {
             event.target.value = number.toString()
-            options[event.target.id] = event.target.value
+            options[event.target.id] = number
         } else {
             event.target.value = options[event.target.id]
         }
@@ -90,7 +88,7 @@ function updateOptions(options) {
         if (element) {
             if (typeof value === 'boolean') {
                 element.checked = value
-            } else if (typeof value === 'string') {
+            } else {
                 element.value = value
             }
         }

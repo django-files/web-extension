@@ -1,18 +1,23 @@
 // JS for popup.html
 
 document.addEventListener('DOMContentLoaded', initPopup)
-
+chrome.runtime.onMessage.addListener(onMessage)
 document
     .querySelectorAll('a[href]')
     .forEach((el) => el.addEventListener('click', popupLinks))
+document
+    .querySelectorAll('.add-auth')
+    .forEach((el) => el.addEventListener('click', authCredentials))
 
-chrome.runtime.onMessage.addListener(onMessage)
-
-const loadingSpinner = document.getElementById('loading-spinner')
+const filesTable = document.getElementById('files-table')
 const errorAlert = document.getElementById('error-alert')
 const authButton = document.getElementById('auth-button')
+const mediaImage = document.getElementById('media-image')
+const mediaOuter = document.getElementById('media-outer')
+const smallAuth = document.getElementById('small-auth')
 
-authButton.addEventListener('click', authCredentials)
+const loadingImage = '../media/loading.gif'
+let authError = false
 
 /**
  * Popup Init Function
@@ -24,11 +29,17 @@ async function initPopup() {
     const { options } = await chrome.storage.sync.get(['options'])
     console.log('options:', options)
 
+    authError = false
+    // Check auth if checkAuth is enabled in options
+    if (options.checkAuth) {
+        smallAuth.classList.remove('d-none')
+    }
+
     // If missing auth data or options.checkAuth check current site for auth
     if (!options?.siteUrl || !options?.authToken) {
         console.log('siteUrl, authToken:', options?.siteUrl, options?.authToken)
-        authButton.classList.remove('btn-sm')
-        authButton.classList.add('btn-lg', 'my-2')
+        // authButton.classList.remove('btn-sm')
+        // authButton.classList.add('btn-lg', 'my-2')
         return displayAlert({ message: 'Missing URL or Token.', auth: true })
     }
 
@@ -39,12 +50,14 @@ async function initPopup() {
     document.getElementById('django-files-links').classList.remove('d-none')
 
     // If recent files disabled, do nothing
-    if (options.recentFiles === '0') {
+    if (!parseInt(options.recentFiles, 10)) {
         return displayAlert({
             message: 'Recent Files Disabled in Options.',
             type: 'success',
         })
     }
+    filesTable.classList.remove('d-none')
+    genLoadingData(options.recentFiles)
 
     // Check Django Files API for recent files
     const opts = {
@@ -81,12 +94,12 @@ async function initPopup() {
 
     // Check auth if checkAuth is enabled in options
     if (options.checkAuth) {
+        smallAuth.classList.remove('d-none')
         await checkSiteAuth()
     }
 
     // Hide loading display table, update table
-    loadingSpinner.classList.add('d-none')
-    document.getElementById('files-table').classList.remove('d-none')
+    // loadingTable.classList.add('d-none')
     updateTable(data)
 
     // Re-init clipboardJS and popupLinks after updateTable
@@ -98,7 +111,7 @@ async function initPopup() {
     // Enable Popup Mouseover Preview if popupPreview
     if (options.popupPreview) {
         console.log('Enabling Mouseover Preview')
-        initPopupMouseover()
+        initPopupMouseover(options.popupTimeout)
     }
 }
 
@@ -141,7 +154,14 @@ async function onMessage(message) {
                 authToken: message.authToken,
             }
             await chrome.storage.local.set({ auth })
-            authButton.classList.remove('d-none')
+            console.log('New Authentication Found.')
+            if (options.checkAuth) {
+                smallAuth.classList.remove('disabled', 'btn-outline-secondary')
+                smallAuth.classList.add('btn-warning')
+            }
+            if (authError) {
+                authButton.classList.remove('d-none')
+            }
         }
     }
 }
@@ -163,6 +183,7 @@ async function authCredentials(event) {
         console.log('Auth Credentials Updated...')
         authButton.classList.add('d-none')
         errorAlert.classList.add('d-none')
+        smallAuth.classList.add('disabled', 'btn-outline-secondary')
         await initPopup()
         try {
             await chrome.runtime.sendMessage('reload-options')
@@ -173,23 +194,65 @@ async function authCredentials(event) {
 }
 
 /**
+ * Generate Loading Data for filesTable
+ * @function genLoadingData
+ * @param {Number} rows
+ */
+function genLoadingData(rows) {
+    console.log('genLoadingData:', rows)
+    const number = parseInt(rows, 10)
+    if (number > 0) {
+        filesTable.classList.remove('d-none')
+        const tbody = filesTable.querySelector('tbody')
+        const tr = filesTable.querySelector('tfoot tr')
+        for (let i = 0; i < number; i++) {
+            const row = tr.cloneNode(true)
+            row.classList.remove('d-none')
+            const rand = Math.floor(40 + Math.random() * 61)
+            row.querySelector('.placeholder').style.width = `${rand}%`
+            if (tbody.rows[i]) {
+                tbody.replaceChild(row, tbody.rows[i])
+            } else {
+                tbody.appendChild(row)
+            }
+        }
+    }
+}
+
+/**
  * Update Popup Table with Data
  * @function updateTable
- * @param {Object} data
+ * @param {Array} data
  */
 function updateTable(data) {
-    const tbody = document.querySelector('#files-table tbody')
-    tbody.innerHTML = ''
-
-    // console.log('data:', data)
-    data.forEach(function (value) {
+    console.log('updateTable:', data)
+    const tbody = filesTable.querySelector('tbody')
+    const length = tbody.rows.length
+    // console.log(`data.length: ${data.length}`)
+    // console.log(`tbody.rows.length: ${tbody.rows.length}`)
+    for (let i = 0; i < length; i++) {
+        // console.log(`i: ${i}`)
+        let row = tbody.rows[i]
+        if (!row) {
+            row = tbody.insertRow()
+        }
+        if (data.length === i) {
+            console.log('End of data. Removing remaining rows...')
+            const rowsToRemove = length - i
+            for (let j = 0; j < rowsToRemove; j++) {
+                tbody.deleteRow(tbody.rows.length - 1)
+            }
+            break
+        }
+        const value = data[i]
+        // TODO: This should not happen because of above condition
+        if (!value) {
+            console.warn(`No Data Value at Index: ${i}`, row)
+            continue
+        }
+        // TODO: This throws an error if value is not valid URL
         const url = new URL(value)
         const name = url.pathname.replace(/^\/u\//, '')
-        const row = tbody.insertRow()
-
-        // const count = document.createTextNode(i + 1)
-        // const cell1 = row.insertCell()
-        // cell1.appendChild(count)
 
         const copy = document.createElement('a')
         copy.title = 'Copy'
@@ -199,9 +262,11 @@ function updateTable(data) {
         copy.innerHTML = '<i class="fa-regular fa-clipboard"></i>'
         copy.classList.add('link-body-emphasis')
         copy.onclick = clipClick
-        const cell1 = row.insertCell()
-        // cell1.classList.add('align-middle')
-        cell1.appendChild(copy)
+        const cell0 = row.cells[0]
+        cell0.classList.add('align-middle')
+        cell0.style.width = '20px'
+        cell0.innerHTML = ''
+        cell0.appendChild(copy)
 
         const link = document.createElement('a')
         link.text = name
@@ -215,10 +280,11 @@ function updateTable(data) {
         )
         link.target = '_blank'
         link.dataset.raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
-        const cell2 = row.insertCell()
-        cell2.classList.add('text-break')
-        cell2.appendChild(link)
-    })
+        const cell1 = row.cells[1]
+        cell1.classList.add('text-break')
+        cell1.innerHTML = ''
+        cell1.appendChild(link)
+    }
 }
 
 /**
@@ -246,11 +312,13 @@ function clipClick(event) {
  * @param {Boolean} auth
  */
 function displayAlert({ message, type = 'warning', auth = false } = {}) {
-    loadingSpinner.classList.add('d-none')
+    console.log(`displayAlert: ${type}:`, message)
+    filesTable.classList.add('d-none')
     errorAlert.innerHTML = message
     errorAlert.classList.add(`alert-${type}`)
     errorAlert.classList.remove('d-none')
     if (auth) {
+        authError = true
         checkSiteAuth().then()
     }
 }
@@ -271,18 +339,24 @@ async function checkSiteAuth() {
 
 /**
  * Initialize Popup Mouseover Preview
+ * @param {Number} timeout
  */
-function initPopupMouseover() {
-    const mediaContainer = document.getElementById('media-container')
-    const mediaImage = document.getElementById('media-image')
+function initPopupMouseover(timeout) {
+    timeout = timeout * 1000 || 1
+    console.log('initPopupMouseover: timeout:', timeout)
+
     let timeoutID
 
-    mediaContainer.addEventListener('mouseover', () => {
-        mediaContainer.classList.add('d-none')
-        mediaImage.src = ''
+    mediaOuter.addEventListener('mouseover', () => {
+        mediaOuter.classList.add('d-none')
+        mediaImage.src = loadingImage
         if (timeoutID) {
             clearTimeout(timeoutID)
         }
+    })
+    mediaImage.addEventListener('error', (event) => {
+        console.log('mediaError:', event)
+        mediaImage.src = '../media/error.png'
     })
 
     document.querySelectorAll('.link-underline').forEach((el) => {
@@ -293,25 +367,23 @@ function initPopupMouseover() {
     function onMouseOver(event) {
         // console.log('onMouseOver:', event)
         if (event.pageY < window.innerHeight / 2) {
-            mediaContainer.classList.remove('top-0')
-            mediaContainer.classList.add('bottom-0')
+            mediaOuter.classList.remove('top-0')
+            mediaOuter.classList.add('bottom-0')
         } else {
-            mediaContainer.classList.remove('bottom-0')
-            mediaContainer.classList.add('top-0')
+            mediaOuter.classList.remove('bottom-0')
+            mediaOuter.classList.add('top-0')
         }
         // console.log('name:', event.target.innerText)
         // console.log('raw:', event.target.dataset.raw)
         const str = event.target.innerText
-        const imageExtensions = /\.(jpeg|jpg|gif|png|bmp|svg|webp)$/i
+        const imageExtensions = /\.(gif|ico|jpeg|jpg|png|svg|webp)$/i
         if (str.match(imageExtensions)) {
+            mediaImage.src = loadingImage
             mediaImage.src = event.target.dataset.raw
-            mediaContainer.classList.remove('d-none')
+            mediaOuter.classList.remove('d-none')
         } else {
-            mediaContainer.classList.add('d-none')
-            mediaImage.src = ''
-            if (timeoutID) {
-                clearTimeout(timeoutID)
-            }
+            mediaOuter.classList.add('d-none')
+            mediaImage.src = loadingImage
         }
         // console.log('timeoutID:', timeoutID)
         if (timeoutID) {
@@ -321,9 +393,14 @@ function initPopupMouseover() {
 
     function onMouseOut() {
         timeoutID = setTimeout(function () {
-            mediaContainer.classList.add('d-none')
-            mediaImage.src = ''
+            mediaOuter.classList.add('d-none')
+            mediaImage.src = loadingImage
             timeoutID = undefined
-        }, 3000)
+        }, timeout)
     }
 }
+
+// function mediaError(event) {
+//     console.log('mediaError:', event)
+//     mediaImage.src = '../media/error.png'
+// }

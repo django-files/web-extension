@@ -17,7 +17,8 @@ async function onInstalled(details) {
         setDefaultOptions({
             siteUrl: '',
             authToken: '',
-            recentFiles: '10',
+            recentFiles: 12,
+            popupTimeout: 3,
             contextMenu: true,
             popupPreview: true,
             showUpdate: false,
@@ -284,7 +285,7 @@ async function setDefaultOptions(defaultOptions) {
  */
 async function migrate2to3(details, options) {
     if (details.reason === 'update') {
-        if (parseInt(details.previousVersion.split('.')[1]) < 3) {
+        if (parseInt(details.previousVersion.split('.')[1], 10) < 3) {
             console.log(`Migration from version: ${details.previousVersion}`)
             let { auth } = await chrome.storage.sync.get(['auth'])
             console.log('auth:', auth)

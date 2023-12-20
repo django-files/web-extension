@@ -5,7 +5,7 @@ body {
     overflow-x: hidden;
 }
 
-#media-container {
+#media-outer {
     z-index: 3;
 }
 
