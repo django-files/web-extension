@@ -34,17 +34,21 @@ let timeout
  */
 async function initPopup() {
     console.log('initPopup')
+
+    // Get options
     const { options } = await chrome.storage.sync.get(['options'])
     console.log('options:', options)
 
-    // Set Options (since this is the only one)
+    // Set Options (this is currently the only one in the popup)
     document.getElementById('popupPreview').checked = options.popupPreview
 
+    // Ensure authError is set to false
     authError = false
+
     // Check auth if checkAuth is enabled in options
-    // if (options.checkAuth) {
-    //     alwaysAuth.classList.remove('d-none')
-    // }
+    if (options.checkAuth) {
+        await checkSiteAuth()
+    }
 
     // If missing auth data or options.checkAuth check current site for auth
     if (!options?.siteUrl || !options?.authToken) {
@@ -103,14 +107,7 @@ async function initPopup() {
         return displayAlert({ message: 'No Files Returned.' })
     }
 
-    // Check auth if checkAuth is enabled in options
-    if (options.checkAuth) {
-        // alwaysAuth.classList.remove('d-none')
-        await checkSiteAuth()
-    }
-
-    // Hide loading display table, update table
-    // loadingTable.classList.add('d-none')
+    // Update table should only be called here, changes should use initPopup()
     updateTable(data)
 
     // Re-init clipboardJS and popupLinks after updateTable
