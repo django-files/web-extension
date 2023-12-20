@@ -1,9 +1,7 @@
 // JS for options.html
 
 document.addEventListener('DOMContentLoaded', initOptions)
-
 chrome.runtime.onMessage.addListener(onMessage)
-
 document
     .querySelectorAll('input')
     .forEach((el) => el.addEventListener('change', saveOptions))

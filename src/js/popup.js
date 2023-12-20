@@ -1,9 +1,7 @@
 // JS for popup.html
 
 document.addEventListener('DOMContentLoaded', initPopup)
-
 chrome.runtime.onMessage.addListener(onMessage)
-
 document
     .querySelectorAll('a[href]')
     .forEach((el) => el.addEventListener('click', popupLinks))
@@ -18,6 +16,7 @@ const mediaImage = document.getElementById('media-image')
 const mediaOuter = document.getElementById('media-outer')
 const smallAuth = document.getElementById('small-auth')
 
+const loadingImage = '../media/loading.gif'
 let authError = false
 
 /**
@@ -350,7 +349,7 @@ function initPopupMouseover(timeout) {
 
     mediaOuter.addEventListener('mouseover', () => {
         mediaOuter.classList.add('d-none')
-        mediaImage.src = '../media/loading.webp'
+        mediaImage.src = loadingImage
         if (timeoutID) {
             clearTimeout(timeoutID)
         }
@@ -379,12 +378,12 @@ function initPopupMouseover(timeout) {
         const str = event.target.innerText
         const imageExtensions = /\.(gif|ico|jpeg|jpg|png|svg|webp)$/i
         if (str.match(imageExtensions)) {
-            mediaImage.src = '../media/loading.webp'
+            mediaImage.src = loadingImage
             mediaImage.src = event.target.dataset.raw
             mediaOuter.classList.remove('d-none')
         } else {
             mediaOuter.classList.add('d-none')
-            mediaImage.src = '../media/loading.webp'
+            mediaImage.src = loadingImage
         }
         // console.log('timeoutID:', timeoutID)
         if (timeoutID) {
@@ -395,7 +394,7 @@ function initPopupMouseover(timeout) {
     function onMouseOut() {
         timeoutID = setTimeout(function () {
             mediaOuter.classList.add('d-none')
-            mediaImage.src = '../media/loading.webp'
+            mediaImage.src = loadingImage
             timeoutID = undefined
         }, timeout)
     }
