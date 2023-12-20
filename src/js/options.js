@@ -61,7 +61,7 @@ async function saveOptions(event) {
         event.target.value = event.target.value.replace(/\/+$/, '')
         options[event.target.id] = event.target.value
     } else if (event.target.type === 'number') {
-        const number = parseInt(event.target.value)
+        const number = parseInt(event.target.value, 10)
         if (!isNaN(number) && number >= 0 && number <= 99) {
             event.target.value = number.toString()
             options[event.target.id] = number

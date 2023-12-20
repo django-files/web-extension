@@ -50,7 +50,7 @@ async function initPopup() {
     document.getElementById('django-files-links').classList.remove('d-none')
 
     // If recent files disabled, do nothing
-    if (!parseInt(options.recentFiles)) {
+    if (!parseInt(options.recentFiles, 10)) {
         return displayAlert({
             message: 'Recent Files Disabled in Options.',
             type: 'success',
@@ -200,7 +200,7 @@ async function authCredentials(event) {
  */
 function genLoadingData(rows) {
     console.log('genLoadingData:', rows)
-    const number = parseInt(rows)
+    const number = parseInt(rows, 10)
     if (number > 0) {
         filesTable.classList.remove('d-none')
         const tbody = filesTable.querySelector('tbody')
