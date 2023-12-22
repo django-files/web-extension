@@ -219,6 +219,7 @@ async function authCredentials(event) {
         authButton.classList.add('d-none')
         errorAlert.classList.add('d-none')
         alwaysAuth.classList.add('d-none')
+        mediaOuter.classList.add('d-none')
         await initPopup()
     } else {
         displayAlert({ message: 'Error Getting or Setting Credentials.' })
