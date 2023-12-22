@@ -117,9 +117,9 @@ async function initPopup() {
         .forEach((el) => el.addEventListener('click', popupLinks))
 
     // Enable Popup Mouseover Preview if popupPreview
+    timeout = options.popupTimeout * 1000
     if (options.popupPreview) {
         console.log('Enabling Mouseover Preview')
-        timeout = options.popupTimeout * 1000
         initPopupMouseover()
     }
 }
