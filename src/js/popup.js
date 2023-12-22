@@ -313,7 +313,10 @@ function updateTable(data) {
             'link-underline-opacity-75-hover'
         )
         link.target = '_blank'
-        link.dataset.raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
+        link.dataset.raw =
+            url.origin +
+            url.pathname.replace(/^\/u\//, '/raw/') +
+            '?view=gallery'
         const cell1 = row.cells[1]
         cell1.classList.add('text-break')
         cell1.innerHTML = ''
