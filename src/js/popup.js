@@ -1,7 +1,7 @@
 // JS for popup.html
 
-document.addEventListener('DOMContentLoaded', initPopup)
 chrome.runtime.onMessage.addListener(onMessage)
+document.addEventListener('DOMContentLoaded', initPopup)
 document
     .querySelectorAll('a[href]')
     .forEach((el) => el.addEventListener('click', popupLinks))
@@ -21,6 +21,7 @@ const authButton = document.getElementById('auth-button')
 const mediaImage = document.getElementById('media-image')
 const mediaOuter = document.getElementById('media-outer')
 const alwaysAuth = document.getElementById('always-auth')
+const mediaError = document.getElementById('media-error')
 
 const loadingImage = '../media/loading.gif'
 let authError = false
@@ -117,9 +118,9 @@ async function initPopup() {
         .forEach((el) => el.addEventListener('click', popupLinks))
 
     // Enable Popup Mouseover Preview if popupPreview
+    timeout = options.popupTimeout * 1000
     if (options.popupPreview) {
         console.log('Enabling Mouseover Preview')
-        timeout = options.popupTimeout * 1000
         initPopupMouseover()
     }
 }
@@ -219,6 +220,7 @@ async function authCredentials(event) {
         authButton.classList.add('d-none')
         errorAlert.classList.add('d-none')
         alwaysAuth.classList.add('d-none')
+        mediaOuter.classList.add('d-none')
         await initPopup()
     } else {
         displayAlert({ message: 'Error Getting or Setting Credentials.' })
@@ -311,7 +313,10 @@ function updateTable(data) {
             'link-underline-opacity-75-hover'
         )
         link.target = '_blank'
-        link.dataset.raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
+        link.dataset.raw =
+            url.origin +
+            url.pathname.replace(/^\/u\//, '/raw/') +
+            '?view=gallery'
         const cell1 = row.cells[1]
         cell1.classList.add('text-break')
         cell1.innerHTML = ''
@@ -380,7 +385,9 @@ function initPopupMouseover() {
     })
     mediaImage.addEventListener('error', (event) => {
         console.log('mediaError:', event)
-        mediaImage.src = '../media/error.png'
+        mediaImage.classList.add('d-none')
+        mediaError.classList.remove('d-none')
+        mediaImage.src = '../media/loading.gif'
     })
     document.querySelectorAll('.link-underline').forEach((el) => {
         el.addEventListener('mouseover', onMouseOver)
@@ -390,6 +397,8 @@ function initPopupMouseover() {
 
 function onMouseOver(event) {
     // console.log('onMouseOver:', event)
+    mediaError.classList.add('d-none')
+    mediaImage.classList.remove('d-none')
     if (event.pageY < window.innerHeight / 2) {
         mediaOuter.classList.remove('top-0')
         mediaOuter.classList.add('bottom-0')

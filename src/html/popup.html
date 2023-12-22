@@ -12,10 +12,17 @@
 </head>
 <body>
 
-<div class="container-fluid p-2">
-    <div id="media-outer" class="d-none position-fixed top-0 p-1 w-100">
-        <img id="media-image" src="../media/loading.gif" alt="" class="d-block img-thumbnail rounded border-white mx-auto mw-100">
+<div id="media-outer" class="d-none position-fixed top-0 p-1 w-100">
+    <img id="media-image" src="../media/loading.gif" alt="" class="d-block img-thumbnail rounded border-white mx-auto mw-100">
+    <div id="media-error" class="d-flex align-items-center justify-content-center d-none">
+        <div class="alert alert-danger text-center d-inline-block" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> Error Loading Image!<br>
+            Inspect Popup for More Details...
+        </div>
     </div>
+</div>
+
+<div class="container-fluid p-2">
 
     <div class=" mb-1">
         <div class="form-check form-switch float-start form-select-lg me-2" style="padding-top: 1px; padding-bottom: 0;"
