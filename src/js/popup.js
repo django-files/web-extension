@@ -21,6 +21,7 @@ const authButton = document.getElementById('auth-button')
 const mediaImage = document.getElementById('media-image')
 const mediaOuter = document.getElementById('media-outer')
 const alwaysAuth = document.getElementById('always-auth')
+const mediaError = document.getElementById('media-error')
 
 const loadingImage = '../media/loading.gif'
 let authError = false
@@ -381,7 +382,9 @@ function initPopupMouseover() {
     })
     mediaImage.addEventListener('error', (event) => {
         console.log('mediaError:', event)
-        mediaImage.src = '../media/error.png'
+        mediaImage.classList.add('d-none')
+        mediaError.classList.remove('d-none')
+        mediaImage.src = '../media/loading.gif'
     })
     document.querySelectorAll('.link-underline').forEach((el) => {
         el.addEventListener('mouseover', onMouseOver)
@@ -391,6 +394,8 @@ function initPopupMouseover() {
 
 function onMouseOver(event) {
     // console.log('onMouseOver:', event)
+    mediaError.classList.add('d-none')
+    mediaImage.classList.remove('d-none')
     if (event.pageY < window.innerHeight / 2) {
         mediaOuter.classList.remove('top-0')
         mediaOuter.classList.add('bottom-0')
