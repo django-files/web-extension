@@ -23,7 +23,8 @@ and upload any Image, Video or Audio files with right click.
 *   [Install](#install)
 *   [Features](#features)
 *   [Configure](#configure)
-*   [Known Building](#building)
+*   [Setup](#setup)
+*   [Building](#building)
 *   [Development](#development)
 
 # Install
@@ -45,14 +46,19 @@ All Chromium Based Browsers can install the extension from the
 ## Features
 
 *   View Recent Uploads on Popup
-*   Right Click to Upload any Image, Video, or Audio
-*   Right Click to Shorten any URL
+*   Preview Popup Images on Hover.
+*   Right Click any Image, Video, or Audio to Upload.
+*   Right Click any URL to Shorten.
+*   Automatically Auth with Django Files.
+*   Automatic Dark/Light Mode based on Browser Settings.
 
 ## Configure
 
 You can pin the Addon by clicking the `Puzzle Piece`, find the `Django Files icon`, then;  
 **Firefox**, click the `Settings Wheel` and `Pin to Toolbar`.  
 **Chrome**, click the `Pin` icon.
+
+## Setup
 
 To automatically configure the web extension to work with your Django Files instance do the following:
 
@@ -62,8 +68,8 @@ To automatically configure the web extension to work with your Django Files inst
 
 The addon should now be configured to work with your Django Files instance.
 
-You can now click the Django Files icon to view your recent uploads.  
-Right-click on any Image, Video, Audio, or URL upload to Django Files or Shorten URL.
+You can now click the Django Files icon to view your recent uploads or open Options.  
+Right-click on any Image, Video, Audio, or URL upload to Django Files or Shorten URL.  
 
 # Development
 

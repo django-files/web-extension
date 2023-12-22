@@ -1,7 +1,7 @@
 // JS for options.html
 
-document.addEventListener('DOMContentLoaded', initOptions)
 chrome.storage.onChanged.addListener(onChanged)
+document.addEventListener('DOMContentLoaded', initOptions)
 document
     .querySelectorAll('input')
     .forEach((el) => el.addEventListener('change', saveOptions))

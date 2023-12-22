@@ -1,7 +1,7 @@
 // JS for popup.html
 
-document.addEventListener('DOMContentLoaded', initPopup)
 chrome.runtime.onMessage.addListener(onMessage)
+document.addEventListener('DOMContentLoaded', initPopup)
 document
     .querySelectorAll('a[href]')
     .forEach((el) => el.addEventListener('click', popupLinks))
