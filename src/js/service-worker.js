@@ -21,6 +21,7 @@ async function onInstalled(details) {
             popupTimeout: 3,
             contextMenu: true,
             popupPreview: true,
+            deleteConfirm: true,
             checkAuth: true,
             showUpdate: false,
         })

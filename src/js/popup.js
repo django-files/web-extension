@@ -347,7 +347,7 @@ function updateTable(data) {
  * @function deleteClick
  * @param {MouseEvent} event
  */
-function deleteClick(event) {
+async function deleteClick(event) {
     console.log('deleteClick:', event)
     const closest = event.target?.closest('tr').querySelector('.file-link')
     const name = closest.dataset?.name
@@ -356,7 +356,12 @@ function deleteClick(event) {
         return console.error('No name for: event, closest', event, closest)
     }
     deleteName.textContent = name
-    deleteModal.show()
+    const { options } = await chrome.storage.sync.get(['options'])
+    if (options.deleteConfirm) {
+        deleteModal.show()
+    } else {
+        await deleteConfirm(event)
+    }
 }
 
 /**
