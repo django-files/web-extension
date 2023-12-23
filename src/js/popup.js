@@ -3,6 +3,9 @@
 chrome.runtime.onMessage.addListener(onMessage)
 document.addEventListener('DOMContentLoaded', initPopup)
 document
+    .getElementById('confirm-delete')
+    .addEventListener('click', deleteConfirm)
+document
     .querySelectorAll('a[href]')
     .forEach((el) => el.addEventListener('click', popupLinks))
 document
@@ -18,10 +21,12 @@ document
 const filesTable = document.getElementById('files-table')
 const errorAlert = document.getElementById('error-alert')
 const authButton = document.getElementById('auth-button')
-const mediaImage = document.getElementById('media-image')
-const mediaOuter = document.getElementById('media-outer')
 const alwaysAuth = document.getElementById('always-auth')
+const mediaOuter = document.getElementById('media-outer')
+const mediaImage = document.getElementById('media-image')
 const mediaError = document.getElementById('media-error')
+const deleteName = document.getElementById('delete-name')
+const deleteModal = bootstrap.Modal.getOrCreateInstance('#delete-modal')
 
 const loadingImage = '../media/loading.gif'
 let authError = false
@@ -291,11 +296,10 @@ function updateTable(data) {
         const copy = document.createElement('a')
         copy.title = 'Copy'
         copy.setAttribute('role', 'button')
-        copy.classList.add('clip')
-        copy.dataset.clipboardText = value
+        copy.classList.add('link-body-emphasis', 'clip')
         copy.innerHTML = '<i class="fa-regular fa-clipboard"></i>'
-        copy.classList.add('link-body-emphasis')
-        copy.onclick = clipClick
+        copy.dataset.clipboardText = value
+        copy.addEventListener('click', clipClick)
         const cell0 = row.cells[0]
         cell0.classList.add('align-middle')
         cell0.style.width = '20px'
@@ -310,9 +314,11 @@ function updateTable(data) {
         link.classList.add(
             'link-underline',
             'link-underline-opacity-0',
-            'link-underline-opacity-75-hover'
+            'link-underline-opacity-75-hover',
+            'file-link'
         )
         link.target = '_blank'
+        link.dataset.name = name
         link.dataset.raw =
             url.origin +
             url.pathname.replace(/^\/u\//, '/raw/') +
@@ -321,7 +327,79 @@ function updateTable(data) {
         cell1.classList.add('text-break')
         cell1.innerHTML = ''
         cell1.appendChild(link)
+
+        const del = document.createElement('a')
+        del.title = 'Delete'
+        del.setAttribute('role', 'button')
+        del.classList.add('link-danger')
+        del.innerHTML = '<i class="fa-regular fa-trash-can"></i>'
+        del.addEventListener('click', deleteClick)
+        const cell2 = row.cells[2]
+        cell2.classList.add('align-middle')
+        cell2.style.width = '20px'
+        cell2.innerHTML = ''
+        cell2.appendChild(del)
     }
+}
+
+/**
+ * Delete Click Callback
+ * @function deleteClick
+ * @param {MouseEvent} event
+ */
+function deleteClick(event) {
+    console.log('deleteClick:', event)
+    const closest = event.target?.closest('tr').querySelector('.file-link')
+    const name = closest.dataset?.name
+    console.log('name:', name)
+    if (!name) {
+        return console.error('No name for: event, closest', event, closest)
+    }
+    deleteName.textContent = name
+    deleteModal.show()
+}
+
+/**
+ * Confirm Delete Click Callback
+ * @function deleteConfirm
+ * @param {MouseEvent} event
+ */
+async function deleteConfirm(event) {
+    console.log('deleteConfirm:', event)
+    const name = deleteName.textContent
+    console.log(`Deleting File: ${name}`)
+    // TODO: Catch Error...
+    const response = await deleteFile(name)
+    console.log('response:', response)
+    if (response.ok) {
+        mediaOuter.classList.add('d-none')
+        deleteModal.hide()
+        await initPopup()
+    } else {
+        // TODO: Handle Error...
+        console.error('Error Deleting File: name, response:', name, response)
+    }
+}
+
+/**
+ * Post URL to endpoint
+ * @function deleteFile
+ * @param {String} name
+ * @return {Response}
+ */
+async function deleteFile(name) {
+    console.log(`deleteFile: ${name}`)
+    const { options } = await chrome.storage.sync.get(['options'])
+    console.log('options:', options)
+    const headers = { Authorization: options.authToken }
+    const opts = {
+        method: 'DELETE',
+        headers: headers,
+    }
+    const apiUrl = `${options.siteUrl}/api/delete/${name}`
+    const response = await fetch(apiUrl, opts)
+    console.log('response:', response)
+    return response
 }
 
 /**
@@ -389,7 +467,7 @@ function initPopupMouseover() {
         mediaError.classList.remove('d-none')
         mediaImage.src = '../media/loading.gif'
     })
-    document.querySelectorAll('.link-underline').forEach((el) => {
+    document.querySelectorAll('.file-link').forEach((el) => {
         el.addEventListener('mouseover', onMouseOver)
         el.addEventListener('mouseout', onMouseOut)
     })
