@@ -58,16 +58,33 @@
 
     <table id="files-table" class="d-none table table-striped table-hover table-sm small align-middle mb-0">
         <caption class="visually-hidden">Recent Uploads</caption>
-        <thead class="visually-hidden"><tr><th>Options</th><th>File URL</th></tr></thead>
+        <thead class="visually-hidden"><tr><th>Copy</th><th>File URL</th><th>Delete</th></tr></thead>
         <tbody></tbody>
         <tfoot class="d-none">
         <tr>
             <td colspan="align-middle" style="width: 20px;"><i class="fa-solid fa-spinner fa-spin"></i></td>
             <td class="placeholder-glow"><span class="placeholder" style="width: 100%;"></span></td>
+            <td class="placeholder-glow" style="width: 20px;"><i class="fa-solid fa-circle-dot fa-xs"></i></td>
         </tr>
         </tfoot>
     </table>
 </div>
+
+<div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content">
+    <div class="modal-body text-center">
+        <p>Are you sure you want to delete this file?</p>
+        <p><kbd id="delete-name" class="text-break"></kbd></p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="confirm-delete">
+            Delete <i class="fa-regular fa-trash-can ms-1"></i></button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    </div>
+</div> <!-- modal-content -->
+</div> <!-- modal-dialog -->
+</div> <!-- modal -->
 
 <script type="text/javascript" src="../dist/polyfill/browser-polyfill.min.js"></script>
 <script type="text/javascript" src="../dist/jquery/jquery.min.js"></script>
