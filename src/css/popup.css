@@ -13,3 +13,7 @@ body {
     max-height: 44vh;
     background-color: #303030;
 }
+
+#toast-container {
+    z-index: 4;
+}

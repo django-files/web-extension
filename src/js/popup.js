@@ -383,6 +383,7 @@ async function deleteConfirm(event) {
     } else {
         // TODO: Handle Error...
         console.error('Error Deleting File: name, response:', name, response)
+        showToast(`Error Deleting: <strong>${name}</strong>`, 'danger')
     }
 }
 
@@ -405,6 +406,21 @@ async function deleteFile(name) {
     const response = await fetch(apiUrl, opts)
     console.log('response:', response)
     return response
+}
+
+/**
+ * Show Bootstrap Toast
+ * @function showToast
+ * @param {String} message
+ * @param {String} bsClass
+ */
+function showToast(message, bsClass = 'success') {
+    const element = document.querySelector('.d-none .toast').cloneNode(true)
+    console.log('element:', element)
+    element.classList.add(`text-bg-${bsClass}`)
+    element.querySelector('.toast-body').innerHTML = message
+    document.getElementById('toast-container').appendChild(element)
+    new bootstrap.Toast(element).show()
 }
 
 /**
