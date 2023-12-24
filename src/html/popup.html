@@ -57,13 +57,12 @@
 
     <table id="files-table" class="d-none table table-striped table-hover table-sm small align-middle mb-0">
         <caption class="visually-hidden">Recent Uploads</caption>
-        <thead class="visually-hidden"><tr><th>Copy</th><th>File URL</th><th>Delete</th></tr></thead>
+        <thead class="visually-hidden"><tr><th>Menu</th><th>File URL</th></tr></thead>
         <tbody></tbody>
         <tfoot class="d-none">
         <tr>
             <td colspan="align-middle" style="width: 20px;"><i class="fa-solid fa-spinner fa-spin"></i></td>
             <td class="placeholder-glow"><span class="placeholder" style="width: 100%;"></span></td>
-            <td class="placeholder-glow" style="width: 20px;"><i class="fa-solid fa-circle-dot fa-xs"></i></td>
         </tr>
         </tfoot>
     </table>
@@ -74,10 +73,19 @@
 </div>
 
 <div class="d-none">
+    <ul class="dropdown-menu" style="max-width: 320px;">
+        <li><a class="dropdown-item clip" data-action="copy">
+            <i class="fa-regular fa-clipboard link-body-emphasis me-3"></i> Copy Link</a></li>
+        <li><a class="dropdown-item clip" data-action="raw">
+            <i class="fa-regular fa-clipboard link-body-emphasis me-3"></i> Copy Raw</a></li>
+        <li><a class="dropdown-item" data-action="delete">
+            <i class="fa-regular fa-trash-can link-danger me-3"></i> Delete</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li class="dropdown-item-text text-center text-break small clip mouse-link"></li>
+    </ul>
     <div class="toast align-items-center border-0 mb-3" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
         <div class="d-flex">
-            <div class="toast-body small"></div>
-<!--            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>-->
+            <div class="toast-body text-break small"></div>
         </div>
     </div>
 </div>

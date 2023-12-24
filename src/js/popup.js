@@ -39,11 +39,11 @@ let timeout
  * @function initPopup
  */
 async function initPopup() {
-    console.log('initPopup')
+    console.debug('initPopup')
 
     // Get options
     const { options } = await chrome.storage.sync.get(['options'])
-    console.log('options:', options)
+    console.debug('options:', options)
 
     // Set Options (this is currently the only one in the popup)
     document.getElementById('popupPreview').checked = options.popupPreview
@@ -101,7 +101,7 @@ async function initPopup() {
             auth: true,
         })
     }
-    console.log(`response.status: ${response.status}`, response, data)
+    console.debug(`response.status: ${response.status}`, response, data)
 
     // Check response data is valid and has files
     if (!response?.ok) {
@@ -115,19 +115,21 @@ async function initPopup() {
 
     // Update table should only be called here, changes should use initPopup()
     updateTable(data)
+    document
+        .querySelectorAll('.dropdown-item')
+        .forEach((el) => el.addEventListener('click', ctxMenu))
+
+    // Enable Popup Mouseover Preview if popupPreview
+    timeout = options.popupTimeout * 1000
+    if (options.popupPreview) {
+        initPopupMouseover()
+    }
 
     // Re-init clipboardJS and popupLinks after updateTable
     new ClipboardJS('.clip')
     document
         .querySelectorAll('a[href]')
         .forEach((el) => el.addEventListener('click', popupLinks))
-
-    // Enable Popup Mouseover Preview if popupPreview
-    timeout = options.popupTimeout * 1000
-    if (options.popupPreview) {
-        console.log('Enabling Mouseover Preview')
-        initPopupMouseover()
-    }
 }
 
 /**
@@ -137,7 +139,7 @@ async function initPopup() {
  * @param {MouseEvent} event
  */
 async function popupLinks(event) {
-    console.log('popupLinks:', event)
+    console.debug('popupLinks:', event)
     event.preventDefault()
     const anchor = event.target.closest('a')
     console.log(`anchor.href: ${anchor.href}`)
@@ -157,8 +159,8 @@ async function popupLinks(event) {
 async function onMessage(message) {
     // console.log('onMessage: message, sender:', message, sender)
     if (message?.siteUrl && message?.authToken) {
-        console.log(`url: ${message.siteUrl}`)
-        console.log(`token: ${message.authToken}`)
+        console.debug(`url: ${message.siteUrl}`)
+        console.debug(`token: ${message.authToken}`)
         const { options } = await chrome.storage.sync.get(['options'])
         if (
             options?.siteUrl !== message.siteUrl ||
@@ -169,7 +171,7 @@ async function onMessage(message) {
                 authToken: message.authToken,
             }
             await chrome.storage.local.set({ auth })
-            console.log('New Authentication Found.')
+            console.info('New Authentication Found.')
             if (options.checkAuth) {
                 alwaysAuth.classList.remove('d-none')
             }
@@ -189,8 +191,8 @@ async function saveOptions(event) {
     // console.log('saveOptions:', event)
     const { options } = await chrome.storage.sync.get(['options'])
     options[event.target.id] = event.target.checked
-    console.log(`Set: "${event.target.id}" to target:`, event.target)
-    console.log('options:', options)
+    console.info(`Set: "${event.target.id}" to target:`, event.target)
+    console.debug('options:', options)
     await chrome.storage.sync.set({ options })
     if (event.target.id === 'popupPreview') {
         if (event.target.checked) {
@@ -213,15 +215,15 @@ async function saveOptions(event) {
  * @param {MouseEvent} event
  */
 async function authCredentials(event) {
-    console.log('authCredentials:', event)
+    console.debug('authCredentials:', event)
     const { auth } = await chrome.storage.local.get(['auth'])
-    console.log('auth:', auth)
+    console.debug('auth:', auth)
     if (auth?.authToken && auth?.siteUrl) {
         const { options } = await chrome.storage.sync.get(['options'])
         options.authToken = auth.authToken
         options.siteUrl = auth.siteUrl
         await chrome.storage.sync.set({ options })
-        console.log('Auth Credentials Updated...')
+        console.info('Auth Credentials Updated...')
         authButton.classList.add('d-none')
         errorAlert.classList.add('d-none')
         alwaysAuth.classList.add('d-none')
@@ -238,7 +240,7 @@ async function authCredentials(event) {
  * @param {Number} rows
  */
 function genLoadingData(rows) {
-    console.log('genLoadingData:', rows)
+    console.debug('genLoadingData:', rows)
     const number = parseInt(rows, 10)
     if (number > 0) {
         filesTable.classList.remove('d-none')
@@ -264,19 +266,19 @@ function genLoadingData(rows) {
  * @param {Array} data
  */
 function updateTable(data) {
-    console.log('updateTable:', data)
+    console.debug('updateTable:', data)
     const tbody = filesTable.querySelector('tbody')
     const length = tbody.rows.length
-    // console.log(`data.length: ${data.length}`)
-    // console.log(`tbody.rows.length: ${tbody.rows.length}`)
+    // console.debug(`data.length: ${data.length}`)
+    // console.debug(`tbody.rows.length: ${tbody.rows.length}`)
     for (let i = 0; i < length; i++) {
-        // console.log(`i: ${i}`)
+        // console.debug(`i: ${i}`)
         let row = tbody.rows[i]
         if (!row) {
             row = tbody.insertRow()
         }
         if (data.length === i) {
-            console.log('End of data. Removing remaining rows...')
+            console.info('End of data. Removing remaining rows...')
             const rowsToRemove = length - i
             for (let j = 0; j < rowsToRemove; j++) {
                 tbody.deleteRow(tbody.rows.length - 1)
@@ -286,26 +288,43 @@ function updateTable(data) {
         const value = data[i]
         // TODO: This should not happen because of above condition
         if (!value) {
-            console.warn(`No Data Value at Index: ${i}`, row)
+            console.error(`No Data Value at Index: ${i}`, row)
             continue
         }
         // TODO: This throws an error if value is not valid URL
         const url = new URL(value)
         const name = url.pathname.replace(/^\/u\//, '')
+        const raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
 
-        const copy = document.createElement('a')
-        copy.title = 'Copy'
-        copy.setAttribute('role', 'button')
-        copy.classList.add('link-body-emphasis', 'clip')
-        copy.innerHTML = '<i class="fa-regular fa-clipboard"></i>'
-        copy.dataset.clipboardText = value
-        copy.addEventListener('click', clipClick)
+        // Menu Button -> 0
+        const menu = document.createElement('a')
+        menu.title = 'Menu'
+        menu.classList.add('link-body-emphasis')
+        menu.setAttribute('role', 'button')
+        menu.setAttribute('aria-expanded', 'false')
+        menu.dataset.bsToggle = 'dropdown'
+        menu.innerHTML = '<i class="fa-solid fa-bars"></i>'
+
+        // Drop Down -> Menu
+        const drop = document
+            .querySelector('.d-none .dropdown-menu')
+            .cloneNode(true)
+        const dropText = drop.querySelector('.text-break')
+        dropText.textContent = name
+        dropText.dataset.raw = raw
+        dropText.dataset.clipboardText = name
+        drop.querySelector('[data-action="copy"]').dataset.clipboardText = value
+        drop.querySelector('[data-action="raw"]').dataset.clipboardText = raw
+        menu.appendChild(drop)
+
+        // Cell: 0
         const cell0 = row.cells[0]
         cell0.classList.add('align-middle')
         cell0.style.width = '20px'
         cell0.innerHTML = ''
-        cell0.appendChild(copy)
+        cell0.appendChild(menu)
 
+        // File Link -> 1
         const link = document.createElement('a')
         link.text = name
         link.title = name
@@ -315,52 +334,44 @@ function updateTable(data) {
             'link-underline',
             'link-underline-opacity-0',
             'link-underline-opacity-75-hover',
-            'file-link'
+            'file-link',
+            'mouse-link'
         )
         link.target = '_blank'
         link.dataset.name = name
-        link.dataset.raw =
-            url.origin +
-            url.pathname.replace(/^\/u\//, '/raw/') +
-            '?view=gallery'
+        // link.dataset.row = i.toString()
+        link.id = `file-${i}`
+        link.dataset.raw = `${raw}?view=gallery`
+
+        // Cell: 0
         const cell1 = row.cells[1]
         cell1.classList.add('text-break')
         cell1.innerHTML = ''
         cell1.appendChild(link)
-
-        const del = document.createElement('a')
-        del.title = 'Delete'
-        del.setAttribute('role', 'button')
-        del.classList.add('link-danger')
-        del.innerHTML = '<i class="fa-regular fa-trash-can"></i>'
-        del.addEventListener('click', deleteClick)
-        const cell2 = row.cells[2]
-        cell2.classList.add('align-middle')
-        cell2.style.width = '20px'
-        cell2.innerHTML = ''
-        cell2.appendChild(del)
     }
 }
 
 /**
- * Delete Click Callback
- * @function deleteClick
+ * Context Menu Click Callback
+ * @function ctxMenu
  * @param {MouseEvent} event
  */
-async function deleteClick(event) {
-    console.log('deleteClick:', event)
-    const closest = event.target?.closest('tr')?.querySelector('.file-link')
-    const name = closest.dataset?.name
-    console.log('name:', name)
-    if (!name) {
-        return console.error('No name for: event, closest', event, closest)
-    }
-    deleteName.textContent = name
-    const { options } = await chrome.storage.sync.get(['options'])
-    if (options.deleteConfirm) {
-        deleteModal.show()
-    } else {
-        await deleteConfirm(event)
+async function ctxMenu(event) {
+    console.debug('ctxMenu:', event)
+    event.preventDefault()
+    const anchor = event.target.closest('a')
+    // console.log('anchor:', anchor)
+    console.log('action:', anchor.dataset?.action)
+    const file = event.target?.closest('tr')?.querySelector('.file-link')
+    console.log('name:', file.dataset?.name)
+    if (anchor.dataset?.action === 'delete') {
+        deleteName.textContent = file.dataset?.name
+        const { options } = await chrome.storage.sync.get(['options'])
+        if (options.deleteConfirm) {
+            deleteModal.show()
+        } else {
+            await deleteConfirm(event)
+        }
     }
 }
 
@@ -370,31 +381,31 @@ async function deleteClick(event) {
  * @param {MouseEvent} event
  */
 async function deleteConfirm(event) {
-    console.log('deleteConfirm:', event)
+    console.debug('deleteConfirm:', event)
     const name = deleteName.textContent
-    console.log(`Deleting File: ${name}`)
+    console.log(`deleteConfirm await deleteFile: ${name}`)
     // TODO: Catch Error? Throw should happen during init...
     const response = await deleteFile(name)
-    console.log('response:', response)
+    console.debug('response:', response)
     if (response.ok) {
         mediaOuter.classList.add('d-none')
         deleteModal.hide()
         await initPopup()
     } else {
-        console.error(`Error Deleting File: "${name}", response:`, response)
+        console.info(`Error Deleting File: "${name}", response:`, response)
         showToast(`Error Deleting: <strong>${name}</strong>`, 'danger')
         deleteModal.hide()
     }
 }
 
 /**
- * Post URL to endpoint
+ * Delete File Request
  * @function deleteFile
  * @param {String} name
  * @return {Response}
  */
 async function deleteFile(name) {
-    console.log(`deleteFile: ${name}`)
+    console.debug(`deleteFile: ${name}`)
     const { options } = await chrome.storage.sync.get(['options'])
     // console.log('options:', options)
     const headers = { Authorization: options.authToken }
@@ -402,7 +413,7 @@ async function deleteFile(name) {
         method: 'DELETE',
         headers: headers,
     }
-    const apiUrl = `${options.siteUrl}/api/delete/${name}`
+    const apiUrl = `${options.siteUrl}/api/file/${name}`
     return await fetch(apiUrl, opts)
 }
 
@@ -421,27 +432,6 @@ function showToast(message, type = 'success') {
     const toast = new bootstrap.Toast(element)
     element.addEventListener('mouseover', () => toast.hide())
     toast.show()
-    // const callback = () => {
-    //     element.addEventListener('mouseover', () => toast.hide())
-    // }
-    // setTimeout(callback, 1000)
-}
-
-/**
- * Clipboard Click Callback
- * @function clipClick
- * @param {MouseEvent} event
- */
-function clipClick(event) {
-    console.log('clipClick:', event)
-    const element = event.target.closest('a')
-    // console.log('element:', element)
-    element.classList.add('link-success')
-    element.classList.remove('link-body-emphasis')
-    setTimeout(() => {
-        element.classList.add('link-body-emphasis')
-        element.classList.remove('link-success')
-    }, 500)
 }
 
 /**
@@ -464,12 +454,13 @@ function displayAlert({ message, type = 'warning', auth = false } = {}) {
 }
 
 async function checkSiteAuth() {
+    console.debug('checkSiteAuth')
     try {
         const [tab] = await chrome.tabs.query({
             currentWindow: true,
             active: true,
         })
-        console.log('tab:', tab)
+        console.debug('tab:', tab)
         await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             files: ['/js/auth.js'],
@@ -478,7 +469,7 @@ async function checkSiteAuth() {
 }
 
 function initPopupMouseover() {
-    console.log('initPopupMouseover')
+    console.debug('initPopupMouseover')
     mediaOuter.addEventListener('mouseover', () => {
         mediaOuter.classList.add('d-none')
         mediaImage.src = loadingImage
@@ -486,13 +477,13 @@ function initPopupMouseover() {
             clearTimeout(timeoutID)
         }
     })
-    mediaImage.addEventListener('error', () => {
-        // console.log('mediaError:', event)
+    mediaImage.addEventListener('error', (event) => {
+        console.debug('mediaError:', event)
         mediaImage.classList.add('d-none')
         mediaError.classList.remove('d-none')
         mediaImage.src = '../media/loading.gif'
     })
-    document.querySelectorAll('.file-link').forEach((el) => {
+    document.querySelectorAll('.mouse-link').forEach((el) => {
         el.addEventListener('mouseover', onMouseOver)
         el.addEventListener('mouseout', onMouseOut)
     })
@@ -509,8 +500,6 @@ function onMouseOver(event) {
         mediaOuter.classList.remove('bottom-0')
         mediaOuter.classList.add('top-0')
     }
-    // console.log('name:', event.target.innerText)
-    // console.log('raw:', event.target.dataset.raw)
     const str = event.target.innerText
     const imageExtensions = /\.(gif|ico|jpeg|jpg|png|svg|webp)$/i
     if (str.match(imageExtensions)) {
