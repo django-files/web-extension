@@ -419,11 +419,12 @@ function showToast(message, type = 'success') {
     element.querySelector('.toast-body').innerHTML = message
     document.getElementById('toast-container').appendChild(element)
     const toast = new bootstrap.Toast(element)
+    element.addEventListener('mouseover', () => toast.hide())
     toast.show()
-    const callback = () => {
-        element.addEventListener('mouseover', () => toast.hide())
-    }
-    setTimeout(callback, 1000)
+    // const callback = () => {
+    //     element.addEventListener('mouseover', () => toast.hide())
+    // }
+    // setTimeout(callback, 1000)
 }
 
 /**
