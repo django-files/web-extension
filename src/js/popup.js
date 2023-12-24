@@ -418,7 +418,12 @@ function showToast(message, type = 'success') {
     element.classList.add(`text-bg-${type}`)
     element.querySelector('.toast-body').innerHTML = message
     document.getElementById('toast-container').appendChild(element)
-    new bootstrap.Toast(element).show()
+    const toast = new bootstrap.Toast(element)
+    toast.show()
+    const callback = () => {
+        element.addEventListener('mouseover', () => toast.hide())
+    }
+    setTimeout(callback, 1000)
 }
 
 /**
