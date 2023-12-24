@@ -23,7 +23,6 @@
 </div>
 
 <div class="container-fluid p-2">
-
     <div class=" mb-1">
         <div class="form-check form-switch float-start form-select-lg me-2" style="padding-top: 1px; padding-bottom: 0;"
              data-bs-title="Disable/Enable Mouseover Preview." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
@@ -68,6 +67,19 @@
         </tr>
         </tfoot>
     </table>
+</div>
+
+<div aria-live="polite" aria-atomic="true" class="">
+    <div id="toast-container" class="toast-container bottom-0 end-0 p-3"></div>
+</div>
+
+<div class="d-none">
+    <div class="toast align-items-center border-0 mt-3" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+        <div class="d-flex">
+            <div class="toast-body small"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true">

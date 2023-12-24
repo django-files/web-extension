@@ -349,7 +349,7 @@ function updateTable(data) {
  */
 async function deleteClick(event) {
     console.log('deleteClick:', event)
-    const closest = event.target?.closest('tr').querySelector('.file-link')
+    const closest = event.target?.closest('tr')?.querySelector('.file-link')
     const name = closest.dataset?.name
     console.log('name:', name)
     if (!name) {
@@ -373,7 +373,7 @@ async function deleteConfirm(event) {
     console.log('deleteConfirm:', event)
     const name = deleteName.textContent
     console.log(`Deleting File: ${name}`)
-    // TODO: Catch Error...
+    // TODO: Catch Error? Throw should happen during init...
     const response = await deleteFile(name)
     console.log('response:', response)
     if (response.ok) {
@@ -381,8 +381,9 @@ async function deleteConfirm(event) {
         deleteModal.hide()
         await initPopup()
     } else {
-        // TODO: Handle Error...
-        console.error('Error Deleting File: name, response:', name, response)
+        console.error(`Error Deleting File: "${name}", response:`, response)
+        showToast(`Error Deleting: <strong>${name}</strong>`, 'danger')
+        deleteModal.hide()
     }
 }
 
@@ -395,16 +396,34 @@ async function deleteConfirm(event) {
 async function deleteFile(name) {
     console.log(`deleteFile: ${name}`)
     const { options } = await chrome.storage.sync.get(['options'])
-    console.log('options:', options)
+    // console.log('options:', options)
     const headers = { Authorization: options.authToken }
     const opts = {
         method: 'DELETE',
         headers: headers,
     }
     const apiUrl = `${options.siteUrl}/api/delete/${name}`
-    const response = await fetch(apiUrl, opts)
-    console.log('response:', response)
-    return response
+    return await fetch(apiUrl, opts)
+}
+
+/**
+ * Show Bootstrap Toast
+ * @function showToast
+ * @param {String} message
+ * @param {String} type
+ */
+function showToast(message, type = 'success') {
+    console.log(`showToast: ${type}:`, message)
+    const element = document.querySelector('.d-none .toast').cloneNode(true)
+    element.classList.add(`text-bg-${type}`)
+    element.querySelector('.toast-body').innerHTML = message
+    document.getElementById('toast-container').appendChild(element)
+    const toast = new bootstrap.Toast(element)
+    toast.show()
+    const callback = () => {
+        element.addEventListener('mouseover', () => toast.hide())
+    }
+    setTimeout(callback, 1000)
 }
 
 /**
@@ -466,8 +485,8 @@ function initPopupMouseover() {
             clearTimeout(timeoutID)
         }
     })
-    mediaImage.addEventListener('error', (event) => {
-        console.log('mediaError:', event)
+    mediaImage.addEventListener('error', () => {
+        // console.log('mediaError:', event)
         mediaImage.classList.add('d-none')
         mediaError.classList.remove('d-none')
         mediaImage.src = '../media/loading.gif'
