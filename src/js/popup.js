@@ -28,6 +28,10 @@ const mediaError = document.getElementById('media-error')
 const deleteName = document.getElementById('delete-name')
 const deleteModal = bootstrap.Modal.getOrCreateInstance('#delete-modal')
 
+const clipboard = new ClipboardJS('.clip')
+clipboard.on('success', () => showToast('Copied to Clipboard'))
+clipboard.on('error', () => showToast('Clipboard Copy Failed', 'warning'))
+
 const loadingImage = '../media/loading.gif'
 let authError = false
 let timeoutID
@@ -114,7 +118,7 @@ async function initPopup() {
     }
 
     // Update table should only be called here, changes should use initPopup()
-    updateTable(data)
+    updateTable(data, options)
     document
         .querySelectorAll('.dropdown-item')
         .forEach((el) => el.addEventListener('click', ctxMenu))
@@ -125,11 +129,13 @@ async function initPopup() {
         initPopupMouseover()
     }
 
-    // Re-init clipboardJS and popupLinks after updateTable
-    new ClipboardJS('.clip')
+    // Re-init popupLinks after updateTable
     document
         .querySelectorAll('a[href]')
         .forEach((el) => el.addEventListener('click', popupLinks))
+
+    // Re-init clipboardJS after updateTable
+    new ClipboardJS('.clip')
 }
 
 /**
@@ -264,8 +270,9 @@ function genLoadingData(rows) {
  * Update Popup Table with Data
  * @function updateTable
  * @param {Array} data
+ * @param {Object} options
  */
-function updateTable(data) {
+function updateTable(data, options) {
     console.debug('updateTable:', data)
     const tbody = filesTable.querySelector('tbody')
     const length = tbody.rows.length
@@ -295,17 +302,23 @@ function updateTable(data) {
         const url = new URL(value)
         const name = url.pathname.replace(/^\/u\//, '')
         const raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
+        const password = url.searchParams.get('password')
+        let rawURL = new URL(raw)
+        if (password) {
+            rawURL.searchParams.append('password', password)
+        }
 
-        // Menu Button -> 0
-        const menu = document.createElement('a')
-        menu.title = 'Menu'
-        menu.classList.add('link-body-emphasis')
-        menu.setAttribute('role', 'button')
-        menu.setAttribute('aria-expanded', 'false')
-        menu.dataset.bsToggle = 'dropdown'
-        menu.innerHTML = '<i class="fa-solid fa-bars"></i>'
+        // CTX Button -> 0
+        const button = document.createElement('a')
+        // button.title = 'Menu'
+        button.classList.add('link-body-emphasis', 'ctx-button')
+        button.setAttribute('role', 'button')
+        button.setAttribute('aria-expanded', 'false')
+        button.dataset.bsToggle = 'dropdown'
+        button.innerHTML = '<i class="fa-solid fa-bars"></i>'
+        button.addEventListener('click', ctxButton)
 
-        // Drop Down -> Menu
+        // CTX Drop Down -> Menu
         const drop = document
             .querySelector('.d-none .dropdown-menu')
             .cloneNode(true)
@@ -314,15 +327,17 @@ function updateTable(data) {
         dropText.dataset.raw = raw
         dropText.dataset.clipboardText = name
         drop.querySelector('[data-action="copy"]').dataset.clipboardText = value
-        drop.querySelector('[data-action="raw"]').dataset.clipboardText = raw
-        menu.appendChild(drop)
+        drop.querySelector('[data-action="raw"]').dataset.clipboardText =
+            rawURL.href
+        drop.querySelectorAll('.raw').forEach((el) => (el.href = rawURL.href))
+        button.appendChild(drop)
 
         // Cell: 0
         const cell0 = row.cells[0]
         cell0.classList.add('align-middle')
         cell0.style.width = '20px'
         cell0.innerHTML = ''
-        cell0.appendChild(menu)
+        cell0.appendChild(button)
 
         // File Link -> 1
         const link = document.createElement('a')
@@ -341,9 +356,9 @@ function updateTable(data) {
         link.dataset.name = name
         // link.dataset.row = i.toString()
         link.id = `file-${i}`
-        link.dataset.raw = `${raw}?view=gallery`
+        link.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
 
-        // Cell: 0
+        // Cell: 1
         const cell1 = row.cells[1]
         cell1.classList.add('text-break')
         cell1.innerHTML = ''
@@ -375,6 +390,80 @@ async function ctxMenu(event) {
     }
 }
 
+async function ctxButton(event) {
+    console.log('ctxButton:', event)
+    const row = event.target?.closest('tr')
+    const file = row?.querySelector('.file-link')
+    console.log('file:', file)
+    console.log('name:', file.dataset.name)
+    const ctx = row.querySelector('.dropdown-menu')
+    const icons = ctx.querySelector('.file-icons')
+    const spinner = icons.querySelector('.fa-spinner')
+    if (!spinner) {
+        return console.log('Data Already Populated')
+    }
+
+    const response = await handleFile(file.dataset.name, 'GET')
+    console.debug('response:', response)
+    const data = await response.json()
+    console.log('data:', data)
+
+    icons.innerHTML = ''
+    if (!data) {
+        const i = document.createElement('i')
+        i.classList.add('me-3', 'fa-solid', 'fa-triangle-exclamation')
+        i.title = 'Private'
+        icons.appendChild(i)
+        return console.info('No Data Returned')
+    }
+
+    // const raw = ctx.querySelector('.raw')
+    // console.log('raw:', raw)
+    // console.log('file.dataset.raw:', file.dataset.raw)
+    // raw.href = file.dataset.raw
+    // raw.classList.remove('disabled')
+
+    const eye = document.createElement('i')
+    eye.classList.add('me-1', 'fa-solid', 'fa-eye')
+    eye.title = data.view
+    icons.appendChild(eye)
+    const views = document.createElement('span')
+    views.innerText = data.view
+    views.classList.add('me-3')
+    icons.appendChild(views)
+
+    if (data.private) {
+        console.debug('Private')
+        const i = document.createElement('i')
+        i.classList.add('me-3', 'fa-solid', 'fa-lock', 'text-danger-emphasis')
+        i.title = 'Private'
+        icons.appendChild(i)
+    }
+    if (data.password) {
+        console.debug('Password')
+        const i = document.createElement('i')
+        i.classList.add('me-3', 'fa-solid', 'fa-key')
+        i.title = 'Password Protected'
+        const a = document.createElement('a')
+        a.classList.add('link-warning', 'clip')
+        a.dataset.clipboardText = data.password
+        a.setAttribute('role', 'button')
+        a.appendChild(i)
+        icons.appendChild(a)
+    }
+    if (data.expr) {
+        console.debug('Expire')
+        const i = document.createElement('i')
+        i.classList.add('me-1', 'fa-solid', 'fa-hourglass-start')
+        i.title = data.expr
+        icons.appendChild(i)
+        const text = document.createElement('span')
+        text.innerText = data.expr
+        text.classList.add('me-3')
+        icons.appendChild(text)
+    }
+}
+
 /**
  * Confirm Delete Click Callback
  * @function deleteConfirm
@@ -385,7 +474,7 @@ async function deleteConfirm(event) {
     const name = deleteName.textContent
     console.log(`deleteConfirm await deleteFile: ${name}`)
     // TODO: Catch Error? Throw should happen during init...
-    const response = await deleteFile(name)
+    const response = await handleFile(name, 'DELETE')
     console.debug('response:', response)
     if (response.ok) {
         mediaOuter.classList.add('d-none')
@@ -400,18 +489,23 @@ async function deleteConfirm(event) {
 
 /**
  * Delete File Request
- * @function deleteFile
+ * @function handleFile
  * @param {String} name
+ * @param {String} method
+ * @param {Object} data
  * @return {Response}
  */
-async function deleteFile(name) {
-    console.debug(`deleteFile: ${name}`)
+async function handleFile(name, method, data = null) {
+    console.debug(`handleFile: ${name}`)
     const { options } = await chrome.storage.sync.get(['options'])
     // console.log('options:', options)
     const headers = { Authorization: options.authToken }
     const opts = {
-        method: 'DELETE',
+        method: method,
         headers: headers,
+    }
+    if (data) {
+        opts.data = JSON.stringify(data)
     }
     const apiUrl = `${options.siteUrl}/api/file/${name}`
     return await fetch(apiUrl, opts)
@@ -490,7 +584,7 @@ function initPopupMouseover() {
 }
 
 function onMouseOver(event) {
-    // console.log('onMouseOver:', event)
+    // console.debug('onMouseOver:', event)
     mediaError.classList.add('d-none')
     mediaImage.classList.remove('d-none')
     if (event.pageY < window.innerHeight / 2) {
@@ -517,6 +611,7 @@ function onMouseOver(event) {
 }
 
 function onMouseOut() {
+    // console.debug('onMouseOut')
     timeoutID = setTimeout(function () {
         mediaOuter.classList.add('d-none')
         mediaImage.src = loadingImage
