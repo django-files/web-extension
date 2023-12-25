@@ -24,10 +24,10 @@
 
 <div class="container-fluid p-2">
     <div class=" mb-1">
-        <div class="form-check form-switch float-start form-select-lg me-2" style="padding-top: 1px; padding-bottom: 0;"
+        <div class="form-check form-switch float-start form-select-lg me-2 pb-0" style="padding-top: 1px;"
              data-bs-title="Disable/Enable Mouseover Preview." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
             <input class="form-check-input" id="popupPreview" type="checkbox" role="switch">
-            <label class="form-check-label visually-hidden" for="popupPreview" aria-describedby="popupPreviewHelp"></label>
+            <label class="form-check-label visually-hidden" for="popupPreview" aria-describedby="popupPreviewHelp">Popup Preview</label>
         </div>
         <a id="always-auth" class="d-none btn btn-sm btn-outline-warning float-start add-auth" role="button"
            data-bs-title="Update Authentication with Current Site." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
@@ -74,21 +74,24 @@
 
 <div class="d-none">
     <ul class="dropdown-menu py-1">
-        <li class="small"><a class="dropdown-item clip" data-action="copy">
+        <li class="small"><a class="dropdown-item clip copy-link">
             <i class="fa-solid fa-copy link-body-emphasis me-3"></i> Copy Share Link</a></li>
-        <li class="small"><a class="dropdown-item clip" data-action="raw">
+        <li class="small"><a class="dropdown-item clip copy-raw">
             <i class="fa-regular fa-copy link-body-emphasis me-3"></i> Copy Raw Link</a></li>
         <li><hr class="dropdown-divider my-1"></li>
         <li class="small"><a class="dropdown-item clip raw" href="">
             <i class="fa-solid fa-arrow-up-right-from-square link-body-emphasis me-3"></i> Open Raw File</a></li>
-<!--        <li class="small"><a class="dropdown-item clip raw" href="" download="file">-->
-<!--            <i class="fa-solid fa-file-download link-body-emphasis me-3"></i> Download File</a></li>-->
         <li class="small"><a class="dropdown-item" data-action="delete">
             <i class="fa-regular fa-trash-can link-danger me-3"></i> Delete File</a></li>
         <li><hr class="dropdown-divider my-1"></li>
         <li class="dropdown-item-text text-center text-break small clip mouse-link py-0"></li>
         <li class="dropdown-item-text text-center file-icons">
-            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span class="text-body-tertiary view-text">0</span>
+            <i class="fa-solid fa-eye text-body-tertiary mx-1"></i>
+            <i class="fa-solid fa-lock mx-1 text-body-tertiary"></i>
+            <a class="pass-link"><i class="fa-solid fa-key mx-1 text-body-tertiary"></i></a>
+            <i class="fa-solid fa-hourglass-start mx-1 text-body-tertiary"></i>
+            <span class="expr-text"></span>
         </li>
     </ul>
     <div class="toast align-items-center border-0 mb-3" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">

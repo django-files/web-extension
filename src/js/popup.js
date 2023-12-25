@@ -292,7 +292,7 @@ function updateTable(data, options) {
             }
             break
         }
-        const value = data[i]
+        const value = data[i].url
         // TODO: This should not happen because of above condition
         if (!value) {
             console.error(`No Data Value at Index: ${i}`, row)
@@ -300,7 +300,7 @@ function updateTable(data, options) {
         }
         // TODO: This throws an error if value is not valid URL
         const url = new URL(value)
-        const name = url.pathname.replace(/^\/u\//, '')
+        // TODO: Return RAW URL from API
         const raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
         const password = url.searchParams.get('password')
         let rawURL = new URL(raw)
@@ -310,25 +310,24 @@ function updateTable(data, options) {
 
         // CTX Button -> 0
         const button = document.createElement('a')
-        // button.title = 'Menu'
         button.classList.add('link-body-emphasis', 'ctx-button')
         button.setAttribute('role', 'button')
         button.setAttribute('aria-expanded', 'false')
         button.dataset.bsToggle = 'dropdown'
         button.innerHTML = '<i class="fa-solid fa-bars"></i>'
-        button.addEventListener('click', ctxButton)
 
         // CTX Drop Down -> Menu
         const drop = document
             .querySelector('.d-none .dropdown-menu')
             .cloneNode(true)
-        const dropText = drop.querySelector('.text-break')
-        dropText.textContent = name
-        dropText.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
-        dropText.dataset.clipboardText = name
-        drop.querySelector('[data-action="copy"]').dataset.clipboardText = value
-        drop.querySelector('[data-action="raw"]').dataset.clipboardText =
-            rawURL.href
+        updateContextMenu(drop, data[i]).then()
+        const fileName = drop.querySelector('li.mouse-link')
+        console.log('fileName:', fileName)
+        fileName.innerText = data[i].name
+        fileName.dataset.clipboardText = data[i].name
+        fileName.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
+        drop.querySelector('.copy-link').dataset.clipboardText = value
+        drop.querySelector('.copy-raw').dataset.clipboardText = rawURL.href
         drop.querySelectorAll('.raw').forEach((el) => (el.href = rawURL.href))
         button.appendChild(drop)
 
@@ -341,8 +340,8 @@ function updateTable(data, options) {
 
         // File Link -> 1
         const link = document.createElement('a')
-        link.text = name
-        link.title = name
+        link.text = data[i].name
+        link.title = data[i].name
         link.href = value
         link.setAttribute('role', 'button')
         link.classList.add(
@@ -353,9 +352,9 @@ function updateTable(data, options) {
             'mouse-link'
         )
         link.target = '_blank'
-        link.dataset.name = name
+        link.dataset.name = data[i].name
         // link.dataset.row = i.toString()
-        link.id = `file-${i}`
+        // link.id = `file-${i}`
         link.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
 
         // Cell: 1
@@ -367,6 +366,41 @@ function updateTable(data, options) {
 }
 
 /**
+ * @function updateContextMenu
+ * @param {HTMLElement} ctx
+ * @param {Object} data
+ * @return {Promise<void>}
+ */
+async function updateContextMenu(ctx, data) {
+    console.debug('updateContextMenu:', ctx, data)
+    if (data.view) {
+        const views = ctx.querySelector('.view-text')
+        views.innerText = data.view
+        enableEl(ctx, '.view-text')
+        enableEl(ctx, '.fa-eye')
+    }
+    if (data.private) {
+        enableEl(ctx, '.fa-lock', 'text-danger-emphasis')
+    }
+    if (data.password) {
+        enableEl(ctx, '.fa-key', 'text-warning-emphasis')
+        const link = ctx.querySelector('.pass-link')
+        link.classList.add('clip')
+        link.dataset.clipboardText = data.password
+    }
+    if (data.expr) {
+        enableEl(ctx, '.fa-hourglass-start')
+        ctx.querySelector('.expr-text').innerText = data.expr
+    }
+}
+
+function enableEl(ctx, selector, add = 'text-body-emphasis') {
+    const el = ctx.querySelector(selector)
+    el.classList.remove('text-body-tertiary')
+    el.classList.add(add)
+}
+
+/**
  * Context Menu Click Callback
  * @function ctxMenu
  * @param {MouseEvent} event
@@ -375,10 +409,10 @@ async function ctxMenu(event) {
     console.debug('ctxMenu:', event)
     event.preventDefault()
     const anchor = event.target.closest('a')
-    // console.log('anchor:', anchor)
-    console.log('action:', anchor.dataset?.action)
+    // console.debug('anchor:', anchor)
+    console.debug('action:', anchor.dataset?.action)
     const file = event.target?.closest('tr')?.querySelector('.file-link')
-    console.log('name:', file.dataset?.name)
+    console.debug('name:', file.dataset?.name)
     if (anchor.dataset?.action === 'delete') {
         deleteName.textContent = file.dataset?.name
         const { options } = await chrome.storage.sync.get(['options'])
@@ -387,88 +421,6 @@ async function ctxMenu(event) {
         } else {
             await deleteConfirm(event)
         }
-    }
-}
-
-async function ctxButton(event) {
-    console.debug('ctxButton:', event)
-    const row = event.target?.closest('tr')
-    const file = row?.querySelector('.file-link')
-    console.log('file:', file)
-    console.log('name:', file.dataset.name)
-    const ctx = row.querySelector('.dropdown-menu')
-    const icons = ctx.querySelector('.file-icons')
-    const spinner = icons.querySelector('.fa-spinner')
-    if (!spinner) {
-        return console.log('Data Already Populated')
-    }
-
-    let data
-    let error
-    try {
-        const response = await handleFile(file.dataset.name, 'GET')
-        console.debug('response:', response)
-        data = await response.json()
-        console.log('data:', data)
-    } catch (e) {
-        console.info('error:', e)
-        error = e
-    }
-
-    icons.innerHTML = ''
-    if (!data) {
-        const i = document.createElement('i')
-        i.classList.add(
-            'me-3',
-            'fa-solid',
-            'fa-triangle-exclamation',
-            'link-danger'
-        )
-        i.title = 'Private'
-        icons.appendChild(i)
-        const text = document.createElement('span')
-        text.innerText = error?.toString() || 'No Data Returned.'
-        text.classList.add('text-danger-emphasis', 'small')
-        icons.appendChild(text)
-        return console.info('No Data Returned')
-    }
-
-    const views = document.createElement('span')
-    views.innerText = data.view
-    icons.appendChild(views)
-    const eye = document.createElement('i')
-    eye.classList.add('mx-2', 'fa-solid', 'fa-eye')
-    eye.title = data.view
-    icons.appendChild(eye)
-
-    if (data.private) {
-        console.debug('Private')
-        const i = document.createElement('i')
-        i.classList.add('mx-2', 'fa-solid', 'fa-lock', 'text-danger-emphasis')
-        i.title = 'Private'
-        icons.appendChild(i)
-    }
-    if (data.password) {
-        console.debug('Password')
-        const i = document.createElement('i')
-        i.classList.add('mx-2', 'fa-solid', 'fa-key')
-        i.title = 'Password Protected'
-        const a = document.createElement('a')
-        a.classList.add('link-warning', 'clip')
-        a.dataset.clipboardText = data.password
-        a.setAttribute('role', 'button')
-        a.appendChild(i)
-        icons.appendChild(a)
-    }
-    if (data.expr) {
-        console.debug('Expire')
-        const i = document.createElement('i')
-        i.classList.add('mx-2', 'fa-solid', 'fa-hourglass-start')
-        i.title = data.expr
-        icons.appendChild(i)
-        const text = document.createElement('span')
-        text.innerText = data.expr
-        icons.appendChild(text)
     }
 }
 
