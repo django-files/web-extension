@@ -391,7 +391,7 @@ async function ctxMenu(event) {
 }
 
 async function ctxButton(event) {
-    console.log('ctxButton:', event)
+    console.debug('ctxButton:', event)
     const row = event.target?.closest('tr')
     const file = row?.querySelector('.file-link')
     console.log('file:', file)
@@ -403,25 +403,35 @@ async function ctxButton(event) {
         return console.log('Data Already Populated')
     }
 
-    const response = await handleFile(file.dataset.name, 'GET')
-    console.debug('response:', response)
-    const data = await response.json()
-    console.log('data:', data)
+    let data
+    let error
+    try {
+        const response = await handleFile(file.dataset.name, 'GET')
+        console.debug('response:', response)
+        data = await response.json()
+        console.log('data:', data)
+    } catch (e) {
+        console.info('error:', e)
+        error = e
+    }
 
     icons.innerHTML = ''
     if (!data) {
         const i = document.createElement('i')
-        i.classList.add('me-3', 'fa-solid', 'fa-triangle-exclamation')
+        i.classList.add(
+            'me-3',
+            'fa-solid',
+            'fa-triangle-exclamation',
+            'link-danger'
+        )
         i.title = 'Private'
         icons.appendChild(i)
+        const text = document.createElement('span')
+        text.innerText = error?.toString() || 'No Data Returned.'
+        text.classList.add('text-danger-emphasis', 'small')
+        icons.appendChild(text)
         return console.info('No Data Returned')
     }
-
-    // const raw = ctx.querySelector('.raw')
-    // console.log('raw:', raw)
-    // console.log('file.dataset.raw:', file.dataset.raw)
-    // raw.href = file.dataset.raw
-    // raw.classList.remove('disabled')
 
     const eye = document.createElement('i')
     eye.classList.add('me-1', 'fa-solid', 'fa-eye')
