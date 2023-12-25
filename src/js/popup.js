@@ -324,7 +324,7 @@ function updateTable(data, options) {
             .cloneNode(true)
         const dropText = drop.querySelector('.text-break')
         dropText.textContent = name
-        dropText.dataset.raw = raw
+        dropText.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
         dropText.dataset.clipboardText = name
         drop.querySelector('[data-action="copy"]').dataset.clipboardText = value
         drop.querySelector('[data-action="raw"]').dataset.clipboardText =
@@ -433,26 +433,25 @@ async function ctxButton(event) {
         return console.info('No Data Returned')
     }
 
-    const eye = document.createElement('i')
-    eye.classList.add('me-1', 'fa-solid', 'fa-eye')
-    eye.title = data.view
-    icons.appendChild(eye)
     const views = document.createElement('span')
     views.innerText = data.view
-    views.classList.add('me-3')
     icons.appendChild(views)
+    const eye = document.createElement('i')
+    eye.classList.add('mx-2', 'fa-solid', 'fa-eye')
+    eye.title = data.view
+    icons.appendChild(eye)
 
     if (data.private) {
         console.debug('Private')
         const i = document.createElement('i')
-        i.classList.add('me-3', 'fa-solid', 'fa-lock', 'text-danger-emphasis')
+        i.classList.add('mx-2', 'fa-solid', 'fa-lock', 'text-danger-emphasis')
         i.title = 'Private'
         icons.appendChild(i)
     }
     if (data.password) {
         console.debug('Password')
         const i = document.createElement('i')
-        i.classList.add('me-3', 'fa-solid', 'fa-key')
+        i.classList.add('mx-2', 'fa-solid', 'fa-key')
         i.title = 'Password Protected'
         const a = document.createElement('a')
         a.classList.add('link-warning', 'clip')
@@ -464,12 +463,11 @@ async function ctxButton(event) {
     if (data.expr) {
         console.debug('Expire')
         const i = document.createElement('i')
-        i.classList.add('me-1', 'fa-solid', 'fa-hourglass-start')
+        i.classList.add('mx-2', 'fa-solid', 'fa-hourglass-start')
         i.title = data.expr
         icons.appendChild(i)
         const text = document.createElement('span')
         text.innerText = data.expr
-        text.classList.add('me-3')
         icons.appendChild(text)
     }
 }
