@@ -292,18 +292,22 @@ function updateTable(data, options) {
             }
             break
         }
-        const value = data[i].url
-        // TODO: This should not happen because of above condition
-        if (!value) {
-            console.error(`No Data Value at Index: ${i}`, row)
-            continue
+        // TODO: Backwards Compatible with Older DJ Versions
+        let url
+        let name
+        let href
+        if (typeof data[i] === 'object') {
+            url = new URL(data[i].url)
+            name = data[i].name
+            href = data[i].url
+        } else {
+            url = new URL(data[i])
+            name = url.pathname.replace(/^\/u\//, '')
+            href = data[i]
         }
-        // TODO: This throws an error if value is not valid URL
-        const url = new URL(value)
-        // TODO: Return RAW URL from API
         const raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
-        const password = url.searchParams.get('password')
         let rawURL = new URL(raw)
+        const password = url.searchParams.get('password')
         if (password) {
             rawURL.searchParams.append('password', password)
         }
@@ -320,13 +324,14 @@ function updateTable(data, options) {
         const drop = document
             .querySelector('.d-none .dropdown-menu')
             .cloneNode(true)
-        updateContextMenu(drop, data[i]).then()
+        if (typeof data[i] === 'object') {
+            updateContextMenu(drop, data[i]).then()
+        }
         const fileName = drop.querySelector('li.mouse-link')
-        console.log('fileName:', fileName)
-        fileName.innerText = data[i].name
-        fileName.dataset.clipboardText = data[i].name
+        fileName.innerText = name
+        fileName.dataset.clipboardText = name
         fileName.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
-        drop.querySelector('.copy-link').dataset.clipboardText = value
+        drop.querySelector('.copy-link').dataset.clipboardText = href
         drop.querySelector('.copy-raw').dataset.clipboardText = rawURL.href
         drop.querySelectorAll('.raw').forEach((el) => (el.href = rawURL.href))
         button.appendChild(drop)
@@ -340,9 +345,9 @@ function updateTable(data, options) {
 
         // File Link -> 1
         const link = document.createElement('a')
-        link.text = data[i].name
-        link.title = data[i].name
-        link.href = value
+        link.text = name
+        link.title = name
+        link.href = href
         link.setAttribute('role', 'button')
         link.classList.add(
             'link-underline',
@@ -352,9 +357,7 @@ function updateTable(data, options) {
             'mouse-link'
         )
         link.target = '_blank'
-        link.dataset.name = data[i].name
-        // link.dataset.row = i.toString()
-        // link.id = `file-${i}`
+        link.dataset.name = name
         link.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
 
         // Cell: 1
@@ -467,7 +470,9 @@ async function handleFile(name, method, data = null) {
     if (data) {
         opts.data = JSON.stringify(data)
     }
-    const apiUrl = `${options.siteUrl}/api/file/${name}`
+    // TODO: Update to /file/ Endpoint...
+    // const apiUrl = `${options.siteUrl}/api/file/${name}`
+    const apiUrl = `${options.siteUrl}/api/delete/${name}`
     return await fetch(apiUrl, opts)
 }
 
