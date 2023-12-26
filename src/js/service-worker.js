@@ -83,7 +83,7 @@ async function contextMenusClicked(ctx) {
  * @param {String} notificationId
  */
 async function notificationsClicked(notificationId) {
-    console.log(`notifications.onClicked: ${notificationId}`)
+    console.debug(`notifications.onClicked: ${notificationId}`)
     chrome.notifications.clear(notificationId)
     if (notificationId.startsWith('http')) {
         await chrome.tabs.create({ active: true, url: notificationId })
@@ -97,7 +97,7 @@ async function notificationsClicked(notificationId) {
  * @param {String} namespace
  */
 function onChanged(changes, namespace) {
-    // console.log('onChanged:', changes, namespace)
+    // console.debug('onChanged:', changes, namespace)
     for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
         if (key === 'options' && namespace === 'sync' && oldValue && newValue) {
             if (oldValue.contextMenu !== newValue.contextMenu) {
@@ -118,7 +118,7 @@ function onChanged(changes, namespace) {
  * @function createContextMenus
  */
 function createContextMenus() {
-    console.log('createContextMenus')
+    console.debug('createContextMenus')
     chrome.contextMenus.removeAll()
     const ctx = ['link', 'image', 'video', 'audio']
     const contexts = [
@@ -147,9 +147,9 @@ function createContextMenus() {
  * @return {Response}
  */
 async function postURL(endpoint, url) {
-    console.log(`postURL: "${endpoint}", "${url}"`)
+    console.debug(`postURL: "${endpoint}", "${url}"`)
     const { options } = await chrome.storage.sync.get(['options'])
-    console.log('options:', options)
+    console.debug('options:', options)
     if (!options?.siteUrl || !options?.authToken) {
         throw new Error('Missing URL or Token.')
     }
@@ -163,7 +163,7 @@ async function postURL(endpoint, url) {
     }
     const apiUrl = `${options.siteUrl}/api/${endpoint}/`
     const response = await fetch(apiUrl, opts)
-    console.log('response:', response)
+    console.debug('response:', response)
     return response
 }
 
@@ -175,18 +175,18 @@ async function postURL(endpoint, url) {
  * @param {String} message
  */
 async function processRemote(endpoint, url, message) {
-    console.log(`processRemote: "${endpoint}", "${url}", "${message}"`)
+    console.debug(`processRemote: "${endpoint}", "${url}", "${message}"`)
     let response
     try {
         response = await postURL(endpoint, url)
     } catch (e) {
-        console.log('error:', e)
+        console.info('error:', e)
         return await sendNotification('Fetch Error', `Error: ${error.message}`)
     }
     // console.log('response:', response)
     if (response.ok) {
         const data = await response.json()
-        console.log('data:', data)
+        console.debug('data:', data)
         await clipboardWrite(data.url)
         await sendNotification(message, data.url, data.url)
     } else {
@@ -195,7 +195,7 @@ async function processRemote(endpoint, url, message) {
             console.log('data:', data)
             await sendNotification('Processing Error', `Error: ${data.error}`)
         } catch (e) {
-            console.log('error:', e)
+            console.info('error:', e)
             await sendNotification(
                 'Processing Error',
                 `Error: Response Status: ${response.status}`
@@ -213,7 +213,7 @@ async function processRemote(endpoint, url, message) {
  * @param {Number} timeout - Optional
  */
 async function sendNotification(title, text, id = '', timeout = 10) {
-    console.log(`sendNotification: ${id || 'randomID'}: ${title} - ${text}`)
+    console.debug(`sendNotification: ${id || 'randomID'}: ${title} - ${text}`)
     const options = {
         type: 'basic',
         iconUrl: chrome.runtime.getURL('media/logo96.png'),

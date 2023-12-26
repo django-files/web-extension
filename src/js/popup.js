@@ -3,6 +3,7 @@
 chrome.runtime.onMessage.addListener(onMessage)
 document.addEventListener('DOMContentLoaded', initPopup)
 document.getElementById('expire-form').addEventListener('submit', expireForm)
+
 document
     .getElementById('password-form')
     .addEventListener('submit', passwordForm)
@@ -25,10 +26,8 @@ document
 document.querySelectorAll('.modal').forEach((el) =>
     el.addEventListener('shown.bs.modal', (event) => {
         const input = event.target.querySelector('input')
-        if (input) {
-            input.focus()
-            input.select()
-        }
+        input?.focus()
+        input?.select()
     })
 )
 
@@ -226,10 +225,10 @@ async function saveOptions(event) {
     await chrome.storage.sync.set({ options })
     if (event.target.id === 'popupPreview') {
         if (event.target.checked) {
-            console.log('popupPreview Enabled. Running initPopupMouseover...')
+            console.debug('popupPreview Enabled. Running initPopupMouseover...')
             initPopupMouseover()
         } else {
-            console.log('popupPreview Disabled. Removing Event Listeners...')
+            console.debug('popupPreview Disabled. Removing Event Listeners...')
             document.querySelectorAll('.link-underline').forEach((el) => {
                 el.removeEventListener('mouseover', onMouseOver)
                 el.removeEventListener('mouseout', onMouseOut)
@@ -626,7 +625,7 @@ async function deleteConfirm(event) {
 async function handleFile(name, method, data = null) {
     console.debug(`handleFile: ${name}`)
     const { options } = await chrome.storage.sync.get(['options'])
-    // console.log('options:', options)
+    // console.debug('options:', options)
     const headers = { Authorization: options.authToken }
     const opts = {
         method: method,
@@ -740,7 +739,6 @@ function onMouseOver(event) {
         mediaOuter.classList.add('d-none')
         mediaImage.src = loadingImage
     }
-    // console.log('timeoutID:', timeoutID)
     if (timeoutID) {
         clearTimeout(timeoutID)
     }

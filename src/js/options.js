@@ -17,12 +17,12 @@ document
  * @function initOptions
  */
 async function initOptions() {
-    // console.log('initOptions')
+    // console.debug('initOptions')
     document.getElementById('version').textContent =
         chrome.runtime.getManifest().version
 
     const { options } = await chrome.storage.sync.get(['options'])
-    console.log('options:', options)
+    console.debug('options:', options)
     updateOptions(options)
     if (!options?.siteUrl) {
         const siteUrl = document.getElementById('siteUrl')
@@ -42,10 +42,10 @@ async function initOptions() {
  * @param {String} namespace
  */
 function onChanged(changes, namespace) {
-    // console.log('onChanged:', changes, namespace)
+    // console.debug('onChanged:', changes, namespace)
     for (const [key, { newValue }] of Object.entries(changes)) {
         if (namespace === 'sync' && key === 'options') {
-            console.log('newValue:', newValue)
+            console.debug('newValue:', newValue)
             updateOptions(newValue)
         }
     }
@@ -57,7 +57,7 @@ function onChanged(changes, namespace) {
  * @param {FormDataEvent} event
  */
 async function saveOptions(event) {
-    // console.log('saveOptions:', event)
+    // console.debug('saveOptions:', event)
     const { options } = await chrome.storage.sync.get(['options'])
     if (event.target.type === 'checkbox') {
         options[event.target.id] = event.target.checked
@@ -75,8 +75,8 @@ async function saveOptions(event) {
     } else {
         options[event.target.id] = event.target.value
     }
-    console.log(`Set: "${event.target.id}" to target:`, event.target)
-    console.log('options:', options)
+    console.info(`Set: "${event.target.id}" to target:`, event.target)
+    console.debug('options:', options)
     await chrome.storage.sync.set({ options })
 }
 
@@ -87,7 +87,7 @@ async function saveOptions(event) {
  */
 function updateOptions(options) {
     for (const [key, value] of Object.entries(options)) {
-        // console.log(`${key}: ${value}`)
+        // console.debug(`${key}: ${value}`)
         const element = document.getElementById(key)
         if (element) {
             if (typeof value === 'boolean') {
