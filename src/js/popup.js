@@ -2,6 +2,7 @@
 
 chrome.runtime.onMessage.addListener(onMessage)
 document.addEventListener('DOMContentLoaded', initPopup)
+document.getElementById('expire-form').addEventListener('submit', expireForm)
 document
     .getElementById('confirm-delete')
     .addEventListener('click', deleteConfirm)
@@ -17,6 +18,12 @@ document
 document
     .querySelectorAll('[data-bs-toggle="tooltip"]')
     .forEach((el) => new bootstrap.Tooltip(el))
+document
+    .getElementById('expire-modal')
+    .addEventListener('shown.bs.modal', () => {
+        expireInput.focus()
+        expireInput.select()
+    })
 
 const filesTable = document.getElementById('files-table')
 const errorAlert = document.getElementById('error-alert')
@@ -26,7 +33,10 @@ const mediaOuter = document.getElementById('media-outer')
 const mediaImage = document.getElementById('media-image')
 const mediaError = document.getElementById('media-error')
 const deleteName = document.getElementById('delete-name')
+const ctxMenuRow = document.getElementById('ctx-menu-row')
+const expireInput = document.getElementById('expire-input')
 const deleteModal = bootstrap.Modal.getOrCreateInstance('#delete-modal')
+const expireModal = bootstrap.Modal.getOrCreateInstance('#expire-modal')
 
 const clipboard = new ClipboardJS('.clip')
 clipboard.on('success', () => showToast('Copied to Clipboard'))
@@ -36,6 +46,7 @@ const loadingImage = '../media/loading.gif'
 let authError = false
 let timeoutID
 let timeout
+let fileData
 
 /**
  * Initialize Popup
@@ -91,12 +102,11 @@ async function initPopup() {
         cache: 'no-cache',
     }
     let response
-    let data
     try {
         const url = new URL(`${options.siteUrl}/api/recent/`)
         url.searchParams.append('amount', options.recentFiles || '10')
         response = await fetch(url, opts)
-        data = await response.json()
+        fileData = await response.json()
     } catch (e) {
         console.warn(e)
         return displayAlert({
@@ -105,22 +115,26 @@ async function initPopup() {
             auth: true,
         })
     }
-    console.debug(`response.status: ${response.status}`, response, data)
+    console.debug(`response.status: ${response.status}`, response, fileData)
 
     // Check response data is valid and has files
     if (!response?.ok) {
-        console.warn(`error: ${data.error}`)
-        return displayAlert({ message: data.error, type: 'danger', auth: true })
-    } else if (data === undefined) {
+        console.warn(`error: ${fileData.error}`)
+        return displayAlert({
+            message: fileData.error,
+            type: 'danger',
+            auth: true,
+        })
+    } else if (fileData === undefined) {
         return displayAlert({ message: 'Response Data Undefined.', auth: true })
-    } else if (!data.length) {
+    } else if (!fileData.length) {
         return displayAlert({ message: 'No Files Returned.' })
     }
 
     // Update table should only be called here, changes should use initPopup()
-    updateTable(data, options)
+    updateTable(fileData, options)
     document
-        .querySelectorAll('.dropdown-item')
+        .querySelectorAll('.ctx')
         .forEach((el) => el.addEventListener('click', ctxMenu))
 
     // Enable Popup Mouseover Preview if popupPreview
@@ -292,6 +306,7 @@ function updateTable(data, options) {
             }
             break
         }
+        row.id = `row-${i}`
         // TODO: Backwards Compatible with Older DJ Versions
         let url
         let name
@@ -324,6 +339,7 @@ function updateTable(data, options) {
         const drop = document
             .querySelector('.d-none .dropdown-menu')
             .cloneNode(true)
+        drop.id = `ctx-${i}`
         if (typeof data[i] === 'object') {
             updateContextMenu(drop, data[i]).then()
         }
@@ -358,6 +374,7 @@ function updateTable(data, options) {
         )
         link.target = '_blank'
         link.dataset.name = name
+        link.dataset.row = i
         link.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
 
         // Cell: 1
@@ -394,6 +411,9 @@ async function updateContextMenu(ctx, data) {
     if (data.expr) {
         enableEl(ctx, '.fa-hourglass-start')
         ctx.querySelector('.expr-text').innerText = data.expr
+    } else {
+        disableEl(ctx, '.fa-hourglass-start')
+        ctx.querySelector('.expr-text').innerText = ''
     }
 }
 
@@ -401,6 +421,12 @@ function enableEl(ctx, selector, add = 'text-body-emphasis') {
     const el = ctx.querySelector(selector)
     el.classList.remove('text-body-tertiary')
     el.classList.add(add)
+}
+
+function disableEl(ctx, selector, remove = 'text-body-emphasis') {
+    const el = ctx.querySelector(selector)
+    el.classList.remove(remove)
+    el.classList.add('text-body-tertiary')
 }
 
 /**
@@ -414,16 +440,71 @@ async function ctxMenu(event) {
     const anchor = event.target.closest('a')
     // console.debug('anchor:', anchor)
     console.debug('action:', anchor.dataset?.action)
-    const file = event.target?.closest('tr')?.querySelector('.file-link')
-    console.debug('name:', file.dataset?.name)
+    const fileLink = event.target?.closest('tr')?.querySelector('.file-link')
+    console.debug('row:', fileLink.dataset?.row)
+    if (!fileLink.dataset?.row) {
+        console.error('404: fileLink.dataset?.row - Fatal Error!')
+    }
+    ctxMenuRow.value = fileLink.dataset?.row
+    const file = fileData[fileLink.dataset?.row]
+    console.debug('file:', file)
+    let name
+    if (typeof file === 'object') {
+        name = file.name
+    } else {
+        name = fileLink.dataset.name
+    }
+    console.debug('name:', name)
     if (anchor.dataset?.action === 'delete') {
-        deleteName.textContent = file.dataset?.name
+        deleteName.textContent = name
         const { options } = await chrome.storage.sync.get(['options'])
         if (options.deleteConfirm) {
             deleteModal.show()
         } else {
             await deleteConfirm(event)
         }
+    } else if (anchor.dataset?.action === 'expire') {
+        expireInput.value = file.expr
+        expireModal.show()
+        console.log('focus')
+    }
+}
+
+/**
+ * Expire Form Submit Callback
+ * @function expireForm
+ * @param {SubmitEvent} event
+ */
+async function expireForm(event) {
+    console.debug('expireForm:', event)
+    event.preventDefault()
+    const file = fileData[ctxMenuRow.value]
+    console.debug('file:', file)
+    const expr = expireInput.value
+    if (expr === file.expr) {
+        console.log(`New Expire Value Same as Old: ${expr}`)
+        showToast(`New Expire same as Previous: <b>${file.name}</b>`, 'warning')
+        return expireModal.hide()
+    }
+    console.log(`Setting Expire "${expr}" on file: ${file.name}`)
+    const data = { expr: expr }
+    // TODO: Catch Error? Throw should happen during init...
+    const response = await handleFile(file.name, 'POST', data)
+    console.debug('response:', response)
+    if (response.ok) {
+        mediaOuter.classList.add('d-none')
+        showToast(`Expire Updated: <b>${file.name}</b>`)
+        const json = await response.json()
+        console.debug('json:', json)
+        const ctx = document.getElementById(`ctx-${ctxMenuRow.value}`)
+        console.debug('ctx:', ctx)
+        fileData[ctxMenuRow.value] = json
+        await updateContextMenu(ctx, json)
+        expireModal.hide()
+    } else {
+        console.info(`Error Setting Expire: "${expr}", response:`, response)
+        showToast(`Error Setting Expire: <b>${file.name}</b>`, 'danger')
+        expireModal.hide()
     }
 }
 
@@ -434,6 +515,9 @@ async function ctxMenu(event) {
  */
 async function deleteConfirm(event) {
     console.debug('deleteConfirm:', event)
+    event.preventDefault()
+    const file = fileData[ctxMenuRow.value]
+    console.debug('file:', file)
     const name = deleteName.textContent
     console.log(`deleteConfirm await deleteFile: ${name}`)
     // TODO: Catch Error? Throw should happen during init...
@@ -444,8 +528,8 @@ async function deleteConfirm(event) {
         deleteModal.hide()
         await initPopup()
     } else {
-        console.info(`Error Deleting File: "${name}", response:`, response)
-        showToast(`Error Deleting: <strong>${name}</strong>`, 'danger')
+        console.info(`Error Deleting: "${name}", response:`, response)
+        showToast(`Error Deleting: <b>${name}</b>`, 'danger')
         deleteModal.hide()
     }
 }
@@ -468,11 +552,11 @@ async function handleFile(name, method, data = null) {
         headers: headers,
     }
     if (data) {
-        opts.data = JSON.stringify(data)
+        opts.body = JSON.stringify(data)
     }
     // TODO: Update to /file/ Endpoint...
-    // const apiUrl = `${options.siteUrl}/api/file/${name}`
-    const apiUrl = `${options.siteUrl}/api/delete/${name}`
+    const apiUrl = `${options.siteUrl}/api/file/${name}`
+    // const apiUrl = `${options.siteUrl}/api/delete/${name}`
     return await fetch(apiUrl, opts)
 }
 

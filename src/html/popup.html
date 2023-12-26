@@ -81,7 +81,7 @@
         <li><hr class="dropdown-divider my-1"></li>
         <li class="small"><a class="dropdown-item clip raw" href="">
             <i class="fa-solid fa-arrow-up-right-from-square link-body-emphasis me-3"></i> Open Raw File</a></li>
-        <li class="small"><a class="dropdown-item" data-action="delete">
+        <li class="small"><a class="dropdown-item ctx" data-action="delete">
             <i class="fa-regular fa-trash-can link-danger me-3"></i> Delete File</a></li>
         <li><hr class="dropdown-divider my-1"></li>
         <li class="dropdown-item-text text-center text-break small clip mouse-link py-0"></li>
@@ -90,8 +90,8 @@
             <i class="fa-solid fa-eye text-body-tertiary mx-1"></i>
             <i class="fa-solid fa-lock mx-1 text-body-tertiary"></i>
             <a class="pass-link"><i class="fa-solid fa-key mx-1 text-body-tertiary"></i></a>
-            <i class="fa-solid fa-hourglass-start mx-1 text-body-tertiary"></i>
-            <span class="expr-text"></span>
+            <a class="text-decoration-none link-body-emphasis ctx" data-action="expire"><i class="fa-solid fa-hourglass-start mx-1 text-body-tertiary"></i>
+                <span class="expr-text"></span></a>
         </li>
     </ul>
     <div class="toast align-items-center border-0 mb-3" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
@@ -109,13 +109,44 @@
         <p><kbd id="delete-name" class="text-break"></kbd></p>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-danger" id="confirm-delete">
+        <button type="button" class="btn btn-danger me-auto" id="confirm-delete">
             Delete <i class="fa-regular fa-trash-can ms-1"></i></button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close <i class="fa-solid fa-xmark ms-1"></i></button>
     </div>
 </div> <!-- modal-content -->
 </div> <!-- modal-dialog -->
 </div> <!-- modal -->
+
+<div class="modal fade" id="expire-modal" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content">
+    <div class="modal-body">
+        <p class="text-center">
+            Set the file's expiration. <br>
+            For examples, see
+            <a href="https://github.com/onegreyonewhite/pytimeparse2#pytimeparse2-time-expression-parser" target="_blank" rel="noopener">
+                this README.md</a>.
+        </p>
+        <form id="expire-form">
+            <label for="expire-input" class="form-label"><i class="fa-solid fa-hourglass-start me-1"></i> Expiration</label>
+            <input id="expire-input" aria-describedby="expire-input-help" class="form-control" type="text" autocomplete="off">
+            <div class="form-text" id="expire-input-help" >File Expiration (Blank to Disable Expiration).</div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" form="expire-form" class="btn btn-success me-auto">
+            Save <i class="fa-regular fa-floppy-disk ms-1"></i></button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close <i class="fa-solid fa-xmark ms-1"></i></button>
+    </div>
+</div> <!-- modal-content -->
+</div> <!-- modal-dialog -->
+</div> <!-- modal -->
+
+<div class="d-none">
+    <input id="ctx-menu-row" type="hidden" value="">
+</div>
 
 <script type="text/javascript" src="../dist/polyfill/browser-polyfill.min.js"></script>
 <script type="text/javascript" src="../dist/jquery/jquery.min.js"></script>
