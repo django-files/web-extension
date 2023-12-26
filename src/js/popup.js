@@ -21,10 +21,10 @@ document
 document
     .querySelectorAll('[data-bs-toggle="tooltip"]')
     .forEach((el) => new bootstrap.Tooltip(el))
+
 document.querySelectorAll('.modal').forEach((el) =>
     el.addEventListener('shown.bs.modal', (event) => {
         const input = event.target.querySelector('input')
-        console.log('input:', input)
         if (input) {
             input.focus()
             input.select()
@@ -526,11 +526,11 @@ async function passwordForm(event) {
     console.debug('file:', file)
     const password = passwordInput.value
     if (password === file.password) {
-        console.log(`Passwords Identical: ${password} === ${file.password}`)
+        console.info(`Passwords Identical: ${password} === ${file.password}`)
         showToast(`Passwords Identical: <b>${file.name}</b>`, 'warning')
         return passwordModal.hide()
     }
-    console.log(`Setting Password "${password}" on file: ${file.name}`)
+    console.log(`Setting Password: "${password}" on file: ${file.name}`)
     const data = { password: password }
     // TODO: Catch Error? Throw should happen during init...
     const response = await handleFile(file.name, 'POST', data)
@@ -563,11 +563,11 @@ async function expireForm(event) {
     console.debug('file:', file)
     const expr = expireInput.value
     if (expr === file.expr) {
-        console.log(`New Expire Value Same as Old: ${expr}`)
+        console.info(`New Expire Value Same as Old: ${expr}`)
         showToast(`New Expire same as Previous: <b>${file.name}</b>`, 'warning')
         return expireModal.hide()
     }
-    console.log(`Setting Expire "${expr}" on file: ${file.name}`)
+    console.log(`Setting Expire: "${expr}" on file: ${file.name}`)
     const data = { expr: expr }
     // TODO: Catch Error? Throw should happen during init...
     const response = await handleFile(file.name, 'POST', data)
@@ -647,7 +647,7 @@ async function handleFile(name, method, data = null) {
  * @param {String} type
  */
 function showToast(message, type = 'success') {
-    console.log(`showToast: ${type}:`, message)
+    console.debug(`showToast: ${type}:`, message)
     const element = document.querySelector('.d-none .toast').cloneNode(true)
     element.classList.add(`text-bg-${type}`)
     element.querySelector('.toast-body').innerHTML = message
@@ -665,7 +665,7 @@ function showToast(message, type = 'success') {
  * @param {Boolean} auth
  */
 function displayAlert({ message, type = 'warning', auth = false } = {}) {
-    console.log(`displayAlert: ${type}:`, message)
+    console.info(`displayAlert: ${type}:`, message)
     filesTable.classList.add('d-none')
     errorAlert.innerHTML = message
     errorAlert.classList.add(`alert-${type}`)
