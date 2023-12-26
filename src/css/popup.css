@@ -1,7 +1,7 @@
 /* CSS for popup.html */
 
 body {
-    width: 380px;
+    width: 400px;
     overflow-x: hidden;
 }
 
@@ -14,6 +14,7 @@ body {
     background-color: #303030;
 }
 
-#toast-container {
-    z-index: 4;
+ul.dropdown-menu {
+    max-width: 320px;
+    min-width: 180px;
 }
