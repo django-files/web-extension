@@ -470,7 +470,7 @@ async function ctxMenu(event) {
     }
     console.debug('name:', name)
     if (action === 'delete') {
-        deleteName.textContent = name
+        document.querySelector('#delete-modal .file-name').textContent = name
         const { options } = await chrome.storage.sync.get(['options'])
         if (options.deleteConfirm) {
             deleteModal.show()
@@ -479,9 +479,11 @@ async function ctxMenu(event) {
         }
     } else if (action === 'expire') {
         expireInput.value = file.expr
+        document.querySelector('#expire-modal .file-name').textContent = name
         expireModal.show()
     } else if (action === 'password') {
         passwordInput.value = file.password
+        document.querySelector('#password-modal .file-name').textContent = name
         passwordModal.show()
     } else if (action === 'private') {
         await togglePrivate()
@@ -598,7 +600,7 @@ async function deleteConfirm(event) {
     event.preventDefault()
     const file = fileData[ctxMenuRow.value]
     console.debug('file:', file)
-    const name = deleteName.textContent
+    const name = document.querySelector('#delete-modal .file-name').textContent
     console.log(`deleteConfirm await deleteFile: ${name}`)
     // TODO: Catch Error? Throw should happen during init...
     const response = await handleFile(name, 'DELETE')

@@ -107,7 +107,7 @@
 <div class="modal-content">
     <div class="modal-body text-center">
         <p>Are you sure you want to delete this file?</p>
-        <p><kbd id="delete-name" class="text-break"></kbd></p>
+        <p class="text-break"><kbd class="file-name"></kbd></p>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-danger me-auto" id="confirm-delete">
@@ -129,6 +129,7 @@
             <a href="https://github.com/onegreyonewhite/pytimeparse2#pytimeparse2-time-expression-parser" target="_blank" rel="noopener">
                 this README.md</a>.
         </p>
+        <p class="text-center text-break"><kbd class="file-name"></kbd></p>
         <form id="expire-form">
             <label for="expire-input" class="form-label"><i class="fa-solid fa-hourglass-start me-1"></i> Expiration</label>
             <input id="expire-input" aria-describedby="expire-input-help" class="form-control" type="text" autocomplete="off">
@@ -150,6 +151,7 @@
 <div class="modal-content">
     <div class="modal-body">
         <p class="text-center">Set the file's Password.</p>
+        <p class="text-center text-break"><kbd class="file-name"></kbd></p>
         <form id="password-form">
             <label for="password-input" class="form-label"><i class="fa-solid fa-key me-1"></i> Password</label>
             <input id="password-input" aria-describedby="password-input-help" class="form-control" type="text" autocomplete="off">
