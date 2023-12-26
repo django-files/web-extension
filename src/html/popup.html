@@ -73,6 +73,12 @@
 </div>
 
 <div class="d-none">
+    <div class="toast align-items-center border-0 mb-3" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+        <div class="toast-body text-break small"></div>
+    </div>
+
+    <input id="ctx-menu-row" type="hidden" value="">
+
     <ul class="dropdown-menu py-1">
         <li class="small"><a class="dropdown-item clip copy-link">
             <i class="fa-solid fa-copy link-body-emphasis me-3"></i> Copy Share Link</a></li>
@@ -95,12 +101,7 @@
                 <span class="expr-text"></span></a>
         </li>
     </ul>
-    <div class="toast align-items-center border-0 mb-3" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
-        <div class="d-flex">
-            <div class="toast-body text-break small"></div>
-        </div>
-    </div>
-</div>
+</div> <!-- d-none -->
 
 <div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true">
 <div class="modal-dialog modal-dialog-centered">
@@ -167,10 +168,6 @@
 </div> <!-- modal-content -->
 </div> <!-- modal-dialog -->
 </div> <!-- modal -->
-
-<div class="d-none">
-    <input id="ctx-menu-row" type="hidden" value="">
-</div>
 
 <script type="text/javascript" src="../dist/polyfill/browser-polyfill.min.js"></script>
 <script type="text/javascript" src="../dist/jquery/jquery.min.js"></script>

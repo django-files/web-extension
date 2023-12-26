@@ -5,3 +5,7 @@ svg {
     width: 1em;
     margin-bottom: 0.15em;
 }
+
+#toast-container {
+    z-index: 4;
+}
