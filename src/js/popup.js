@@ -4,6 +4,9 @@ chrome.runtime.onMessage.addListener(onMessage)
 document.addEventListener('DOMContentLoaded', initPopup)
 document.getElementById('expire-form').addEventListener('submit', expireForm)
 document
+    .getElementById('password-form')
+    .addEventListener('submit', passwordForm)
+document
     .getElementById('confirm-delete')
     .addEventListener('click', deleteConfirm)
 document
@@ -18,12 +21,16 @@ document
 document
     .querySelectorAll('[data-bs-toggle="tooltip"]')
     .forEach((el) => new bootstrap.Tooltip(el))
-document
-    .getElementById('expire-modal')
-    .addEventListener('shown.bs.modal', () => {
-        expireInput.focus()
-        expireInput.select()
+document.querySelectorAll('.modal').forEach((el) =>
+    el.addEventListener('shown.bs.modal', (event) => {
+        const input = event.target.querySelector('input')
+        console.log('input:', input)
+        if (input) {
+            input.focus()
+            input.select()
+        }
     })
+)
 
 const filesTable = document.getElementById('files-table')
 const errorAlert = document.getElementById('error-alert')
@@ -32,11 +39,13 @@ const alwaysAuth = document.getElementById('always-auth')
 const mediaOuter = document.getElementById('media-outer')
 const mediaImage = document.getElementById('media-image')
 const mediaError = document.getElementById('media-error')
-const deleteName = document.getElementById('delete-name')
 const ctxMenuRow = document.getElementById('ctx-menu-row')
+const deleteName = document.getElementById('delete-name')
 const expireInput = document.getElementById('expire-input')
+const passwordInput = document.getElementById('password-input')
 const deleteModal = bootstrap.Modal.getOrCreateInstance('#delete-modal')
 const expireModal = bootstrap.Modal.getOrCreateInstance('#expire-modal')
+const passwordModal = bootstrap.Modal.getOrCreateInstance('#password-modal')
 
 const clipboard = new ClipboardJS('.clip')
 clipboard.on('success', () => showToast('Copied to Clipboard'))
@@ -133,23 +142,25 @@ async function initPopup() {
 
     // Update table should only be called here, changes should use initPopup()
     updateTable(fileData, options)
+
+    // CTX menus are re-generated, eventListener re-addd
     document
-        .querySelectorAll('.ctx')
+        .querySelectorAll('[data-action]')
         .forEach((el) => el.addEventListener('click', ctxMenu))
 
-    // Enable Popup Mouseover Preview if popupPreview
-    timeout = options.popupTimeout * 1000
-    if (options.popupPreview) {
-        initPopupMouseover()
-    }
-
-    // Re-init popupLinks after updateTable
+    // File Links are re-generated, eventListener re-addd
     document
         .querySelectorAll('a[href]')
         .forEach((el) => el.addEventListener('click', popupLinks))
 
     // Re-init clipboardJS after updateTable
     new ClipboardJS('.clip')
+
+    // Enable Popup Mouseover Preview if popupPreview
+    timeout = options.popupTimeout * 1000
+    if (options.popupPreview) {
+        initPopupMouseover()
+    }
 }
 
 /**
@@ -374,7 +385,7 @@ function updateTable(data, options) {
         )
         link.target = '_blank'
         link.dataset.name = name
-        link.dataset.row = i
+        link.dataset.row = i.toString()
         link.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
 
         // Cell: 1
@@ -392,7 +403,7 @@ function updateTable(data, options) {
  * @return {Promise<void>}
  */
 async function updateContextMenu(ctx, data) {
-    console.debug('updateContextMenu:', ctx, data)
+    // console.debug('updateContextMenu:', ctx, data)
     if (data.view) {
         const views = ctx.querySelector('.view-text')
         views.innerText = data.view
@@ -404,9 +415,11 @@ async function updateContextMenu(ctx, data) {
     }
     if (data.password) {
         enableEl(ctx, '.fa-key', 'text-warning-emphasis')
-        const link = ctx.querySelector('.pass-link')
-        link.classList.add('clip')
-        link.dataset.clipboardText = data.password
+        // const link = ctx.querySelector('.pass-link')
+        // link.classList.add('clip')
+        // link.dataset.clipboardText = data.password
+    } else {
+        disableEl(ctx, '.fa-key', 'text-warning-emphasis')
     }
     if (data.expr) {
         enableEl(ctx, '.fa-hourglass-start')
@@ -439,7 +452,8 @@ async function ctxMenu(event) {
     event.preventDefault()
     const anchor = event.target.closest('a')
     // console.debug('anchor:', anchor)
-    console.debug('action:', anchor.dataset?.action)
+    const action = anchor.dataset?.action
+    console.debug('action:', action)
     const fileLink = event.target?.closest('tr')?.querySelector('.file-link')
     console.debug('row:', fileLink.dataset?.row)
     if (!fileLink.dataset?.row) {
@@ -455,7 +469,7 @@ async function ctxMenu(event) {
         name = fileLink.dataset.name
     }
     console.debug('name:', name)
-    if (anchor.dataset?.action === 'delete') {
+    if (action === 'delete') {
         deleteName.textContent = name
         const { options } = await chrome.storage.sync.get(['options'])
         if (options.deleteConfirm) {
@@ -463,10 +477,77 @@ async function ctxMenu(event) {
         } else {
             await deleteConfirm(event)
         }
-    } else if (anchor.dataset?.action === 'expire') {
+    } else if (action === 'expire') {
         expireInput.value = file.expr
         expireModal.show()
-        console.log('focus')
+    } else if (action === 'password') {
+        passwordInput.value = file.password
+        passwordModal.show()
+    } else if (action === 'private') {
+        await togglePrivate()
+    }
+}
+
+async function togglePrivate() {
+    console.debug('togglePrivate')
+    // event.preventDefault()
+    const file = fileData[ctxMenuRow.value]
+    console.debug('file:', file)
+    const data = { private: !file.private }
+    const response = await handleFile(file.name, 'POST', data)
+    console.debug('response:', response)
+    if (response.ok) {
+        const json = await response.json()
+        console.debug('json:', json)
+        fileData[ctxMenuRow.value] = json
+        const ctx = document.getElementById(`ctx-${ctxMenuRow.value}`)
+        console.debug('ctx:', ctx)
+        if (json.private) {
+            enableEl(ctx, '.fa-lock', 'text-danger-emphasis')
+        } else {
+            disableEl(ctx, '.fa-lock', 'text-danger-emphasis')
+        }
+        showToast(`Privacy Updated: <b>${file.name}</b>`)
+    } else {
+        console.info(`Private Error: "${file.name}", response:`, response)
+        showToast(`Error Setting Privacy: <b>${file.name}</b>`, 'danger')
+    }
+}
+
+/**
+ * Password Form Submit Callback
+ * @function passwordForm
+ * @param {SubmitEvent} event
+ */
+async function passwordForm(event) {
+    console.debug('passwordForm:', event)
+    event.preventDefault()
+    const file = fileData[ctxMenuRow.value]
+    console.debug('file:', file)
+    const password = passwordInput.value
+    if (password === file.password) {
+        console.log(`Passwords Identical: ${password} === ${file.password}`)
+        showToast(`Passwords Identical: <b>${file.name}</b>`, 'warning')
+        return passwordModal.hide()
+    }
+    console.log(`Setting Password "${password}" on file: ${file.name}`)
+    const data = { password: password }
+    // TODO: Catch Error? Throw should happen during init...
+    const response = await handleFile(file.name, 'POST', data)
+    console.debug('response:', response)
+    if (response.ok) {
+        showToast(`Password Updated: <b>${file.name}</b>`)
+        const json = await response.json()
+        console.debug('json:', json)
+        const ctx = document.getElementById(`ctx-${ctxMenuRow.value}`)
+        console.debug('ctx:', ctx)
+        fileData[ctxMenuRow.value] = json
+        await updateContextMenu(ctx, json)
+        passwordModal.hide()
+    } else {
+        console.info(`Password Error: "${password}", response:`, response)
+        showToast(`Error Setting Password: <b>${file.name}</b>`, 'danger')
+        passwordModal.hide()
     }
 }
 
@@ -492,7 +573,6 @@ async function expireForm(event) {
     const response = await handleFile(file.name, 'POST', data)
     console.debug('response:', response)
     if (response.ok) {
-        mediaOuter.classList.add('d-none')
         showToast(`Expire Updated: <b>${file.name}</b>`)
         const json = await response.json()
         console.debug('json:', json)

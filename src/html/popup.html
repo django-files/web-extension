@@ -81,16 +81,17 @@
         <li><hr class="dropdown-divider my-1"></li>
         <li class="small"><a class="dropdown-item clip raw" href="">
             <i class="fa-solid fa-arrow-up-right-from-square link-body-emphasis me-3"></i> Open Raw File</a></li>
-        <li class="small"><a class="dropdown-item ctx" data-action="delete">
+        <li class="small"><a class="dropdown-item" data-action="delete">
             <i class="fa-regular fa-trash-can link-danger me-3"></i> Delete File</a></li>
         <li><hr class="dropdown-divider my-1"></li>
         <li class="dropdown-item-text text-center text-break small clip mouse-link py-0"></li>
         <li class="dropdown-item-text text-center file-icons">
             <span class="text-body-tertiary view-text">0</span>
             <i class="fa-solid fa-eye text-body-tertiary mx-1"></i>
-            <i class="fa-solid fa-lock mx-1 text-body-tertiary"></i>
-            <a class="pass-link"><i class="fa-solid fa-key mx-1 text-body-tertiary"></i></a>
-            <a class="text-decoration-none link-body-emphasis ctx" data-action="expire"><i class="fa-solid fa-hourglass-start mx-1 text-body-tertiary"></i>
+            <a  data-action="private"><i class="fa-solid fa-lock mx-1 text-body-tertiary"></i></a>
+            <a class="pass-link" data-action="password"><i class="fa-solid fa-key mx-1 text-body-tertiary"></i></a>
+            <a class="text-decoration-none link-body-emphasis" data-action="expire">
+                <i class="fa-solid fa-hourglass-start mx-1 text-body-tertiary"></i>
                 <span class="expr-text"></span></a>
         </li>
     </ul>
@@ -110,9 +111,9 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-danger me-auto" id="confirm-delete">
-            Delete <i class="fa-regular fa-trash-can ms-1"></i></button>
+            <i class="fa-regular fa-trash-can me-2"></i> Delete</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Close <i class="fa-solid fa-xmark ms-1"></i></button>
+            Close <i class="fa-solid fa-xmark ms-2"></i></button>
     </div>
 </div> <!-- modal-content -->
 </div> <!-- modal-dialog -->
@@ -136,9 +137,30 @@
     </div>
     <div class="modal-footer">
         <button type="submit" form="expire-form" class="btn btn-success me-auto">
-            Save <i class="fa-regular fa-floppy-disk ms-1"></i></button>
+            <i class="fa-regular fa-floppy-disk me-2"></i> Save</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Close <i class="fa-solid fa-xmark ms-1"></i></button>
+            Close <i class="fa-solid fa-xmark ms-2"></i></button>
+    </div>
+</div> <!-- modal-content -->
+</div> <!-- modal-dialog -->
+</div> <!-- modal -->
+
+<div class="modal fade" id="password-modal" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content">
+    <div class="modal-body">
+        <p class="text-center">Set the file's Password.</p>
+        <form id="password-form">
+            <label for="password-input" class="form-label"><i class="fa-solid fa-key me-1"></i> Password</label>
+            <input id="password-input" aria-describedby="password-input-help" class="form-control" type="text" autocomplete="off">
+            <div class="form-text" id="password-input-help" >File Password (Blank to Disable Password).</div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" form="password-form" class="btn btn-success me-auto">
+            <i class="fa-regular fa-floppy-disk me-2"></i> Save</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close <i class="fa-solid fa-xmark ms-2"></i></button>
     </div>
 </div> <!-- modal-content -->
 </div> <!-- modal-dialog -->
