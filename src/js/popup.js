@@ -338,13 +338,47 @@ function updateTable(data, options) {
             rawURL.searchParams.append('password', password)
         }
 
+        // File Link -> 1
+        const link = document.createElement('a')
+        link.text = name
+        link.title = name
+        link.href = href
+        link.setAttribute('role', 'button')
+        link.classList.add(
+            'link-underline',
+            'link-underline-opacity-0',
+            'link-underline-opacity-75-hover',
+            'file-link',
+            'mouse-link'
+        )
+        link.target = '_blank'
+        link.dataset.name = name
+        link.dataset.row = i.toString()
+        link.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
+
+        // Cell: 1
+        const cell1 = row.cells[0]
+        cell1.classList.add('text-break')
+        cell1.innerHTML = ''
+        const div = document.createElement('div')
+        div.style.position = 'relative'
+        // div.classList.add('my-auto')
+        div.appendChild(link)
+        const board = hoverboard.cloneNode(true)
+        board.id = `menu-${i}`
+        div.appendChild(board)
+        cell1.appendChild(div)
+
         // CTX Button -> 0
-        const button = document.createElement('a')
-        button.classList.add('link-body-emphasis', 'ctx-button')
-        button.setAttribute('role', 'button')
-        button.setAttribute('aria-expanded', 'false')
-        button.dataset.bsToggle = 'dropdown'
-        button.innerHTML = '<i class="fa-solid fa-bars"></i>'
+        // const button = document.createElement('a')
+        // button.classList.add('link-body-emphasis', 'ctx-button')
+        // button.setAttribute('role', 'button')
+        // button.setAttribute('aria-expanded', 'false')
+        // button.dataset.bsToggle = 'dropdown'
+        // button.innerHTML = '<i class="fa-solid fa-bars"></i>'
+
+        // const button = document.querySelector('div.d-none .ctx-button')
+        const button = document.querySelector(`#row-${i} .ctx-button`)
 
         // CTX Drop Down -> Menu
         const drop = document
@@ -364,47 +398,16 @@ function updateTable(data, options) {
         button.appendChild(drop)
 
         // Cell: 0
-        const cell0 = row.cells[0]
-        cell0.classList.add('align-middle')
-        cell0.style.width = '20px'
-        cell0.innerHTML = ''
-        cell0.appendChild(button)
-
-        // File Link -> 1
-        const link = document.createElement('a')
-        link.text = name
-        link.title = name
-        link.href = href
-        link.setAttribute('role', 'button')
-        link.classList.add(
-            'link-underline',
-            'link-underline-opacity-0',
-            'link-underline-opacity-75-hover',
-            'file-link',
-            'mouse-link'
-        )
-        link.target = '_blank'
-        link.dataset.name = name
-        link.dataset.row = i.toString()
-        link.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
+        // const cell0 = row.cells[0]
+        // cell0.classList.add('align-middle')
+        // cell0.style.width = '20px'
+        // cell0.innerHTML = ''
+        // cell0.appendChild(button)
 
         // const hoverIcon = document.createElement('div')
         // hoverIcon.id = 'hover-menu'
         // hoverIcon.classList.add('float-end')
         // hoverIcon.innerHTML = '<i class="fa-solid fa-bars"></i>'
-
-        // Cell: 1
-        const cell1 = row.cells[1]
-        cell1.classList.add('text-break')
-        cell1.innerHTML = ''
-        const div = document.createElement('div')
-        div.style.position = 'relative'
-        // div.classList.add('my-auto')
-        div.appendChild(link)
-        const board = hoverboard.cloneNode(true)
-        board.id = `menu-${i}`
-        div.appendChild(board)
-        cell1.appendChild(div)
     }
 }
 
@@ -415,11 +418,11 @@ let menuShown
  * @param {MouseEvent} event
  */
 function hoverLinks(event) {
-    console.debug('hoverLinks:', event)
+    // console.debug('hoverLinks:', event)
     // console.log('target:', event.target)
     const row = event.target.closest('tr')
-    console.log('row:', row)
-    console.log('idx', row.dataset.idx)
+    // console.log('row:', row)
+    // console.log('idx', row.dataset.idx)
     if (menuShown !== row.dataset.idx) {
         if (menuShown) {
             document.getElementById(`menu-${menuShown}`).classList.add('d-none')
