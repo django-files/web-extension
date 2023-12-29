@@ -315,7 +315,9 @@ function updateTable(data, options) {
             }
             break
         }
+        row.addEventListener('mouseover', hoverLinks)
         row.id = `row-${i}`
+        row.dataset.idx = i.toString()
         // TODO: Backwards Compatible with Older DJ Versions
         let url
         let name
@@ -386,11 +388,46 @@ function updateTable(data, options) {
         link.dataset.row = i.toString()
         link.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
 
+        // const hoverIcon = document.createElement('div')
+        // hoverIcon.id = 'hover-menu'
+        // hoverIcon.classList.add('float-end')
+        // hoverIcon.innerHTML = '<i class="fa-solid fa-bars"></i>'
+
         // Cell: 1
         const cell1 = row.cells[1]
         cell1.classList.add('text-break')
         cell1.innerHTML = ''
-        cell1.appendChild(link)
+        const div = document.createElement('div')
+        div.style.position = 'relative'
+        // div.classList.add('my-auto')
+        div.appendChild(link)
+        const board = hoverboard.cloneNode(true)
+        board.id = `menu-${i}`
+        div.appendChild(board)
+        cell1.appendChild(div)
+    }
+}
+
+const hoverboard = document.getElementById('hover-menu')
+let menuShown
+/**
+ * Like a Hover Board, but for links
+ * @param {MouseEvent} event
+ */
+function hoverLinks(event) {
+    console.debug('hoverLinks:', event)
+    // console.log('target:', event.target)
+    const row = event.target.closest('tr')
+    console.log('row:', row)
+    console.log('idx', row.dataset.idx)
+    if (menuShown !== row.dataset.idx) {
+        if (menuShown) {
+            document.getElementById(`menu-${menuShown}`).classList.add('d-none')
+        }
+        menuShown = row.dataset.idx
+        document
+            .getElementById(`menu-${row.dataset.idx}`)
+            .classList.remove('d-none')
     }
 }
 
