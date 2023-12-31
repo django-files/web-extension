@@ -25,7 +25,7 @@ document
 
 document.querySelectorAll('.modal').forEach((el) =>
     el.addEventListener('shown.bs.modal', (event) => {
-        const input = event.target.querySelector('input')
+        const input = event.target?.querySelector('input')
         input?.focus()
         input?.select()
     })
@@ -79,8 +79,8 @@ async function initPopup() {
     }
 
     // If missing auth data or options.checkAuth check current site for auth
-    if (!options?.siteUrl || !options?.authToken) {
-        console.log('siteUrl, authToken:', options?.siteUrl, options?.authToken)
+    if (!options.siteUrl || !options.authToken) {
+        console.log('siteUrl, authToken:', options.siteUrl, options.authToken)
         // authButton.classList.remove('btn-sm')
         // authButton.classList.add('btn-lg', 'my-2')
         return displayAlert({ message: 'Missing URL or Token.', auth: true })
@@ -366,6 +366,10 @@ function updateTable(data, options) {
         div.appendChild(link)
         const board = hoverboard.cloneNode(true)
         board.id = `menu-${i}`
+
+        board.querySelector('.copy-link').dataset.clipboardText = href
+        board.querySelector('.copy-raw').dataset.clipboardText = rawURL.href
+
         div.appendChild(board)
         cell1.appendChild(div)
 
@@ -381,8 +385,11 @@ function updateTable(data, options) {
         const button = document.querySelector(`#row-${i} .ctx-button`)
 
         // CTX Drop Down -> Menu
+        // const drop = document
+        //     .querySelector('.d-none .dropdown-menu')
+        //     .cloneNode(true)
         const drop = document
-            .querySelector('.d-none .dropdown-menu')
+            .querySelector('.clone .dropdown-menu')
             .cloneNode(true)
         drop.id = `ctx-${i}`
         if (typeof data[i] === 'object') {
@@ -426,6 +433,11 @@ function hoverLinks(event) {
     if (menuShown !== row.dataset.idx) {
         if (menuShown) {
             document.getElementById(`menu-${menuShown}`).classList.add('d-none')
+            const ctx = bootstrap.Dropdown.getOrCreateInstance(
+                `#menu-${menuShown} .ctx-button`
+            )
+            // console.debug('ctx:', ctx)
+            ctx.hide()
         }
         menuShown = row.dataset.idx
         document
@@ -696,7 +708,7 @@ function showToast(message, type = 'success') {
         element.classList.add(`text-bg-${type}`)
         container.appendChild(element)
         const toast = new bootstrap.Toast(element)
-        element.addEventListener('mouseover', () => toast.hide())
+        element.addEventListener('mousemove', () => toast.hide())
         toast.show()
     } else {
         console.info('Missing clone or container:', clone, container)

@@ -15,10 +15,12 @@ body {
 }
 
 ul.dropdown-menu {
-    max-width: 320px;
-    min-width: 200px;
+    width: 240px;
+    /*margin-right: 1px;*/
+    /*max-width: 320px;*/
+    /*min-width: 200px;*/
 }
 
-#hover-menu {
+.hover-menu {
     position: absolute;
 }
