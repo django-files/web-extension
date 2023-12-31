@@ -18,6 +18,7 @@ async function onInstalled(details) {
             siteUrl: '',
             authToken: '',
             recentFiles: 12,
+            popupWidth: 360,
             popupTimeout: 3,
             contextMenu: true,
             popupPreview: true,

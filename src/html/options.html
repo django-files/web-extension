@@ -17,7 +17,7 @@
 
 <div class="container-fluid p-2 h-100">
 <div class="d-flex align-items-center h-100">
-<div class="col-xl-6 col-md-8 col-12 m-auto">
+<div class="col-xxl-8 col-lg-10 col-12 m-auto">
 <div class="card p-2 mb-2">
 <div class="card-body">
     <div class="d-flex justify-content-center align-items-center">
@@ -49,33 +49,38 @@
                 <input id="authToken" aria-describedby="authTokenHelp" type="password" class="form-control" autocomplete="off">
                 <div class="form-text" id="authTokenHelp">Token From Django Files Settings.</div>
             </div>
-            <div class="col-sm-6 col-12 mb-2">
+            <div class="col-sm-4 col-12 mb-2">
                 <label for="recentFiles" class="form-label"><i class="fa-solid fa-list-ol me-2"></i> Recent Files</label>
                 <input id="recentFiles" aria-describedby="recentFilesHelp" type="number" class="form-control" autocomplete="off">
-                <div class="form-text" id="recentFilesHelp">Popup Recent Files. 0 to Disable.</div>
+                <div class="form-text" id="recentFilesHelp">Popup Recent Files. <span class="d-inline-block">0 to Disable.</span></div>
             </div>
-            <div class="col-sm-6 col-12 mb-2">
+            <div class="col-sm-4 col-12 mb-2">
+                <label for="popupWidth" class="form-label"><i class="fa-solid fa-text-width me-2"></i> Popup Width</label>
+                <input id="popupWidth" aria-describedby="popupWidthHelp" type="number" class="form-control" autocomplete="off">
+                <div class="form-text" id="popupWidthHelp">Popup Width in Pixels. <span class="d-inline-block">300-600.</span></div>
+            </div>
+            <div class="col-sm-4 col-12 mb-2">
                 <label for="popupTimeout" class="form-label"><i class="fa-solid fa-stopwatch me-2"></i> Preview Timeout</label>
                 <input id="popupTimeout" aria-describedby="popupTimeoutHelp" type="number" class="form-control" autocomplete="off">
-                <div class="form-text" id="popupTimeoutHelp">Popup Preview Timeout Seconds.</div>
+                <div class="form-text" id="popupTimeoutHelp">Popup Preview Timeout in Seconds.</div>
             </div>
         </div>
 
         <div class="my-3">
             <div class="form-check form-switch mb-2">
-                <input class="form-check-input" id="contextMenu" type="checkbox" role="switch">
-                <label class="form-check-label" for="contextMenu" aria-describedby="contextMenuHelp">
-                    Enable Right Click Menu
-                    <span data-bs-toggle="tooltip" data-bs-title="Show Right Click Context Menu.">
+                <input class="form-check-input" id="popupPreview" type="checkbox" role="switch">
+                <label class="form-check-label" for="popupPreview" aria-describedby="popupPreviewHelp">
+                    Show Preview on Popup
+                    <span data-bs-toggle="tooltip" data-bs-title="Display Media Preview on Popup Mouseover.">
                         <i class="fa-solid fa-circle-info ms-1"></i>
                     </span>
                 </label>
             </div>
             <div class="form-check form-switch mb-2">
-                <input class="form-check-input" id="popupPreview" type="checkbox" role="switch">
-                <label class="form-check-label" for="popupPreview" aria-describedby="popupPreviewHelp">
-                    Show Preview on Popup
-                    <span data-bs-toggle="tooltip" data-bs-title="Display Media Preview on Popup Mouseover.">
+                <input class="form-check-input" id="checkAuth" type="checkbox" role="switch">
+                <label class="form-check-label" for="checkAuth" aria-describedby="checkAuthHelp">
+                    Always Check for Site Auth
+                    <span data-bs-toggle="tooltip" data-bs-title="Always Query Current Site for Auth Credentials.">
                         <i class="fa-solid fa-circle-info ms-1"></i>
                     </span>
                 </label>
@@ -90,10 +95,10 @@
                 </label>
             </div>
             <div class="form-check form-switch mb-2">
-                <input class="form-check-input" id="checkAuth" type="checkbox" role="switch">
-                <label class="form-check-label" for="checkAuth" aria-describedby="checkAuthHelp">
-                    Always Check for Site Auth
-                    <span data-bs-toggle="tooltip" data-bs-title="Always Query Current Site for Auth Credentials.">
+                <input class="form-check-input" id="contextMenu" type="checkbox" role="switch">
+                <label class="form-check-label" for="contextMenu" aria-describedby="contextMenuHelp">
+                    Enable Context Menu
+                    <span data-bs-toggle="tooltip" data-bs-title="Show Right Click Context Menu.">
                         <i class="fa-solid fa-circle-info ms-1"></i>
                     </span>
                 </label>

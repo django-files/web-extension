@@ -32,6 +32,7 @@ document.querySelectorAll('.modal').forEach((el) =>
 )
 
 const filesTable = document.getElementById('files-table')
+const authAlert = document.getElementById('auth-alert')
 const errorAlert = document.getElementById('error-alert')
 const authButton = document.getElementById('auth-button')
 const alwaysAuth = document.getElementById('always-auth')
@@ -69,6 +70,15 @@ async function initPopup() {
 
     // Set Options (this is currently the only one in the popup)
     document.getElementById('popupPreview').checked = options.popupPreview
+
+    document.body.style.width = `${options.popupWidth}px`
+
+    const siteUrl = new URL(options.siteUrl)
+    document.querySelector('.head img').title = siteUrl.host
+    document.querySelector('.head h3').title = siteUrl.host
+    // const popupTitle = document.getElementById('popup-title')
+    // popupTitle.title = siteUrl.host
+    // new bootstrap.Tooltip(popupTitle)
 
     // Ensure authError is set to false
     authError = false
@@ -254,6 +264,7 @@ async function authCredentials(event) {
         await chrome.storage.sync.set({ options })
         console.info('Auth Credentials Updated...')
         authButton.classList.add('d-none')
+        authAlert.classList.add('d-none')
         errorAlert.classList.add('d-none')
         alwaysAuth.classList.add('d-none')
         mediaOuter.classList.add('d-none')
@@ -729,6 +740,7 @@ function displayAlert({ message, type = 'warning', auth = false } = {}) {
     errorAlert.classList.add(`alert-${type}`)
     errorAlert.classList.remove('d-none')
     if (auth) {
+        authAlert.classList.remove('d-none')
         authError = true
         checkSiteAuth().then()
     }
