@@ -57,13 +57,10 @@
 
     <table id="files-table" class="d-none table table-striped table-hover table-sm small align-middle mb-0">
         <caption class="visually-hidden">Recent Uploads</caption>
-        <thead class="visually-hidden"><tr><th>Menu</th><th>File URL</th></tr></thead>
+        <thead class="visually-hidden"><tr><th>File URL</th></tr></thead>
         <tbody></tbody>
         <tfoot class="d-none">
-        <tr>
-            <td colspan="align-middle" style="width: 20px;"><i class="fa-solid fa-spinner fa-spin"></i></td>
-            <td class="placeholder-glow"><span class="placeholder" style="width: 100%;"></span></td>
-        </tr>
+        <tr><td class="placeholder-glow"><span class="placeholder" style="width: 100%;"></span></td></tr>
         </tfoot>
     </table>
 </div>
@@ -72,7 +69,18 @@
     <div id="toast-container" class="toast-container d-flex flex-column-reverse top-0 start-0 p-3"></div>
 </div>
 
-<div class="d-none">
+<div class="d-none clone">
+    <div id="hover-menu" class="hover-menu d-none top-0 end-0 bg-dark bg-opacity-75 rounded-1 px-1">
+        <a role="button" class="link-danger" title="Delete" data-action="delete">
+            <i class="fa-regular fa-trash-can"></i></a>
+        <a role="button" class="link-secondary copy-raw clip" title="Copy Raw">
+            <i class="fa-solid fa-copy mx-1"></i></a>
+        <a role="button" class="link-body-emphasis copy-link clip" title="Copy Link">
+            <i class="fa-solid fa-copy mx-1"></i></a>
+        <a role="button" class="link-body-emphasis ctx-button" title="Open Menu" data-bs-toggle="dropdown">
+            <i class="fa-solid fa-bars"></i></a>
+    </div>
+
     <div class="toast align-items-center border-0 mb-3" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
         <div class="toast-body text-break small"></div>
     </div>
