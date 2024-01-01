@@ -64,9 +64,12 @@ let fileData
 async function initPopup() {
     console.debug('initPopup')
 
-    // const manifest = chrome.runtime.getManifest()
-    // document.querySelector('.version').textContent = manifest.version
-    // document.getElementById('homepage_url').href = manifest.homepage_url
+    const manifest = chrome.runtime.getManifest()
+    const imgLink = document.querySelector('.head img').closest('a')
+    imgLink.href = manifest.homepage_url
+    imgLink.title = `v${manifest.version}`
+    const titleLink = document.querySelector('.head h3 a')
+    titleLink.href = manifest.homepage_url
 
     // Get options
     const { options } = await chrome.storage.sync.get(['options'])
@@ -77,26 +80,14 @@ async function initPopup() {
 
     document.body.style.width = `${options.popupWidth}px`
 
+    // Set Title Link and Title if siteUrl
     if (options.siteUrl) {
-        try {
-            const siteUrl = new URL(options.siteUrl)
-            document.querySelector('.head img').title = siteUrl.host
-            document.querySelector('.head h3').title = siteUrl.host
-            // const popupTitle = document.getElementById('popup-title')
-            // popupTitle.title = siteUrl.host
-            // new bootstrap.Tooltip(popupTitle)
-        } catch (e) {
-            console.log(e)
-        }
+        titleLink.title = options.siteUrl
+        titleLink.href = options.siteUrl
     }
 
     // Ensure authError is set to false
     authError = false
-
-    // Check auth if checkAuth is enabled in options
-    if (options.checkAuth) {
-        await checkSiteAuth()
-    }
 
     // If missing auth data or options.checkAuth check current site for auth
     if (!options.siteUrl || !options.authToken) {
@@ -106,11 +97,18 @@ async function initPopup() {
         return displayAlert({ message: 'Missing URL or Token.', auth: true })
     }
 
+    // Check auth if checkAuth is enabled in options
+    if (options.checkAuth) {
+        await checkSiteAuth()
+    }
+
     // URL set in options, so show Django Files site link buttons
-    document
-        .querySelectorAll('[data-location]')
-        .forEach((el) => (el.href = options.siteUrl + el.dataset.location))
-    document.getElementById('django-files-links').classList.remove('d-none')
+    if (options.popupLinks) {
+        document
+            .querySelectorAll('[data-location]')
+            .forEach((el) => (el.href = options.siteUrl + el.dataset.location))
+        document.getElementById('django-files-links').classList.remove('d-none')
+    }
 
     // If recent files disabled, do nothing
     if (!parseInt(options.recentFiles, 10)) {
