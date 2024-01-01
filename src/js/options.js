@@ -66,11 +66,21 @@ async function saveOptions(event) {
         options[event.target.id] = event.target.value
     } else if (event.target.type === 'number') {
         const number = parseInt(event.target.value, 10)
-        if (!isNaN(number) && number >= 0 && number <= 99) {
+        let min = 0
+        let max = 60
+        if (event.target.id === 'recentFiles') {
+            max = 99
+        } else if (event.target.id === 'popupWidth') {
+            min = 320
+            max = 600
+        }
+        if (!isNaN(number) && number >= min && number <= max) {
             event.target.value = number.toString()
             options[event.target.id] = number
         } else {
             event.target.value = options[event.target.id]
+            // TODO: Add Error Handling
+            // showToast(`Value ${number} Out of Range for ${event.target.id}`,'warning')
         }
     } else {
         options[event.target.id] = event.target.value

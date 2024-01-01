@@ -1,7 +1,7 @@
 /* CSS for popup.html */
 
 body {
-    width: 400px;
+    width: 380px;
     overflow-x: hidden;
 }
 
@@ -15,7 +15,7 @@ body {
 }
 
 ul.dropdown-menu {
-    width: 240px;
+    width: 260px;
 }
 
 .hover-menu {

@@ -32,6 +32,7 @@ document.querySelectorAll('.modal').forEach((el) =>
 )
 
 const filesTable = document.getElementById('files-table')
+const authAlert = document.getElementById('auth-alert')
 const errorAlert = document.getElementById('error-alert')
 const authButton = document.getElementById('auth-button')
 const alwaysAuth = document.getElementById('always-auth')
@@ -63,6 +64,13 @@ let fileData
 async function initPopup() {
     console.debug('initPopup')
 
+    const manifest = chrome.runtime.getManifest()
+    const imgLink = document.querySelector('.head img').closest('a')
+    imgLink.href = manifest.homepage_url
+    imgLink.title = `v${manifest.version}`
+    const titleLink = document.querySelector('.head h3 a')
+    titleLink.href = manifest.homepage_url
+
     // Get options
     const { options } = await chrome.storage.sync.get(['options'])
     console.debug('options:', options)
@@ -70,13 +78,16 @@ async function initPopup() {
     // Set Options (this is currently the only one in the popup)
     document.getElementById('popupPreview').checked = options.popupPreview
 
+    document.body.style.width = `${options.popupWidth}px`
+
+    // Set Title Link and Title if siteUrl
+    if (options.siteUrl) {
+        titleLink.title = options.siteUrl
+        titleLink.href = options.siteUrl
+    }
+
     // Ensure authError is set to false
     authError = false
-
-    // Check auth if checkAuth is enabled in options
-    if (options.checkAuth) {
-        await checkSiteAuth()
-    }
 
     // If missing auth data or options.checkAuth check current site for auth
     if (!options.siteUrl || !options.authToken) {
@@ -86,11 +97,18 @@ async function initPopup() {
         return displayAlert({ message: 'Missing URL or Token.', auth: true })
     }
 
+    // Check auth if checkAuth is enabled in options
+    if (options.checkAuth) {
+        await checkSiteAuth()
+    }
+
     // URL set in options, so show Django Files site link buttons
-    document
-        .querySelectorAll('[data-location]')
-        .forEach((el) => (el.href = options.siteUrl + el.dataset.location))
-    document.getElementById('django-files-links').classList.remove('d-none')
+    if (options.popupLinks) {
+        document
+            .querySelectorAll('[data-location]')
+            .forEach((el) => (el.href = options.siteUrl + el.dataset.location))
+        document.getElementById('django-files-links').classList.remove('d-none')
+    }
 
     // If recent files disabled, do nothing
     if (!parseInt(options.recentFiles, 10)) {
@@ -137,6 +155,11 @@ async function initPopup() {
     } else if (!fileData.length) {
         return displayAlert({ message: 'No Files Returned.' })
     }
+
+    // if (fileData.length < 8) {
+    //     document.body.style.minHeight = '340px'
+    // }
+    document.body.style.minHeight = '320px'
 
     // Update table should only be called here, changes should use initPopup()
     updateTable(fileData, options)
@@ -254,6 +277,7 @@ async function authCredentials(event) {
         await chrome.storage.sync.set({ options })
         console.info('Auth Credentials Updated...')
         authButton.classList.add('d-none')
+        authAlert.classList.add('d-none')
         errorAlert.classList.add('d-none')
         alwaysAuth.classList.add('d-none')
         mediaOuter.classList.add('d-none')
@@ -729,6 +753,7 @@ function displayAlert({ message, type = 'warning', auth = false } = {}) {
     errorAlert.classList.add(`alert-${type}`)
     errorAlert.classList.remove('d-none')
     if (auth) {
+        authAlert.classList.remove('d-none')
         authError = true
         checkSiteAuth().then()
     }
