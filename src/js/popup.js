@@ -64,6 +64,10 @@ let fileData
 async function initPopup() {
     console.debug('initPopup')
 
+    // const manifest = chrome.runtime.getManifest()
+    // document.querySelector('.version').textContent = manifest.version
+    // document.getElementById('homepage_url').href = manifest.homepage_url
+
     // Get options
     const { options } = await chrome.storage.sync.get(['options'])
     console.debug('options:', options)
@@ -73,12 +77,18 @@ async function initPopup() {
 
     document.body.style.width = `${options.popupWidth}px`
 
-    const siteUrl = new URL(options.siteUrl)
-    document.querySelector('.head img').title = siteUrl.host
-    document.querySelector('.head h3').title = siteUrl.host
-    // const popupTitle = document.getElementById('popup-title')
-    // popupTitle.title = siteUrl.host
-    // new bootstrap.Tooltip(popupTitle)
+    if (options.siteUrl) {
+        try {
+            const siteUrl = new URL(options.siteUrl)
+            document.querySelector('.head img').title = siteUrl.host
+            document.querySelector('.head h3').title = siteUrl.host
+            // const popupTitle = document.getElementById('popup-title')
+            // popupTitle.title = siteUrl.host
+            // new bootstrap.Tooltip(popupTitle)
+        } catch (e) {
+            console.log(e)
+        }
+    }
 
     // Ensure authError is set to false
     authError = false
@@ -147,6 +157,11 @@ async function initPopup() {
     } else if (!fileData.length) {
         return displayAlert({ message: 'No Files Returned.' })
     }
+
+    // if (fileData.length < 8) {
+    //     document.body.style.minHeight = '340px'
+    // }
+    document.body.style.minHeight = '320px'
 
     // Update table should only be called here, changes should use initPopup()
     updateTable(fileData, options)

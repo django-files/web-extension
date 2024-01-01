@@ -71,7 +71,7 @@ async function saveOptions(event) {
         if (event.target.id === 'recentFiles') {
             max = 99
         } else if (event.target.id === 'popupWidth') {
-            min = 300
+            min = 320
             max = 600
         }
         if (!isNaN(number) && number >= min && number <= max) {
