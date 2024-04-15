@@ -326,7 +326,7 @@ function updateTable(data, options) {
     // console.debug(`data.length: ${data.length}`)
     // console.debug(`tbody.rows.length: ${tbody.rows.length}`)
     for (let i = 0; i < length; i++) {
-        // console.debug(`i: ${i}`)
+        // console.debug(`i: ${i}`, data[i])
         let row = tbody.rows[i]
         if (!row) {
             row = tbody.insertRow()
@@ -356,10 +356,9 @@ function updateTable(data, options) {
             rawURL.searchParams.append('token', options.authToken)
         }
         if (url.searchParams.has('password')) {
-            rawURLCopy.searchParams.append(
-                'password',
-                url.searchParams.get('password')
-            )
+            const password = url.searchParams.get('password')
+            // console.debug('adding password to rawURLCopy:', password)
+            rawURLCopy.searchParams.append('password', password)
         }
         rawURL.searchParams.append('view', 'gallery')
 
@@ -393,8 +392,7 @@ function updateTable(data, options) {
         board.id = `menu-${i}`
 
         board.querySelector('.copy-link').dataset.clipboardText = data[i].url
-        board.querySelector('.copy-raw').dataset.clipboardText =
-            data[i].raw || rawURLCopy.href
+        board.querySelector('.copy-raw').dataset.clipboardText = rawURLCopy.href
 
         div.appendChild(board)
         cell1.appendChild(div)
@@ -427,7 +425,9 @@ function updateTable(data, options) {
         fileName.dataset.thumb = data[i].thumb || rawURL.href
         drop.querySelector('.copy-link').dataset.clipboardText = data[i].url
         drop.querySelector('.copy-raw').dataset.clipboardText = rawURLCopy.href
-        drop.querySelectorAll('.raw').forEach((el) => (el.href = rawURL.href))
+        drop.querySelectorAll('.raw').forEach(
+            (el) => (el.href = rawURLCopy.href)
+        )
         button.appendChild(drop)
 
         // Cell: 0
