@@ -344,11 +344,14 @@ function updateTable(data, options) {
         row.dataset.idx = i.toString()
 
         const url = new URL(data[i].url)
+        let rawURLCopy
         let rawURL
         if (data[i].raw) {
+            rawURLCopy = new URL(data[i].raw)
             rawURL = new URL(data[i].raw)
         } else {
             const raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
+            rawURLCopy = new URL(raw)
             rawURL = new URL(raw)
             rawURL.searchParams.append('token', options.authToken)
             if (url.searchParams.has('password')) {
@@ -393,7 +396,7 @@ function updateTable(data, options) {
 
         board.querySelector('.copy-link').dataset.clipboardText = data[i].url
         board.querySelector('.copy-raw').dataset.clipboardText =
-            data[i].raw || rawURL.href
+            data[i].raw || rawURLCopy.href
 
         div.appendChild(board)
         cell1.appendChild(div)
@@ -423,9 +426,8 @@ function updateTable(data, options) {
         const fileName = drop.querySelector('li.mouse-link')
         fileName.innerText = data[i].name
         fileName.dataset.clipboardText = data[i].name
-        fileName.dataset.raw = `${rawURL.href}?token=${options.authToken}&view=gallery`
         drop.querySelector('.copy-link').dataset.clipboardText = data[i].url
-        drop.querySelector('.copy-raw').dataset.clipboardText = rawURL.href
+        drop.querySelector('.copy-raw').dataset.clipboardText = rawURLCopy.href
         drop.querySelectorAll('.raw').forEach((el) => (el.href = rawURL.href))
         button.appendChild(drop)
 
