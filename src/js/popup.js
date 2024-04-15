@@ -354,21 +354,20 @@ function updateTable(data, options) {
             rawURLCopy = new URL(raw)
             rawURL = new URL(raw)
             rawURL.searchParams.append('token', options.authToken)
-            if (url.searchParams.has('password')) {
-                rawURL.searchParams.append(
-                    'password',
-                    url.searchParams.get('password')
-                )
-            }
+        }
+        if (url.searchParams.has('password')) {
+            rawURLCopy.searchParams.append(
+                'password',
+                url.searchParams.get('password')
+            )
         }
         rawURL.searchParams.append('view', 'gallery')
-        console.debug('rawURL:', rawURL)
 
         // File Link -> 1
         const link = document.createElement('a')
         link.text = data[i].name
         link.title = data[i].name
-        link.href = url.href
+        link.href = data[i].url
         link.setAttribute('role', 'button')
         link.classList.add(
             'link-underline',
@@ -380,7 +379,6 @@ function updateTable(data, options) {
         link.target = '_blank'
         link.dataset.name = data[i].name
         link.dataset.row = i.toString()
-        link.dataset.raw = rawURL.href
         link.dataset.thumb = data[i].thumb || rawURL.href
 
         // Cell: 1
@@ -814,6 +812,7 @@ function onMouseOver(event) {
     if (str.match(imageExtensions)) {
         mediaImage.src = loadingImage
         mediaImage.src = event.target.dataset.thumb
+        // console.debug('dataset.thumb', event.target.dataset.thumb)
         mediaOuter.classList.remove('d-none')
     } else {
         mediaOuter.classList.add('d-none')
