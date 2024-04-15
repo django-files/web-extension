@@ -424,6 +424,7 @@ function updateTable(data, options) {
         const fileName = drop.querySelector('li.mouse-link')
         fileName.innerText = data[i].name
         fileName.dataset.clipboardText = data[i].name
+        fileName.dataset.thumb = data[i].thumb || rawURL.href
         drop.querySelector('.copy-link').dataset.clipboardText = data[i].url
         drop.querySelector('.copy-raw').dataset.clipboardText = rawURLCopy.href
         drop.querySelectorAll('.raw').forEach((el) => (el.href = rawURL.href))
