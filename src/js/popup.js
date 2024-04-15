@@ -326,7 +326,7 @@ function updateTable(data, options) {
     // console.debug(`data.length: ${data.length}`)
     // console.debug(`tbody.rows.length: ${tbody.rows.length}`)
     for (let i = 0; i < length; i++) {
-        // console.debug(`i: ${i}`)
+        // console.debug(`i: ${i}`, data[i])
         let row = tbody.rows[i]
         if (!row) {
             row = tbody.insertRow()
@@ -342,31 +342,31 @@ function updateTable(data, options) {
         row.addEventListener('mouseover', hoverLinks)
         row.id = `row-${i}`
         row.dataset.idx = i.toString()
-        // TODO: Backwards Compatible with Older DJ Versions
-        let url
-        let name
-        let href
-        if (typeof data[i] === 'object') {
-            url = new URL(data[i].url)
-            name = data[i].name
-            href = data[i].url
+
+        const url = new URL(data[i].url)
+        let rawURLCopy
+        let rawURL
+        if (data[i].raw) {
+            rawURLCopy = new URL(data[i].raw)
+            rawURL = new URL(data[i].raw)
         } else {
-            url = new URL(data[i])
-            name = url.pathname.replace(/^\/u\//, '')
-            href = data[i]
+            const raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
+            rawURLCopy = new URL(raw)
+            rawURL = new URL(raw)
+            rawURL.searchParams.append('token', options.authToken)
         }
-        const raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
-        let rawURL = new URL(raw)
-        const password = url.searchParams.get('password')
-        if (password) {
-            rawURL.searchParams.append('password', password)
+        if (url.searchParams.has('password')) {
+            const password = url.searchParams.get('password')
+            // console.debug('adding password to rawURLCopy:', password)
+            rawURLCopy.searchParams.append('password', password)
         }
+        rawURL.searchParams.append('view', 'gallery')
 
         // File Link -> 1
         const link = document.createElement('a')
-        link.text = name
-        link.title = name
-        link.href = href
+        link.text = data[i].name
+        link.title = data[i].name
+        link.href = data[i].url
         link.setAttribute('role', 'button')
         link.classList.add(
             'link-underline',
@@ -376,9 +376,9 @@ function updateTable(data, options) {
             'mouse-link'
         )
         link.target = '_blank'
-        link.dataset.name = name
+        link.dataset.name = data[i].name
         link.dataset.row = i.toString()
-        link.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
+        link.dataset.thumb = data[i].thumb || rawURL.href
 
         // Cell: 1
         const cell1 = row.cells[0]
@@ -391,8 +391,8 @@ function updateTable(data, options) {
         const board = hoverboard.cloneNode(true)
         board.id = `menu-${i}`
 
-        board.querySelector('.copy-link').dataset.clipboardText = href
-        board.querySelector('.copy-raw').dataset.clipboardText = rawURL.href
+        board.querySelector('.copy-link').dataset.clipboardText = data[i].url
+        board.querySelector('.copy-raw').dataset.clipboardText = rawURLCopy.href
 
         div.appendChild(board)
         cell1.appendChild(div)
@@ -420,12 +420,14 @@ function updateTable(data, options) {
             updateContextMenu(drop, data[i]).then()
         }
         const fileName = drop.querySelector('li.mouse-link')
-        fileName.innerText = name
-        fileName.dataset.clipboardText = name
-        fileName.dataset.raw = `${raw}?token=${options.authToken}&view=gallery`
-        drop.querySelector('.copy-link').dataset.clipboardText = href
-        drop.querySelector('.copy-raw').dataset.clipboardText = rawURL.href
-        drop.querySelectorAll('.raw').forEach((el) => (el.href = rawURL.href))
+        fileName.innerText = data[i].name
+        fileName.dataset.clipboardText = data[i].name
+        fileName.dataset.thumb = data[i].thumb || rawURL.href
+        drop.querySelector('.copy-link').dataset.clipboardText = data[i].url
+        drop.querySelector('.copy-raw').dataset.clipboardText = rawURLCopy.href
+        drop.querySelectorAll('.raw').forEach(
+            (el) => (el.href = rawURLCopy.href)
+        )
         button.appendChild(drop)
 
         // Cell: 0
@@ -810,7 +812,8 @@ function onMouseOver(event) {
     const imageExtensions = /\.(gif|ico|jpeg|jpg|png|svg|webp)$/i
     if (str.match(imageExtensions)) {
         mediaImage.src = loadingImage
-        mediaImage.src = event.target.dataset.raw
+        mediaImage.src = event.target.dataset.thumb
+        // console.debug('dataset.thumb', event.target.dataset.thumb)
         mediaOuter.classList.remove('d-none')
     } else {
         mediaOuter.classList.add('d-none')
