@@ -7,10 +7,14 @@
   },
   "extends": "eslint:recommended",
   "parserOptions": {
-    "ecmaVersion": "latest"
+    "ecmaVersion": "latest",
+    "sourceType": "module"
   },
   "rules": {
+    "no-empty": "off",
     "no-extra-semi": "off",
-    "no-undef": "off"
+    "no-func-assign": "off",
+    "no-undef": "off",
+    "no-unused-vars": "off"
   }
 }
