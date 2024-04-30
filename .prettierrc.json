@@ -1,16 +1,17 @@
 {
   "trailingComma": "es5",
-  "semi": false,
   "tabWidth": 4,
+  "semi": false,
+  "singleQuote": true,
   "overrides": [
     {
-      "files": ["**/*.js"],
+      "files": ["**/*.html"],
       "options": {
-        "singleQuote": true
+        "singleQuote": false
       }
     },
     {
-      "files": ["**/*.json"],
+      "files": ["**/*.json", "**/*.yaml"],
       "options": {
         "tabWidth": 2
       }
