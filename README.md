@@ -52,6 +52,10 @@ All Chromium Based Browsers can install the extension from the
 *   Automatically Auth with Django Files.
 *   Automatic Dark/Light Mode based on Browser Settings.
 
+> [!TIP]
+> **Don't see your feature here?**
+> Request one on the [Feature Request Discussion](https://github.com/django-files/web-extension/discussions/categories/feature-requests).
+
 ## Configure
 
 You can pin the Addon by clicking the `Puzzle Piece`, find the `Django Files icon`, then;  
@@ -70,6 +74,8 @@ The addon should now be configured to work with your Django Files instance.
 
 You can now click the Django Files icon to view your recent uploads or open Options.  
 Right-click on any Image, Video, Audio, or URL upload to Django Files or Shorten URL.  
+
+Alternatively, you can open the Options page and add your URL and Token.
 
 # Development
 
