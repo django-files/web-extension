@@ -54,7 +54,7 @@ All Chromium Based Browsers can install the extension from the
 
 > [!TIP]
 > **Don't see your feature here?**
-> Request one on the [Feature Request Discussion](https://github.com/cssnr/asn-plus/discussions/categories/feature-requests).
+> Request one on the [Feature Request Discussion](https://github.com/django-files/web-extension/discussions/categories/feature-requests).
 
 ## Configure
 
