@@ -444,7 +444,7 @@ function updateTable(data, options) {
         //     .querySelector('.d-none .dropdown-menu')
         //     .cloneNode(true)
         const drop = document
-            .querySelector('.clone .dropdown-menu')
+            .querySelector('.clone > .dropdown-menu')
             .cloneNode(true)
         drop.id = `ctx-${i}`
         if (typeof data[i] === 'object') {
