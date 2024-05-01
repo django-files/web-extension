@@ -406,7 +406,7 @@ function updateTable(data, options) {
         div.appendChild(faKey.cloneNode(true))
 
         if (options.popupIcons) {
-            updateFileIcons(div, data[i])
+            updateFileIcons(data[i], div)
         }
         // if (options.popupIcons) {
         //     if (data[i].private) {
@@ -475,17 +475,33 @@ function updateTable(data, options) {
     }
 }
 
-function updateFileIcons(el, file) {
-    console.debug('updateFileIcons:', file)
-    if (file.private) {
-        console.info('private')
-        // div.appendChild(faLock.cloneNode(true))
-        el.querySelector('.fa-lock').classList.remove('d-none')
+/**
+ * @function updateFileIcons
+ * @param {Object} file
+ * @param {HTMLElement} el
+ */
+function updateFileIcons(file, el = null) {
+    console.debug('updateFileIcons:', file, el)
+    if (!el) {
+        console.debug('Element from ctxMenuRow.value')
+        el = document.getElementById(`row-${ctxMenuRow.value}`)
     }
+    console.debug('el:', el)
+    const lock = el.querySelector('.fa-lock')
+    if (file.private) {
+        console.debug('private')
+        // div.appendChild(faLock.cloneNode(true))
+        lock.classList.remove('d-none')
+    } else {
+        lock.classList.add('d-none')
+    }
+    const key = el.querySelector('.fa-key')
     if (file.password) {
-        console.info('password')
+        console.debug('password')
         // div.appendChild(faKey.cloneNode(true))
-        el.querySelector('.fa-key').classList.remove('d-none')
+        key.classList.remove('d-none')
+    } else {
+        key.classList.add('d-none')
     }
 }
 
@@ -625,6 +641,7 @@ async function togglePrivate() {
         fileData[ctxMenuRow.value] = json
         const ctx = document.getElementById(`ctx-${ctxMenuRow.value}`)
         console.debug('ctx:', ctx)
+        updateFileIcons(json)
         if (json.private) {
             enableEl(ctx, '.fa-lock', 'text-danger-emphasis')
         } else {
@@ -666,6 +683,7 @@ async function passwordForm(event) {
         console.debug('ctx:', ctx)
         fileData[ctxMenuRow.value] = json
         await updateContextMenu(ctx, json)
+        updateFileIcons(json)
         passwordModal.hide()
     } else {
         console.info(`Password Error: "${password}", response:`, response)
@@ -703,6 +721,7 @@ async function expireForm(event) {
         console.debug('ctx:', ctx)
         fileData[ctxMenuRow.value] = json
         await updateContextMenu(ctx, json)
+        updateFileIcons(json)
         expireModal.hide()
     } else {
         console.info(`Error Setting Expire: "${expr}", response:`, response)
