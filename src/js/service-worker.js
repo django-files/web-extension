@@ -41,7 +41,7 @@ async function onInstalled(details) {
             popupIcons: true,
             iconPrivate: true,
             iconPassword: true,
-            iconExpire: true,
+            iconExpire: false,
             popupLinks: true,
             checkAuth: true,
             deleteConfirm: true,
