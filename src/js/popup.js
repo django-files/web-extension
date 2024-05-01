@@ -42,9 +42,13 @@ const mediaError = document.getElementById('media-error')
 const ctxMenuRow = document.getElementById('ctx-menu-row')
 const expireInput = document.getElementById('expire-input')
 const passwordInput = document.getElementById('password-input')
+
 const deleteModal = bootstrap.Modal.getOrCreateInstance('#delete-modal')
 const expireModal = bootstrap.Modal.getOrCreateInstance('#expire-modal')
 const passwordModal = bootstrap.Modal.getOrCreateInstance('#password-modal')
+
+const faLock = document.querySelector('.clone > i.fa-lock')
+const faKey = document.querySelector('.clone > i.fa-key')
 
 const clipboard = new ClipboardJS('.clip')
 clipboard.on('success', () => showToast('Copied to Clipboard'))
@@ -334,8 +338,6 @@ function updateTable(data, options) {
     const length = tbody.rows.length
     // console.debug(`data.length: ${data.length}`)
     // console.debug(`tbody.rows.length: ${tbody.rows.length}`)
-    const faLock = document.querySelector('.clone > i.fa-lock')
-    const faKey = document.querySelector('.clone > i.fa-key')
     for (let i = 0; i < length; i++) {
         // console.debug(`i: ${i}`, data[i])
         let row = tbody.rows[i]
@@ -400,16 +402,22 @@ function updateTable(data, options) {
         // div.classList.add('my-auto')
         div.appendChild(link)
 
+        div.appendChild(faLock.cloneNode(true))
+        div.appendChild(faKey.cloneNode(true))
+
         if (options.popupIcons) {
-            if (data[i].private) {
-                console.info('private')
-                div.appendChild(faLock.cloneNode(true))
-            }
-            if (data[i].password) {
-                console.info('password')
-                div.appendChild(faKey.cloneNode(true))
-            }
+            updateFileIcons(div, data[i])
         }
+        // if (options.popupIcons) {
+        //     if (data[i].private) {
+        //         console.info('private')
+        //         div.appendChild(faLock.cloneNode(true))
+        //     }
+        //     if (data[i].password) {
+        //         console.info('password')
+        //         div.appendChild(faKey.cloneNode(true))
+        //     }
+        // }
 
         const board = hoverboard.cloneNode(true)
         board.id = `menu-${i}`
@@ -464,6 +472,20 @@ function updateTable(data, options) {
         // hoverIcon.id = 'hover-menu'
         // hoverIcon.classList.add('float-end')
         // hoverIcon.innerHTML = '<i class="fa-solid fa-bars"></i>'
+    }
+}
+
+function updateFileIcons(el, file) {
+    console.debug('updateFileIcons:', file)
+    if (file.private) {
+        console.info('private')
+        // div.appendChild(faLock.cloneNode(true))
+        el.querySelector('.fa-lock').classList.remove('d-none')
+    }
+    if (file.password) {
+        console.info('password')
+        // div.appendChild(faKey.cloneNode(true))
+        el.querySelector('.fa-key').classList.remove('d-none')
     }
 }
 
