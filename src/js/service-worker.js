@@ -37,11 +37,12 @@ async function onInstalled(details) {
             recentFiles: 14,
             popupWidth: 380,
             popupTimeout: 5,
-            contextMenu: true,
             popupPreview: true,
+            popupIcons: true,
             popupLinks: true,
-            deleteConfirm: true,
             checkAuth: true,
+            deleteConfirm: true,
+            contextMenu: true,
             showUpdate: false,
         })
     )
@@ -63,7 +64,7 @@ async function onInstalled(details) {
                 console.log(`url: ${url}`)
                 await chrome.tabs.create({ active: false, url })
                 internal.lastShownUpdate = manifest.version
-                console.log('internal:', internal)
+                console.log('storage.sync: internal:', internal)
                 await chrome.storage.sync.set({ internal })
             }
         }
@@ -77,8 +78,7 @@ async function onInstalled(details) {
  * @param {OnClickData} ctx
  */
 async function contextMenusClicked(ctx) {
-    // console.log('contextMenusClicked:', ctx)
-    console.log(`ctx.menuItemId: ${ctx.menuItemId}`)
+    console.debug('contextMenusClicked:', ctx)
     if (ctx.menuItemId.startsWith('upload')) {
         if (ctx.srcUrl) {
             let type = ctx.menuItemId.split('-').at(-1)
@@ -88,6 +88,10 @@ async function contextMenusClicked(ctx) {
     } else if (ctx.menuItemId === 'short') {
         if (ctx.linkUrl) {
             await processRemote('shorten', ctx.linkUrl, 'Short Created')
+        }
+    } else if (ctx.menuItemId === 'copy') {
+        if (ctx.srcUrl) {
+            await clipboardWrite(ctx.srcUrl)
         }
     } else if (ctx.menuItemId === 'options') {
         chrome.runtime.openOptionsPage()
@@ -102,7 +106,7 @@ async function contextMenusClicked(ctx) {
  * @param {String} notificationId
  */
 async function notificationsClicked(notificationId) {
-    console.debug(`notifications.onClicked: ${notificationId}`)
+    console.debug('notifications.onClicked:', notificationId)
     chrome.notifications.clear(notificationId)
     if (notificationId.startsWith('http')) {
         await chrome.tabs.create({ active: true, url: notificationId })
@@ -141,10 +145,11 @@ function createContextMenus() {
     chrome.contextMenus.removeAll()
     const ctx = ['link', 'image', 'video', 'audio']
     const contexts = [
-        [['link'], 'short', 'normal', 'Create Short URL'],
         [['image'], 'upload-image', 'normal', 'Upload Image'],
         [['video'], 'upload-video', 'normal', 'Upload Video'],
         [['audio'], 'upload-audio', 'normal', 'Upload Audio'],
+        [['link'], 'short', 'normal', 'Create Short URL'],
+        [['image', 'video', 'audio'], 'copy', 'normal', 'Copy Source URL'],
         [ctx, 'separator-1', 'separator', 'separator'],
         [ctx, 'options', 'normal', 'Open Options'],
     ]
@@ -166,7 +171,7 @@ function createContextMenus() {
  * @return {Response}
  */
 async function postURL(endpoint, url) {
-    console.debug(`postURL: "${endpoint}", "${url}"`)
+    console.debug('postURL:', endpoint, url)
     const { options } = await chrome.storage.sync.get(['options'])
     console.debug('options:', options)
     if (!options?.siteUrl || !options?.authToken) {
@@ -194,7 +199,7 @@ async function postURL(endpoint, url) {
  * @param {String} message
  */
 async function processRemote(endpoint, url, message) {
-    console.debug(`processRemote: "${endpoint}", "${url}", "${message}"`)
+    console.debug('processRemote:', endpoint, url, message)
     let response
     try {
         response = await postURL(endpoint, url)
@@ -211,7 +216,7 @@ async function processRemote(endpoint, url, message) {
     } else {
         try {
             const data = await response.json()
-            console.log('data:', data)
+            console.debug('data:', data)
             await sendNotification('Processing Error', `Error: ${data.error}`)
         } catch (e) {
             console.info('error:', e)
@@ -232,7 +237,7 @@ async function processRemote(endpoint, url, message) {
  * @param {Number} timeout - Optional
  */
 async function sendNotification(title, text, id = '', timeout = 10) {
-    console.debug(`sendNotification: ${id || 'randomID'}: ${title} - ${text}`)
+    console.debug('sendNotification', title, text, id, timeout)
     const options = {
         type: 'basic',
         iconUrl: chrome.runtime.getURL('media/logo96.png'),
@@ -252,6 +257,7 @@ async function sendNotification(title, text, id = '', timeout = 10) {
  * @param {String} value
  */
 async function clipboardWrite(value) {
+    console.debug('clipboardWrite', value)
     if (navigator.clipboard) {
         // Firefox
         await navigator.clipboard.writeText(value)
