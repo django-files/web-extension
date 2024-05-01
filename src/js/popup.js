@@ -194,12 +194,21 @@ async function popupLinks(event) {
     console.debug('popupLinks:', event)
     event.preventDefault()
     const anchor = event.target.closest('a')
-    console.log(`anchor.href: ${anchor.href}`)
+    console.debug(`anchor.href: ${anchor.href}`, anchor)
+    let url
     if (anchor.href.endsWith('html/options.html')) {
         chrome.runtime.openOptionsPage()
+        return window.close()
+    } else if (
+        anchor.href.startsWith('http') ||
+        anchor.href.startsWith('chrome-extension')
+    ) {
+        url = anchor.href
     } else {
-        await chrome.tabs.create({ active: true, url: anchor.href })
+        url = chrome.runtime.getURL(anchor.href)
     }
+    console.debug('url:', url)
+    await chrome.tabs.create({ active: true, url })
     return window.close()
 }
 
@@ -325,6 +334,8 @@ function updateTable(data, options) {
     const length = tbody.rows.length
     // console.debug(`data.length: ${data.length}`)
     // console.debug(`tbody.rows.length: ${tbody.rows.length}`)
+    const faLock = document.querySelector('.clone > i.fa-lock')
+    const faKey = document.querySelector('.clone > i.fa-key')
     for (let i = 0; i < length; i++) {
         // console.debug(`i: ${i}`, data[i])
         let row = tbody.rows[i]
@@ -388,6 +399,18 @@ function updateTable(data, options) {
         div.style.position = 'relative'
         // div.classList.add('my-auto')
         div.appendChild(link)
+
+        if (options.popupIcons) {
+            if (data[i].private) {
+                console.info('private')
+                div.appendChild(faLock.cloneNode(true))
+            }
+            if (data[i].password) {
+                console.info('password')
+                div.appendChild(faKey.cloneNode(true))
+            }
+        }
+
         const board = hoverboard.cloneNode(true)
         board.id = `menu-${i}`
 
