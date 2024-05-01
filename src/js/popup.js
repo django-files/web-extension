@@ -42,9 +42,14 @@ const mediaError = document.getElementById('media-error')
 const ctxMenuRow = document.getElementById('ctx-menu-row')
 const expireInput = document.getElementById('expire-input')
 const passwordInput = document.getElementById('password-input')
+
 const deleteModal = bootstrap.Modal.getOrCreateInstance('#delete-modal')
 const expireModal = bootstrap.Modal.getOrCreateInstance('#expire-modal')
 const passwordModal = bootstrap.Modal.getOrCreateInstance('#password-modal')
+
+const faHourglass = document.querySelector('.clone > i.fa-hourglass')
+const faLock = document.querySelector('.clone > i.fa-lock')
+const faKey = document.querySelector('.clone > i.fa-key')
 
 const clipboard = new ClipboardJS('.clip')
 clipboard.on('success', () => showToast('Copied to Clipboard'))
@@ -334,8 +339,6 @@ function updateTable(data, options) {
     const length = tbody.rows.length
     // console.debug(`data.length: ${data.length}`)
     // console.debug(`tbody.rows.length: ${tbody.rows.length}`)
-    const faLock = document.querySelector('.clone > i.fa-lock')
-    const faKey = document.querySelector('.clone > i.fa-key')
     for (let i = 0; i < length; i++) {
         // console.debug(`i: ${i}`, data[i])
         let row = tbody.rows[i]
@@ -400,16 +403,23 @@ function updateTable(data, options) {
         // div.classList.add('my-auto')
         div.appendChild(link)
 
+        div.appendChild(faLock.cloneNode(true))
+        div.appendChild(faKey.cloneNode(true))
+        div.appendChild(faHourglass.cloneNode(true))
+
         if (options.popupIcons) {
-            if (data[i].private) {
-                console.info('private')
-                div.appendChild(faLock.cloneNode(true))
-            }
-            if (data[i].password) {
-                console.info('password')
-                div.appendChild(faKey.cloneNode(true))
-            }
+            updateFileIcons(data[i], div)
         }
+        // if (options.popupIcons) {
+        //     if (data[i].private) {
+        //         console.info('private')
+        //         div.appendChild(faLock.cloneNode(true))
+        //     }
+        //     if (data[i].password) {
+        //         console.info('password')
+        //         div.appendChild(faKey.cloneNode(true))
+        //     }
+        // }
 
         const board = hoverboard.cloneNode(true)
         board.id = `menu-${i}`
@@ -436,7 +446,7 @@ function updateTable(data, options) {
         //     .querySelector('.d-none .dropdown-menu')
         //     .cloneNode(true)
         const drop = document
-            .querySelector('.clone .dropdown-menu')
+            .querySelector('.clone > .dropdown-menu')
             .cloneNode(true)
         drop.id = `ctx-${i}`
         if (typeof data[i] === 'object') {
@@ -464,6 +474,45 @@ function updateTable(data, options) {
         // hoverIcon.id = 'hover-menu'
         // hoverIcon.classList.add('float-end')
         // hoverIcon.innerHTML = '<i class="fa-solid fa-bars"></i>'
+    }
+}
+
+/**
+ * @function updateFileIcons
+ * @param {Object} file
+ * @param {HTMLElement} el
+ */
+async function updateFileIcons(file, el = null) {
+    console.debug('updateFileIcons:', file, el)
+    const { options } = await chrome.storage.sync.get(['options'])
+    if (!el) {
+        console.debug('Element from ctxMenuRow.value')
+        el = document.getElementById(`row-${ctxMenuRow.value}`)
+    }
+    console.debug('el:', el)
+    const hourglass = el.querySelector('.fa-hourglass')
+    if (options.iconExpire && file.expr) {
+        console.debug('private')
+        // div.appendChild(faLock.cloneNode(true))
+        hourglass.classList.remove('d-none')
+    } else {
+        hourglass.classList.add('d-none')
+    }
+    const lock = el.querySelector('.fa-lock')
+    if (options.iconPassword && file.private) {
+        console.debug('private')
+        // div.appendChild(faLock.cloneNode(true))
+        lock.classList.remove('d-none')
+    } else {
+        lock.classList.add('d-none')
+    }
+    const key = el.querySelector('.fa-key')
+    if (options.iconPrivate && file.password) {
+        console.debug('password')
+        // div.appendChild(faKey.cloneNode(true))
+        key.classList.remove('d-none')
+    } else {
+        key.classList.add('d-none')
     }
 }
 
@@ -603,6 +652,7 @@ async function togglePrivate() {
         fileData[ctxMenuRow.value] = json
         const ctx = document.getElementById(`ctx-${ctxMenuRow.value}`)
         console.debug('ctx:', ctx)
+        updateFileIcons(json)
         if (json.private) {
             enableEl(ctx, '.fa-lock', 'text-danger-emphasis')
         } else {
@@ -644,6 +694,7 @@ async function passwordForm(event) {
         console.debug('ctx:', ctx)
         fileData[ctxMenuRow.value] = json
         await updateContextMenu(ctx, json)
+        updateFileIcons(json)
         passwordModal.hide()
     } else {
         console.info(`Password Error: "${password}", response:`, response)
@@ -681,6 +732,7 @@ async function expireForm(event) {
         console.debug('ctx:', ctx)
         fileData[ctxMenuRow.value] = json
         await updateContextMenu(ctx, json)
+        updateFileIcons(json)
         expireModal.hide()
     } else {
         console.info(`Error Setting Expire: "${expr}", response:`, response)
