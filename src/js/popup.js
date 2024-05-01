@@ -47,6 +47,7 @@ const deleteModal = bootstrap.Modal.getOrCreateInstance('#delete-modal')
 const expireModal = bootstrap.Modal.getOrCreateInstance('#expire-modal')
 const passwordModal = bootstrap.Modal.getOrCreateInstance('#password-modal')
 
+const faHourglass = document.querySelector('.clone > i.fa-hourglass')
 const faLock = document.querySelector('.clone > i.fa-lock')
 const faKey = document.querySelector('.clone > i.fa-key')
 
@@ -404,6 +405,7 @@ function updateTable(data, options) {
 
         div.appendChild(faLock.cloneNode(true))
         div.appendChild(faKey.cloneNode(true))
+        div.appendChild(faHourglass.cloneNode(true))
 
         if (options.popupIcons) {
             updateFileIcons(data[i], div)
@@ -480,15 +482,24 @@ function updateTable(data, options) {
  * @param {Object} file
  * @param {HTMLElement} el
  */
-function updateFileIcons(file, el = null) {
+async function updateFileIcons(file, el = null) {
     console.debug('updateFileIcons:', file, el)
+    const { options } = await chrome.storage.sync.get(['options'])
     if (!el) {
         console.debug('Element from ctxMenuRow.value')
         el = document.getElementById(`row-${ctxMenuRow.value}`)
     }
     console.debug('el:', el)
+    const hourglass = el.querySelector('.fa-hourglass')
+    if (options.iconExpire && file.expr) {
+        console.debug('private')
+        // div.appendChild(faLock.cloneNode(true))
+        hourglass.classList.remove('d-none')
+    } else {
+        hourglass.classList.add('d-none')
+    }
     const lock = el.querySelector('.fa-lock')
-    if (file.private) {
+    if (options.iconPassword && file.private) {
         console.debug('private')
         // div.appendChild(faLock.cloneNode(true))
         lock.classList.remove('d-none')
@@ -496,7 +507,7 @@ function updateFileIcons(file, el = null) {
         lock.classList.add('d-none')
     }
     const key = el.querySelector('.fa-key')
-    if (file.password) {
+    if (options.iconPrivate && file.password) {
         console.debug('password')
         // div.appendChild(faKey.cloneNode(true))
         key.classList.remove('d-none')

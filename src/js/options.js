@@ -91,20 +91,45 @@ async function saveOptions(event) {
 }
 
 /**
- * Update Options
+ * Update Options based on type
  * @function initOptions
  * @param {Object} options
  */
 function updateOptions(options) {
-    for (const [key, value] of Object.entries(options)) {
-        // console.debug(`${key}: ${value}`)
-        const element = document.getElementById(key)
-        if (element) {
-            if (typeof value === 'boolean') {
-                element.checked = value
-            } else {
-                element.value = value
-            }
+    console.debug('updateOptions:', options)
+    for (let [key, value] of Object.entries(options)) {
+        if (typeof value === 'undefined') {
+            console.warn('Value undefined for key:', key)
+            continue
         }
+        if (key.startsWith('radio')) {
+            key = value
+            value = true
+        }
+        // console.debug(`${key}: ${value}`)
+        const el = document.getElementById(key)
+        if (!el) {
+            continue
+        }
+        if (el.tagName !== 'INPUT') {
+            el.textContent = value.toString()
+        } else if (el.type === 'checkbox') {
+            el.checked = value
+        } else {
+            el.value = value
+        }
+        if (el.dataset.related) {
+            hideShowElement(`#${el.dataset.related}`, value)
+        }
+    }
+}
+
+function hideShowElement(selector, show, speed = 'fast') {
+    const element = $(`${selector}`)
+    // console.debug('hideShowElement:', show, element)
+    if (show) {
+        element.show(speed)
+    } else {
+        element.hide(speed)
     }
 }
