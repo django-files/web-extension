@@ -335,6 +335,7 @@ function genLoadingData(rows) {
  */
 function updateTable(data, options) {
     console.debug('updateTable:', data)
+    menuShown = false
     const tbody = filesTable.querySelector('tbody')
     const length = tbody.rows.length
     // console.debug(`data.length: ${data.length}`)
