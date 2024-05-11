@@ -15,6 +15,10 @@ document
     .querySelectorAll('.show-hide')
     .forEach((el) => el.addEventListener('click', showHidePassword))
 
+const clipboard = new ClipboardJS('.clip')
+// clipboard.on('success', () => showToast('Copied to Clipboard'))
+// clipboard.on('error', () => showToast('Clipboard Copy Failed', 'warning'))
+
 /**
  * Initialize Options
  * @function initOptions
@@ -141,9 +145,9 @@ function hideShowElement(selector, show, speed = 'fast') {
  */
 async function setShortcuts(selector = '#keyboard-shortcuts') {
     const tbody = document.querySelector(selector).querySelector('tbody')
-    const commands = await chrome.commands.getAll()
     const source = tbody.querySelector('tr.d-none').cloneNode(true)
     source.classList.remove('d-none')
+    const commands = await chrome.commands.getAll()
     for (const command of commands) {
         const row = source.cloneNode(true)
         row.querySelector('.description').textContent = command.description
@@ -153,15 +157,15 @@ async function setShortcuts(selector = '#keyboard-shortcuts') {
 }
 
 function showHidePassword(event) {
-    // console.debug('showHidePassword:', event)
-    const anchor = event.target.closest('button')
-    const selector = anchor.dataset.selector
-    // console.debug('selector:', selector)
-    const input = document.querySelector(selector)
-    // console.debug('input:', input)
+    console.debug('showHidePassword:', event)
+    const element = event.target.closest('button')
+    const input = document.querySelector(element.dataset.selector)
+    const button = document.querySelector(element.dataset.button)
     if (input.type === 'password') {
         input.type = 'text'
+        button?.classList.remove('disabled')
     } else {
         input.type = 'password'
+        button?.classList.add('disabled')
     }
 }

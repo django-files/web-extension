@@ -42,22 +42,32 @@
 
     <form id="options-form" class="options">
         <div class="row">
-            <div class="col-12 mb-2">
-                <label for="siteUrl" class="form-label"><i class="fa-solid fa-globe me-2"></i> Django Files URL</label>
+            <label for="siteUrl" class="form-label"><i class="fa-solid fa-globe me-2"></i> Django Files URL</label>
+            <div class="input-group col-12 ">
                 <input id="siteUrl" aria-describedby="siteUrlHelp" type="text" class="form-control" autocomplete="off">
-                <div class="form-text" id="siteUrlHelp" >The Full URL to your Django Files server.</div>
+                <button class="btn btn-outline-primary clip" data-clipboard-target="#siteUrl" type="button" data-bs-toggle="tooltip"
+                        data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Copy to Clipboard.">
+                    <i class="fa-solid fa-copy"></i>
+                </button>
             </div>
+            <div class="form-text mb-3" id="siteUrlHelp" >The Full URL to your Django Files server.</div>
 
             <label for="authToken" class="form-label"><i class="fa-solid fa-key me-2"></i> Auth Token</label>
             <div class="input-group col-12 ">
                 <input id="authToken" aria-describedby="authTokenHelp" type="password" class="form-control" autocomplete="off">
-                <button class="btn btn-outline-success show-hide" type="button" data-bs-toggle="tooltip" data-selector="#authToken"
+                <button class="btn btn-outline-success show-hide" type="button" data-bs-toggle="tooltip" data-selector="#authToken" data-button="#authTokenCopy"
                         data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Show/Hide Auth Token.">
                     <i class="fa-regular fa-eye"></i>
                 </button>
+                <button id="authTokenCopy" class="btn btn-outline-primary clip disabled" type="button"
+                        data-clipboard-target="#authToken" data-bs-toggle="tooltip"
+                        data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Copy to Clipboard.">
+                    <i class="fa-solid fa-copy"></i>
+                </button>
             </div>
-            <div class="form-text mb-2" id="authTokenHelp">Token From Django Files Settings.</div>
-
+            <div class="form-text mb-3" id="authTokenHelp">Token From Django Files Settings.</div>
+        </div>
+        <div class="row g-2">
             <div class="col-sm-4 col-12 mb-2">
                 <label for="recentFiles" class="form-label"><i class="fa-solid fa-list-ol me-2"></i> Recent Files</label>
                 <input id="recentFiles" aria-describedby="recentFilesHelp" type="number" class="form-control" autocomplete="off">
@@ -85,6 +95,7 @@
                     </span>
                 </label>
             </div>
+
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="popupIcons" type="checkbox" role="switch" data-related="iconOptions">
                 <label class="form-check-label" for="popupIcons" aria-describedby="popupIconsHelp">
@@ -94,7 +105,6 @@
                     </span>
                 </label>
             </div>
-
             <div id="iconOptions" class="ms-5" style="display: none;">
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="iconPrivate" value="iconPrivate">
@@ -125,6 +135,7 @@
                     </span>
                 </label>
             </div>
+
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="checkAuth" type="checkbox" role="switch">
                 <label class="form-check-label" for="checkAuth" aria-describedby="checkAuthHelp">
@@ -134,6 +145,7 @@
                     </span>
                 </label>
             </div>
+
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="deleteConfirm" type="checkbox" role="switch">
                 <label class="form-check-label" for="deleteConfirm" aria-describedby="deleteConfirmHelp">
@@ -143,7 +155,7 @@
                     </span>
                 </label>
             </div>
-<!--            <hr class="my-2">-->
+
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="contextMenu" type="checkbox" role="switch">
                 <label class="form-check-label" for="contextMenu" aria-describedby="contextMenuHelp">
@@ -153,6 +165,7 @@
                     </span>
                 </label>
             </div>
+
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="showUpdate" type="checkbox" role="switch">
                 <label class="form-check-label" for="showUpdate" aria-describedby="showUpdateHelp">
@@ -182,11 +195,15 @@
 </div> <!-- flex -->
 </div> <!-- container -->
 
+<div aria-live="polite" aria-atomic="true" class="">
+    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+</div> <!-- toast -->
+
 <div class="d-none">
     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" id="bi-dot" viewBox="0 0 16 16">
         <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
     </svg>
-</div>
+</div> <!-- d-none -->
 
 <script type="text/javascript" src="../dist/polyfill/browser-polyfill.min.js"></script>
 <script type="text/javascript" src="../dist/jquery/jquery.min.js"></script>
