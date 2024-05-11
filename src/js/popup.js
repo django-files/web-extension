@@ -492,13 +492,13 @@ async function updateFileIcons(file, el = null) {
         hourglass.classList.add('d-none')
     }
     const lock = el.querySelector('.fa-lock')
-    if (options.iconPassword && file.private) {
+    if (options.iconPrivate && file.private) {
         lock.classList.remove('d-none')
     } else {
         lock.classList.add('d-none')
     }
     const key = el.querySelector('.fa-key')
-    if (options.iconPrivate && file.password) {
+    if (options.iconPassword && file.password) {
         key.classList.remove('d-none')
     } else {
         key.classList.add('d-none')
