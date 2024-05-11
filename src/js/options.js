@@ -149,8 +149,14 @@ async function setShortcuts(selector = '#keyboard-shortcuts') {
     source.classList.remove('d-none')
     const commands = await chrome.commands.getAll()
     for (const command of commands) {
+        // console.debug('command:', command)
         const row = source.cloneNode(true)
-        row.querySelector('.description').textContent = command.description
+        // TODO: Chrome does not parse the description for _execute_action in manifest.json
+        let description = command.description
+        if (!description && command.name === '_execute_action') {
+            description = 'Show Popup'
+        }
+        row.querySelector('.description').textContent = description
         row.querySelector('kbd').textContent = command.shortcut || 'Not Set'
         tbody.appendChild(row)
     }
