@@ -69,6 +69,13 @@ let fileData
 async function initPopup() {
     console.debug('initPopup')
 
+    // Options
+    const { options } = await chrome.storage.sync.get(['options'])
+    console.debug('options:', options)
+    document.getElementById('popupPreview').checked = options.popupPreview
+    document.body.style.width = `${options.popupWidth}px`
+
+    // Manifest
     const manifest = chrome.runtime.getManifest()
     const imgLink = document.querySelector('.head img').closest('a')
     imgLink.href = manifest.homepage_url
@@ -76,16 +83,7 @@ async function initPopup() {
     const titleLink = document.querySelector('.head h3 a')
     titleLink.href = manifest.homepage_url
 
-    // Get options
-    const { options } = await chrome.storage.sync.get(['options'])
-    console.debug('options:', options)
-
-    // Set Options (this is currently the only one in the popup)
-    document.getElementById('popupPreview').checked = options.popupPreview
-
-    document.body.style.width = `${options.popupWidth}px`
-
-    // Set Title Link and Title if siteUrl
+    // Title Link
     if (options.siteUrl) {
         titleLink.title = options.siteUrl
         titleLink.href = options.siteUrl
@@ -199,18 +197,16 @@ async function popupLinks(event) {
     console.debug('popupLinks:', event)
     event.preventDefault()
     const anchor = event.target.closest('a')
-    console.debug(`anchor.href: ${anchor.href}`, anchor)
+    const href = anchor.getAttribute('href').replace(/^\.+/g, '')
+    console.debug(`href: ${href}`, anchor)
     let url
-    if (anchor.href.endsWith('html/options.html')) {
+    if (href.endsWith('html/options.html')) {
         chrome.runtime.openOptionsPage()
         return window.close()
-    } else if (
-        anchor.href.startsWith('http') ||
-        anchor.href.startsWith('chrome-extension')
-    ) {
-        url = anchor.href
+    } else if (href.startsWith('http')) {
+        url = href
     } else {
-        url = chrome.runtime.getURL(anchor.href)
+        url = chrome.runtime.getURL(href)
     }
     console.debug('url:', url)
     await chrome.tabs.create({ active: true, url })
@@ -257,8 +253,7 @@ async function saveOptions(event) {
     // console.log('saveOptions:', event)
     const { options } = await chrome.storage.sync.get(['options'])
     options[event.target.id] = event.target.checked
-    console.info(`Set: "${event.target.id}" to target:`, event.target)
-    console.debug('options:', options)
+    console.info(`Set "${event.target.id}" to:`, event.target.checked)
     await chrome.storage.sync.set({ options })
     if (event.target.id === 'popupPreview') {
         if (event.target.checked) {
@@ -335,6 +330,7 @@ function genLoadingData(rows) {
  */
 function updateTable(data, options) {
     console.debug('updateTable:', data)
+    menuShown = false
     const tbody = filesTable.querySelector('tbody')
     const length = tbody.rows.length
     // console.debug(`data.length: ${data.length}`)
@@ -410,16 +406,6 @@ function updateTable(data, options) {
         if (options.popupIcons) {
             updateFileIcons(data[i], div)
         }
-        // if (options.popupIcons) {
-        //     if (data[i].private) {
-        //         console.info('private')
-        //         div.appendChild(faLock.cloneNode(true))
-        //     }
-        //     if (data[i].password) {
-        //         console.info('password')
-        //         div.appendChild(faKey.cloneNode(true))
-        //     }
-        // }
 
         const board = hoverboard.cloneNode(true)
         board.id = `menu-${i}`
@@ -437,14 +423,9 @@ function updateTable(data, options) {
         // button.setAttribute('aria-expanded', 'false')
         // button.dataset.bsToggle = 'dropdown'
         // button.innerHTML = '<i class="fa-solid fa-bars"></i>'
-
-        // const button = document.querySelector('div.d-none .ctx-button')
         const button = document.querySelector(`#row-${i} .ctx-button`)
 
         // CTX Drop Down -> Menu
-        // const drop = document
-        //     .querySelector('.d-none .dropdown-menu')
-        //     .cloneNode(true)
         const drop = document
             .querySelector('.clone > .dropdown-menu')
             .cloneNode(true)
@@ -480,36 +461,29 @@ function updateTable(data, options) {
 /**
  * @function updateFileIcons
  * @param {Object} file
- * @param {HTMLElement} el
+ * @param {HTMLElement} [el]
  */
 async function updateFileIcons(file, el = null) {
-    console.debug('updateFileIcons:', file, el)
+    // console.debug('updateFileIcons:', file, el)
     const { options } = await chrome.storage.sync.get(['options'])
     if (!el) {
-        console.debug('Element from ctxMenuRow.value')
         el = document.getElementById(`row-${ctxMenuRow.value}`)
     }
-    console.debug('el:', el)
+    // console.debug('el:', el)
     const hourglass = el.querySelector('.fa-hourglass')
     if (options.iconExpire && file.expr) {
-        console.debug('private')
-        // div.appendChild(faLock.cloneNode(true))
         hourglass.classList.remove('d-none')
     } else {
         hourglass.classList.add('d-none')
     }
     const lock = el.querySelector('.fa-lock')
-    if (options.iconPassword && file.private) {
-        console.debug('private')
-        // div.appendChild(faLock.cloneNode(true))
+    if (options.iconPrivate && file.private) {
         lock.classList.remove('d-none')
     } else {
         lock.classList.add('d-none')
     }
     const key = el.querySelector('.fa-key')
-    if (options.iconPrivate && file.password) {
-        console.debug('password')
-        // div.appendChild(faKey.cloneNode(true))
+    if (options.iconPassword && file.password) {
         key.classList.remove('d-none')
     } else {
         key.classList.add('d-none')
@@ -524,7 +498,6 @@ let menuShown
  */
 function hoverLinks(event) {
     // console.debug('hoverLinks:', event)
-    // console.log('target:', event.target)
     const row = event.target.closest('tr')
     // console.log('row:', row)
     // console.log('idx', row.dataset.idx)
@@ -652,7 +625,7 @@ async function togglePrivate() {
         fileData[ctxMenuRow.value] = json
         const ctx = document.getElementById(`ctx-${ctxMenuRow.value}`)
         console.debug('ctx:', ctx)
-        updateFileIcons(json)
+        await updateFileIcons(json)
         if (json.private) {
             enableEl(ctx, '.fa-lock', 'text-danger-emphasis')
         } else {
@@ -694,7 +667,7 @@ async function passwordForm(event) {
         console.debug('ctx:', ctx)
         fileData[ctxMenuRow.value] = json
         await updateContextMenu(ctx, json)
-        updateFileIcons(json)
+        await updateFileIcons(json)
         passwordModal.hide()
     } else {
         console.info(`Password Error: "${password}", response:`, response)
@@ -732,7 +705,7 @@ async function expireForm(event) {
         console.debug('ctx:', ctx)
         fileData[ctxMenuRow.value] = json
         await updateContextMenu(ctx, json)
-        updateFileIcons(json)
+        await updateFileIcons(json)
         expireModal.hide()
     } else {
         console.info(`Error Setting Expire: "${expr}", response:`, response)

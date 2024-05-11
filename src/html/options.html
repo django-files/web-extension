@@ -29,27 +29,45 @@
     <div class="clearfix"></div>
     <p class="text-center lead">v<span id="version"></span></p>
 
-    <table class="table table-sm table-borderless">
+    <table id="keyboard-shortcuts" class="table table-sm table-borderless table-hover">
         <caption class="visually-hidden">Keyboard Shortcuts</caption>
         <thead class="visually-hidden"><tr><th>Description</th><th>Shortcut</th></tr></thead>
-        <tbody><tr>
-            <td class="bg-transparent">Show Popup Action <i class="fa-regular fa-keyboard ms-2"></i></td>
-            <td class="bg-transparent text-end" title="Keyboard Shortcut"><kbd id="mainKey">Unknown</kbd></td>
-        </tr></tbody>
+        <tbody>
+        <tr class="d-none">
+            <td class="bg-transparent"><i class="fa-regular fa-keyboard me-1"></i> <span class="description"></span></td>
+            <td class="bg-transparent text-end" title="Keyboard Shortcut"><kbd>Unknown</kbd></td>
+        </tr>
+        </tbody>
     </table>
 
     <form id="options-form" class="options">
         <div class="row">
-            <div class="col-12 mb-2">
-                <label for="siteUrl" class="form-label"><i class="fa-solid fa-globe me-2"></i> Django Files URL</label>
+            <label for="siteUrl" class="form-label"><i class="fa-solid fa-globe me-2"></i> Django Files URL</label>
+            <div class="input-group col-12 ">
                 <input id="siteUrl" aria-describedby="siteUrlHelp" type="text" class="form-control" autocomplete="off">
-                <div class="form-text" id="siteUrlHelp" >The Full URL to your Django Files server.</div>
+                <button class="btn btn-outline-primary clip" data-clipboard-target="#siteUrl" type="button" data-bs-toggle="tooltip"
+                        data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Copy to Clipboard.">
+                    <i class="fa-solid fa-copy"></i>
+                </button>
             </div>
-            <div class="col-12 mb-2">
-                <label for="authToken" class="form-label"><i class="fa-solid fa-key me-2"></i> Auth Token</label>
+            <div class="form-text mb-3" id="siteUrlHelp" >The Full URL to your Django Files server.</div>
+
+            <label for="authToken" class="form-label"><i class="fa-solid fa-key me-2"></i> Auth Token</label>
+            <div class="input-group col-12 ">
                 <input id="authToken" aria-describedby="authTokenHelp" type="password" class="form-control" autocomplete="off">
-                <div class="form-text" id="authTokenHelp">Token From Django Files Settings.</div>
+                <button class="btn btn-outline-success show-hide" type="button" data-bs-toggle="tooltip" data-selector="#authToken" data-button="#authTokenCopy"
+                        data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Show/Hide Auth Token.">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+                <button id="authTokenCopy" class="btn btn-outline-primary clip disabled" type="button"
+                        data-clipboard-target="#authToken" data-bs-toggle="tooltip"
+                        data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Copy to Clipboard.">
+                    <i class="fa-solid fa-copy"></i>
+                </button>
             </div>
+            <div class="form-text mb-3" id="authTokenHelp">Token From Django Files Settings.</div>
+        </div>
+        <div class="row g-2">
             <div class="col-sm-4 col-12 mb-2">
                 <label for="recentFiles" class="form-label"><i class="fa-solid fa-list-ol me-2"></i> Recent Files</label>
                 <input id="recentFiles" aria-describedby="recentFilesHelp" type="number" class="form-control" autocomplete="off">
@@ -57,7 +75,7 @@
             </div>
             <div class="col-sm-4 col-12 mb-2">
                 <label for="popupWidth" class="form-label"><i class="fa-solid fa-arrows-left-right-to-line me-2"></i> Popup Width</label>
-                <input id="popupWidth" aria-describedby="popupWidthHelp" type="number" class="form-control" autocomplete="off">
+                <input id="popupWidth" aria-describedby="popupWidthHelp" type="number" class="form-control" autocomplete="off" step="10">
                 <div class="form-text" id="popupWidthHelp">Popup Width in Pixels. <span class="d-inline-block">320-600.</span></div>
             </div>
             <div class="col-sm-4 col-12 mb-2">
@@ -77,6 +95,7 @@
                     </span>
                 </label>
             </div>
+
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="popupIcons" type="checkbox" role="switch" data-related="iconOptions">
                 <label class="form-check-label" for="popupIcons" aria-describedby="popupIconsHelp">
@@ -86,24 +105,27 @@
                     </span>
                 </label>
             </div>
-
             <div id="iconOptions" class="ms-5" style="display: none;">
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="iconPrivate" value="iconPrivate">
                     <label class="form-check-label" for="iconPrivate">
                         <i class="fa-solid fa-lock text-danger-emphasis"></i>
+                        <span class="visually-hidden">Private Icon</span>
                     </label>
                 </div>
+
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="iconPassword" value="iconPassword">
                     <label class="form-check-label text-warning-emphasis" for="iconPassword">
                         <i class="fa-solid fa-key"></i>
+                        <span class="visually-hidden">Password Icon</span>
                     </label>
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="iconExpire" value="iconExpire">
                     <label class="form-check-label" for="iconExpire">
                         <i class="fa-solid fa-hourglass"></i>
+                        <span class="visually-hidden">Expire Icon</span>
                     </label>
                 </div>
             </div>
@@ -117,6 +139,7 @@
                     </span>
                 </label>
             </div>
+
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="checkAuth" type="checkbox" role="switch">
                 <label class="form-check-label" for="checkAuth" aria-describedby="checkAuthHelp">
@@ -126,6 +149,7 @@
                     </span>
                 </label>
             </div>
+
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="deleteConfirm" type="checkbox" role="switch">
                 <label class="form-check-label" for="deleteConfirm" aria-describedby="deleteConfirmHelp">
@@ -135,7 +159,7 @@
                     </span>
                 </label>
             </div>
-<!--            <hr class="my-2">-->
+
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="contextMenu" type="checkbox" role="switch">
                 <label class="form-check-label" for="contextMenu" aria-describedby="contextMenuHelp">
@@ -145,6 +169,7 @@
                     </span>
                 </label>
             </div>
+
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="showUpdate" type="checkbox" role="switch">
                 <label class="form-check-label" for="showUpdate" aria-describedby="showUpdateHelp">
@@ -174,11 +199,15 @@
 </div> <!-- flex -->
 </div> <!-- container -->
 
+<div aria-live="polite" aria-atomic="true" class="">
+    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+</div> <!-- toast -->
+
 <div class="d-none">
     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" id="bi-dot" viewBox="0 0 16 16">
         <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
     </svg>
-</div>
+</div> <!-- d-none -->
 
 <script type="text/javascript" src="../dist/polyfill/browser-polyfill.min.js"></script>
 <script type="text/javascript" src="../dist/jquery/jquery.min.js"></script>
