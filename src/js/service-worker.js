@@ -227,7 +227,7 @@ async function processRemote(endpoint, url, message) {
         response = await postURL(endpoint, url)
     } catch (e) {
         console.info('error:', e)
-        return await sendNotification('Fetch Error', `Error: ${error.message}`)
+        return await sendNotification('Fetch Error', `Error: ${e.message}`)
     }
     // console.log('response:', response)
     if (response.ok) {
