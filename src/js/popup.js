@@ -406,16 +406,6 @@ function updateTable(data, options) {
         if (options.popupIcons) {
             updateFileIcons(data[i], div)
         }
-        // if (options.popupIcons) {
-        //     if (data[i].private) {
-        //         console.info('private')
-        //         div.appendChild(faLock.cloneNode(true))
-        //     }
-        //     if (data[i].password) {
-        //         console.info('password')
-        //         div.appendChild(faKey.cloneNode(true))
-        //     }
-        // }
 
         const board = hoverboard.cloneNode(true)
         board.id = `menu-${i}`
@@ -433,14 +423,9 @@ function updateTable(data, options) {
         // button.setAttribute('aria-expanded', 'false')
         // button.dataset.bsToggle = 'dropdown'
         // button.innerHTML = '<i class="fa-solid fa-bars"></i>'
-
-        // const button = document.querySelector('div.d-none .ctx-button')
         const button = document.querySelector(`#row-${i} .ctx-button`)
 
         // CTX Drop Down -> Menu
-        // const drop = document
-        //     .querySelector('.d-none .dropdown-menu')
-        //     .cloneNode(true)
         const drop = document
             .querySelector('.clone > .dropdown-menu')
             .cloneNode(true)
@@ -513,7 +498,6 @@ let menuShown
  */
 function hoverLinks(event) {
     // console.debug('hoverLinks:', event)
-    // console.log('target:', event.target)
     const row = event.target.closest('tr')
     // console.log('row:', row)
     // console.log('idx', row.dataset.idx)
