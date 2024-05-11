@@ -11,15 +11,20 @@ document
 document
     .querySelectorAll('[data-bs-toggle="tooltip"]')
     .forEach((el) => new bootstrap.Tooltip(el))
+document
+    .querySelectorAll('.show-hide')
+    .forEach((el) => el.addEventListener('click', showHidePassword))
 
 /**
  * Initialize Options
  * @function initOptions
  */
 async function initOptions() {
-    // console.debug('initOptions')
+    console.debug('initOptions')
+
     document.getElementById('version').textContent =
         chrome.runtime.getManifest().version
+    await setShortcuts('#keyboard-shortcuts')
 
     const { options } = await chrome.storage.sync.get(['options'])
     console.debug('options:', options)
@@ -29,10 +34,6 @@ async function initOptions() {
         siteUrl.placeholder = 'https://example.com'
         siteUrl.focus()
     }
-
-    const commands = await chrome.commands.getAll()
-    document.getElementById('mainKey').textContent =
-        commands.find((x) => x.name === '_execute_action').shortcut || 'Not Set'
 }
 
 /**
@@ -45,7 +46,6 @@ function onChanged(changes, namespace) {
     // console.debug('onChanged:', changes, namespace)
     for (const [key, { newValue }] of Object.entries(changes)) {
         if (namespace === 'sync' && key === 'options') {
-            console.debug('newValue:', newValue)
             updateOptions(newValue)
         }
     }
@@ -131,5 +131,37 @@ function hideShowElement(selector, show, speed = 'fast') {
         element.show(speed)
     } else {
         element.hide(speed)
+    }
+}
+
+/**
+ * Set Keyboard Shortcuts
+ * @function setShortcuts
+ * @param {String} selector
+ */
+async function setShortcuts(selector = '#keyboard-shortcuts') {
+    const tbody = document.querySelector(selector).querySelector('tbody')
+    const commands = await chrome.commands.getAll()
+    const source = tbody.querySelector('tr.d-none').cloneNode(true)
+    source.classList.remove('d-none')
+    for (const command of commands) {
+        const row = source.cloneNode(true)
+        row.querySelector('.description').textContent = command.description
+        row.querySelector('kbd').textContent = command.shortcut || 'Not Set'
+        tbody.appendChild(row)
+    }
+}
+
+function showHidePassword(event) {
+    // console.debug('showHidePassword:', event)
+    const anchor = event.target.closest('button')
+    const selector = anchor.dataset.selector
+    // console.debug('selector:', selector)
+    const input = document.querySelector(selector)
+    // console.debug('input:', input)
+    if (input.type === 'password') {
+        input.type = 'text'
+    } else {
+        input.type = 'password'
     }
 }

@@ -29,13 +29,15 @@
     <div class="clearfix"></div>
     <p class="text-center lead">v<span id="version"></span></p>
 
-    <table class="table table-sm table-borderless">
+    <table id="keyboard-shortcuts" class="table table-sm table-borderless table-hover">
         <caption class="visually-hidden">Keyboard Shortcuts</caption>
         <thead class="visually-hidden"><tr><th>Description</th><th>Shortcut</th></tr></thead>
-        <tbody><tr>
-            <td class="bg-transparent">Show Popup Action <i class="fa-regular fa-keyboard ms-2"></i></td>
-            <td class="bg-transparent text-end" title="Keyboard Shortcut"><kbd id="mainKey">Unknown</kbd></td>
-        </tr></tbody>
+        <tbody>
+        <tr class="d-none">
+            <td class="bg-transparent"><i class="fa-regular fa-keyboard me-1"></i> <span class="description"></span></td>
+            <td class="bg-transparent text-end" title="Keyboard Shortcut"><kbd>Unknown</kbd></td>
+        </tr>
+        </tbody>
     </table>
 
     <form id="options-form" class="options">
@@ -45,11 +47,17 @@
                 <input id="siteUrl" aria-describedby="siteUrlHelp" type="text" class="form-control" autocomplete="off">
                 <div class="form-text" id="siteUrlHelp" >The Full URL to your Django Files server.</div>
             </div>
-            <div class="col-12 mb-2">
-                <label for="authToken" class="form-label"><i class="fa-solid fa-key me-2"></i> Auth Token</label>
+
+            <label for="authToken" class="form-label"><i class="fa-solid fa-key me-2"></i> Auth Token</label>
+            <div class="input-group col-12 ">
                 <input id="authToken" aria-describedby="authTokenHelp" type="password" class="form-control" autocomplete="off">
-                <div class="form-text" id="authTokenHelp">Token From Django Files Settings.</div>
+                <button class="btn btn-outline-success show-hide" type="button" data-bs-toggle="tooltip" data-selector="#authToken"
+                        data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Show/Hide Auth Token.">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
             </div>
+            <div class="form-text mb-2" id="authTokenHelp">Token From Django Files Settings.</div>
+
             <div class="col-sm-4 col-12 mb-2">
                 <label for="recentFiles" class="form-label"><i class="fa-solid fa-list-ol me-2"></i> Recent Files</label>
                 <input id="recentFiles" aria-describedby="recentFilesHelp" type="number" class="form-control" autocomplete="off">
@@ -57,7 +65,7 @@
             </div>
             <div class="col-sm-4 col-12 mb-2">
                 <label for="popupWidth" class="form-label"><i class="fa-solid fa-arrows-left-right-to-line me-2"></i> Popup Width</label>
-                <input id="popupWidth" aria-describedby="popupWidthHelp" type="number" class="form-control" autocomplete="off">
+                <input id="popupWidth" aria-describedby="popupWidthHelp" type="number" class="form-control" autocomplete="off" step="10">
                 <div class="form-text" id="popupWidthHelp">Popup Width in Pixels. <span class="d-inline-block">320-600.</span></div>
             </div>
             <div class="col-sm-4 col-12 mb-2">

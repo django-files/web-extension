@@ -11,6 +11,12 @@
         "default": "Alt+Shift+Z"
       },
       "description": "Show Popup"
+    },
+    "uploadFile": {
+      "suggested_key": {
+        "default": "Alt+Shift+A"
+      },
+      "description": "Upload Files"
     }
   },
   "permissions": [

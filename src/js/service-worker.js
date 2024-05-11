@@ -2,6 +2,7 @@
 
 chrome.runtime.onStartup.addListener(onStartup)
 chrome.runtime.onInstalled.addListener(onInstalled)
+chrome.commands.onCommand.addListener(onCommand)
 chrome.contextMenus.onClicked.addListener(contextMenusClicked)
 chrome.notifications.onClicked.addListener(notificationsClicked)
 chrome.storage.onChanged.addListener(onChanged)
@@ -73,6 +74,24 @@ async function onInstalled(details) {
         }
     }
     chrome.runtime.setUninstallURL(`${githubURL}/issues`)
+}
+
+/**
+ * On Command Callback
+ * @function onCommand
+ * @param {String} command
+ */
+async function onCommand(command) {
+    console.debug(`onCommand: ${command}`)
+    const { options } = await chrome.storage.sync.get(['options'])
+    if (command === 'uploadFile') {
+        if (options.siteUrl) {
+            const url = `${options.siteUrl}/uppy/`
+            await chrome.tabs.create({ active: true, url })
+        }
+    } else {
+        console.warn('Unknown Command:', command)
+    }
 }
 
 /**
