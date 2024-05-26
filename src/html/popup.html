@@ -13,18 +13,7 @@
 </head>
 <body>
 
-<div id="media-outer" class="d-none position-fixed top-0 p-1 w-100">
-    <img id="media-image" src="../media/loading.gif" alt="" class="d-block img-thumbnail rounded border-white mx-auto mw-100">
-    <div id="media-error" class="d-none d-flex align-items-center justify-content-center">
-        <div class="alert alert-danger text-center d-inline-block" role="alert">
-            <i class="fa-solid fa-triangle-exclamation me-2"></i> Error Loading Image!<br>
-            Inspect Popup for More Details...
-        </div>
-    </div>
-</div>
-
 <div class="container-fluid p-2">
-
     <div class="head mb-1">
         <div class="form-check form-switch float-start form-select-lg pb-0" style="padding-top: 1px;"
              data-bs-title="Disable/Enable Mouseover Preview." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
@@ -37,8 +26,8 @@
            data-bs-title="Update Authentication with Current Site." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
             <i class="fa-solid fa-key"></i></a>
         <div class="d-flex align-items-center justify-content-center">
-            <a class="" href=""><img src="../media/logo32.png" class="me-1" height="32" width="32" alt="Django Files"></a>
-            <h3 class="my-0"><a role="button" class="link-body-emphasis text-decoration-none" href="">Django Files</a></h3>
+            <a href=""><img src="../media/logo32.png" class="me-1" height="32" width="32" alt="Django Files"></a>
+            <h3 class="my-0"><a class="link-body-emphasis text-decoration-none" href="">Django Files</a></h3>
         </div>
     </div>
 
@@ -72,11 +61,21 @@
             </tfoot>
         </table>
     </div>
-</div>
+</div> <!-- container-fluid -->
+
+<div id="media-outer" class="d-none position-fixed top-0 p-1 w-100">
+    <img id="media-image" src="../media/loading.gif" alt="" class="d-block img-thumbnail rounded border-white mx-auto mw-100">
+    <div id="media-error" class="d-none d-flex align-items-center justify-content-center">
+        <div class="alert alert-danger text-center d-inline-block" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> Error Loading Image!<br>
+            Inspect Popup for More Details...
+        </div>
+    </div>
+</div> <!-- media-outer -->
 
 <div aria-live="polite" aria-atomic="true" class="">
     <div id="toast-container" class="toast-container d-flex flex-column-reverse top-0 start-0 p-3"></div>
-</div>
+</div> <!-- toast-container -->
 
 <div class="d-none clone">
     <div id="hover-menu" class="hover-menu d-none top-0 end-0 bg-dark bg-opacity-75 rounded-1 px-1">
@@ -121,9 +120,7 @@
     <i class="fa-solid fa-hourglass ms-1 d-none"></i>
     <i class="fa-solid fa-lock text-danger-emphasis ms-1 d-none"></i>
     <i class="fa-solid fa-key text-warning-emphasis ms-1 d-none"></i>
-<!--    <i class="fa-solid fa-lock text-danger-emphasis float-end mt-1 ms-1 d-none"></i>-->
-<!--    <i class="fa-solid fa-key text-warning-emphasis float-end mt-1 ms-1 d-none"></i>-->
-</div> <!-- d-none clone -->
+</div> <!-- d-none -->
 
 <div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true">
 <div class="modal-dialog modal-dialog-centered">
