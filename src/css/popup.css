@@ -5,6 +5,10 @@ body {
     overflow-x: hidden;
 }
 
+#table-wrapper {
+    overflow-y: auto;
+}
+
 #media-outer {
     z-index: 3;
 }

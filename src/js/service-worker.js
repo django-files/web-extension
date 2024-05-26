@@ -31,7 +31,7 @@ async function onStartup() {
 async function onInstalled(details) {
     console.log('onInstalled:', details)
     const githubURL = 'https://github.com/django-files/web-extension'
-    const installURL = 'https://django-files.github.io/extension/'
+    const installURL = 'https://django-files.github.io/extension/#configure'
     const options = await Promise.resolve(
         setDefaultOptions({
             siteUrl: '',
