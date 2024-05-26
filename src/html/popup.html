@@ -62,14 +62,16 @@
         To automatically authenticate, visit your Django Files Website, then check back here...
     </div>
 
-    <table id="files-table" class="d-none table table-striped table-hover table-sm small align-middle mb-0">
-        <caption class="visually-hidden">Recent Uploads</caption>
-        <thead class="visually-hidden"><tr><th>File URL</th></tr></thead>
-        <tbody></tbody>
-        <tfoot class="d-none">
-        <tr><td class="placeholder-glow"><span class="placeholder" style="width: 100%;"></span></td></tr>
-        </tfoot>
-    </table>
+    <div id="table-wrapper" style="overflow: auto;">
+        <table id="files-table" class="d-none table table-striped table-hover table-sm small align-middle mb-0">
+            <caption class="visually-hidden">Recent Uploads</caption>
+            <thead class="visually-hidden"><tr><th>File URL</th></tr></thead>
+            <tbody></tbody>
+            <tfoot class="d-none">
+            <tr><td class="placeholder-glow"><span class="placeholder" style="width: 100%;"></span></td></tr>
+            </tfoot>
+        </table>
+    </div>
 </div>
 
 <div aria-live="polite" aria-atomic="true" class="">

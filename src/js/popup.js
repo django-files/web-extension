@@ -75,6 +75,14 @@ async function initPopup() {
     document.getElementById('popupPreview').checked = options.popupPreview
     document.body.style.width = `${options.popupWidth}px`
 
+    // Table Max Height
+    const wrapper = document.getElementById('table-wrapper')
+    if (options.popupLinks) {
+        wrapper.style.maxHeight = '500px'
+    } else {
+        wrapper.style.maxHeight = '540px'
+    }
+
     // Manifest
     const manifest = chrome.runtime.getManifest()
     const imgLink = document.querySelector('.head img').closest('a')
