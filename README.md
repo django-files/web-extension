@@ -47,10 +47,11 @@ All Chromium Based Browsers can install the extension from the
 
 *   View Recent Uploads on Popup
 *   Preview Popup Images on Hover.
+*   Set Private, Password, and Expiration.
 *   Right Click any Image, Video, or Audio to Upload.
 *   Right Click any URL to Shorten.
-*   Automatically Auth with Django Files.
 *   Automatic Dark/Light Mode based on Browser Settings.
+*   Automatically Auth with Django Files.
 
 > [!TIP]
 > **Don't see your feature here?**
@@ -81,18 +82,31 @@ Alternatively, you can open the Options page and add your URL and Token.
 
 **Quick Start**
 
-To run chrome or firefox with web-ext.
+First, clone (or download) this repository and change into the directory:
+```shell
+git clone https://github.com/django-files/web-extension.git
+cd web-extension
+```
+
+Second, install the dependencies:
 ```shell
 npm isntall
+```
+
+Finally, to run Chrome or Firefox with web-ext, run one of the following:
+```shell
 npm run chrome
 npm run firefox
 ```
 
-To Load Unpacked/Temporary Add-on make a `manifest.json` with.
+Additionally, to Load Unpacked/Temporary Add-on make a `manifest.json` and run from the [src](src) folder, run one of the following:
 ```shell
 npm run manifest:chrome
 npm run manifest:firefox
 ```
+
+Chrome: [https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked)  
+Firefox: [https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/](https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/)
 
 For more information on web-ext, [read this documentation](https://extensionworkshop.com/documentation/develop/web-ext-command-reference/).  
 To pass additional arguments to an `npm run` command, use `--`.  
@@ -101,25 +115,19 @@ Example: `npm run chrome -- --chromium-binary=...`
 ## Building
 
 Install the requirements and copy libraries into the `src/dist` directory by running `npm install`.
-See [gulpfile.js](gulpfile.js) for more information on postinstall.
+See [gulpfile.js](gulpfile.js) for more information on `postinstall`.
 ```shell
 npm install
 ```
 
-To load unpacked or temporary addon from the [src](src) folder, you must generate the `src/manifest.json` for the desired browser.
-```shell
-npm run manifest:chrome
-npm run manifest:firefox
-```
-
-If you would like to create a `.zip` archive of the [src](src) directory for the desired browser.
+To create a `.zip` archive of the [src](src) directory for the desired browser run one of the following:
 ```shell
 npm run build
 npm run build:chrome
 npm run build:firefox
 ```
 
-For more information on building, see the scripts in the [package.json](package.json) file.
+For more information on building, see the scripts section in the [package.json](package.json) file.
 
 ## Chrome Setup
 
@@ -140,8 +148,7 @@ it is very useful to keep addon storage after uninstall/restart with `keepStorag
 1.  Navigate to the folder you extracted earlier, select `manifest.json` then click `Select File`.
 1.  Open `about:config` search for `extensions.webextensions.keepStorageOnUninstall` and set to `true`.
 
-If you need to test a build or browser restart, you must pack the addon.
-This only works in ESR, Development, or Nightly.
+If you need to test a restart, you must pack the addon. This only works in ESR, Development, or Nightly.
 
 1.  Run `npm run build:firefox` then use `web-ext-artifacts/{name}-firefox-{version}.zip`.
 1.  Open `about:config` search for `xpinstall.signatures.required` and set to `false`.

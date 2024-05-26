@@ -3,7 +3,7 @@
 chrome.storage.onChanged.addListener(onChanged)
 document.addEventListener('DOMContentLoaded', initOptions)
 document
-    .querySelectorAll('input')
+    .querySelectorAll('#options-form input')
     .forEach((el) => el.addEventListener('change', saveOptions))
 document
     .getElementById('options-form')

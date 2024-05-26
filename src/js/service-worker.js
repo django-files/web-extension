@@ -31,6 +31,7 @@ async function onStartup() {
 async function onInstalled(details) {
     console.log('onInstalled:', details)
     const githubURL = 'https://github.com/django-files/web-extension'
+    const installURL = 'https://django-files.github.io/extension/#configure'
     const options = await Promise.resolve(
         setDefaultOptions({
             siteUrl: '',
@@ -56,8 +57,7 @@ async function onInstalled(details) {
     }
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage()
-        const url = 'https://django-files.github.io/'
-        await chrome.tabs.create({ active: false, url })
+        await chrome.tabs.create({ active: false, url: installURL })
     } else if (details.reason === 'update' && options.showUpdate) {
         const manifest = chrome.runtime.getManifest()
         if (manifest.version !== details.previousVersion) {
