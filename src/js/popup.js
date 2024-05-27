@@ -361,24 +361,25 @@ function updateTable(data, options) {
         row.id = `row-${i}`
         row.dataset.idx = i.toString()
 
-        const url = new URL(data[i].url)
-        let rawURLCopy
-        let rawURL
-        if (data[i].raw) {
-            rawURLCopy = new URL(data[i].raw)
-            rawURL = new URL(data[i].raw)
-        } else {
-            const raw = url.origin + url.pathname.replace(/^\/u\//, '/raw/')
-            rawURLCopy = new URL(raw)
-            rawURL = new URL(raw)
-            rawURL.searchParams.append('token', options.authToken)
-        }
-        if (url.searchParams.has('password')) {
-            const password = url.searchParams.get('password')
-            // console.debug('adding password to rawURLCopy:', password)
-            rawURLCopy.searchParams.append('password', password)
-        }
+        // Raw URL
+        let rawURL = new URL(data[i].raw)
         rawURL.searchParams.append('view', 'gallery')
+
+        // Raw Copy URL
+        let rawURLCopy = new URL(data[i].raw)
+        if (data[i].password) {
+            rawURLCopy.searchParams.append('password', data[i].password)
+        }
+
+        // Thumb URL
+        let thumbURL
+        if (data[i].thumb) {
+            thumbURL = new URL(data[i].thumb)
+            thumbURL.searchParams.append('view', 'gallery')
+        }
+        if (data[i].password || data[i].private) {
+            thumbURL.searchParams.append('token', options.authToken)
+        }
 
         // File Link -> 1
         const link = document.createElement('a')
@@ -396,7 +397,7 @@ function updateTable(data, options) {
         link.target = '_blank'
         link.dataset.name = data[i].name
         link.dataset.row = i.toString()
-        link.dataset.thumb = data[i].thumb || rawURL.href
+        link.dataset.thumb = thumbURL?.href || rawURL.href
 
         // Cell: 1
         const cell1 = row.cells[0]
