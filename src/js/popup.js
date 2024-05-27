@@ -439,13 +439,11 @@ function updateTable(data, options) {
             .querySelector('.clone > .dropdown-menu')
             .cloneNode(true)
         drop.id = `ctx-${i}`
-        if (typeof data[i] === 'object') {
-            updateContextMenu(drop, data[i]).then()
-        }
+        updateContextMenu(drop, data[i])
         const fileName = drop.querySelector('li.mouse-link')
         fileName.innerText = data[i].name
         fileName.dataset.clipboardText = data[i].name
-        fileName.dataset.thumb = data[i].thumb || rawURL.href
+        fileName.dataset.thumb = thumbURL?.href || rawURL.href
         drop.querySelector('.copy-link').dataset.clipboardText = data[i].url
         drop.querySelector('.copy-raw').dataset.clipboardText = rawURLCopy.href
         drop.querySelectorAll('.raw').forEach(
@@ -501,6 +499,7 @@ async function updateFileIcons(file, el = null) {
 
 const hoverboard = document.getElementById('hover-menu')
 let menuShown
+
 /**
  * Like a Hover Board, but for links
  * @param {MouseEvent} event
@@ -530,7 +529,6 @@ function hoverLinks(event) {
  * @function updateContextMenu
  * @param {HTMLElement} ctx
  * @param {Object} data
- * @return {Promise<void>}
  */
 async function updateContextMenu(ctx, data) {
     // console.debug('updateContextMenu:', ctx, data)
@@ -592,15 +590,9 @@ async function ctxMenu(event) {
     ctxMenuRow.value = fileLink.dataset?.row
     const file = fileData[fileLink.dataset?.row]
     console.debug('file:', file)
-    let name
-    if (typeof file === 'object') {
-        name = file.name
-    } else {
-        name = fileLink.dataset.name
-    }
-    console.debug('name:', name)
     if (action === 'delete') {
-        document.querySelector('#delete-modal .file-name').textContent = name
+        document.querySelector('#delete-modal .file-name').textContent =
+            file.name
         const { options } = await chrome.storage.sync.get(['options'])
         if (options.deleteConfirm) {
             deleteModal.show()
@@ -609,11 +601,13 @@ async function ctxMenu(event) {
         }
     } else if (action === 'expire') {
         expireInput.value = file.expr
-        document.querySelector('#expire-modal .file-name').textContent = name
+        document.querySelector('#expire-modal .file-name').textContent =
+            file.name
         expireModal.show()
     } else if (action === 'password') {
         passwordInput.value = file.password
-        document.querySelector('#password-modal .file-name').textContent = name
+        document.querySelector('#password-modal .file-name').textContent =
+            file.name
         passwordModal.show()
     } else if (action === 'private') {
         await togglePrivate()
@@ -814,7 +808,7 @@ function displayAlert({ message, type = 'warning', auth = false } = {}) {
     if (auth) {
         authAlert.classList.remove('d-none')
         authError = true
-        checkSiteAuth().then()
+        checkSiteAuth()
     }
 }
 
