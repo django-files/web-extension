@@ -363,12 +363,8 @@ function updateTable(data, options) {
 
         // Raw URL
         let rawURL = new URL(data[i].raw)
-        rawURL.searchParams.append('view', 'gallery')
-
-        // Raw Copy URL
-        let rawURLCopy = new URL(data[i].raw)
         if (data[i].password) {
-            rawURLCopy.searchParams.append('password', data[i].password)
+            rawURL.searchParams.append('password', data[i].password)
         }
 
         // Thumb URL
@@ -420,7 +416,7 @@ function updateTable(data, options) {
         board.id = `menu-${i}`
 
         board.querySelector('.copy-link').dataset.clipboardText = data[i].url
-        board.querySelector('.copy-raw').dataset.clipboardText = rawURLCopy.href
+        board.querySelector('.copy-raw').dataset.clipboardText = rawURL.href
 
         div.appendChild(board)
         cell1.appendChild(div)
@@ -445,10 +441,8 @@ function updateTable(data, options) {
         fileName.dataset.clipboardText = data[i].name
         fileName.dataset.thumb = thumbURL?.href || rawURL.href
         drop.querySelector('.copy-link').dataset.clipboardText = data[i].url
-        drop.querySelector('.copy-raw').dataset.clipboardText = rawURLCopy.href
-        drop.querySelectorAll('.raw').forEach(
-            (el) => (el.href = rawURLCopy.href)
-        )
+        drop.querySelector('.copy-raw').dataset.clipboardText = rawURL.href
+        drop.querySelectorAll('.raw').forEach((el) => (el.href = rawURL.href))
         button.appendChild(drop)
 
         // Cell: 0
