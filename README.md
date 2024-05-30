@@ -90,7 +90,7 @@ cd web-extension
 
 Second, install the dependencies:
 ```shell
-npm isntall
+npm install
 ```
 
 Finally, to run Chrome or Firefox with web-ext, run one of the following:
@@ -139,16 +139,14 @@ For more information on building, see the scripts section in the [package.json](
 
 ## Firefox Setup
 
-Note: Firefox Temporary addon's will **not** remain after restarting Firefox, therefore;
-it is very useful to keep addon storage after uninstall/restart with `keepStorageOnUninstall`.
-
 1.  Build or Download a [Release](https://github.com/django-files/web-extension/releases).
 1.  Unzip the archive, place the folder where it must remain and note its location for later.
 1.  Go to `about:debugging#/runtime/this-firefox` and click `Load Temporary Add-on...`
 1.  Navigate to the folder you extracted earlier, select `manifest.json` then click `Select File`.
-1.  Open `about:config` search for `extensions.webextensions.keepStorageOnUninstall` and set to `true`.
+1.  Optional: open `about:config` search for `extensions.webextensions.keepStorageOnUninstall` and set to `true`.
 
 If you need to test a restart, you must pack the addon. This only works in ESR, Development, or Nightly.
+You may also use an Unbranded Build: [https://wiki.mozilla.org/Add-ons/Extension_Signing#Unbranded_Builds](https://wiki.mozilla.org/Add-ons/Extension_Signing#Unbranded_Builds)
 
 1.  Run `npm run build:firefox` then use `web-ext-artifacts/{name}-firefox-{version}.zip`.
 1.  Open `about:config` search for `xpinstall.signatures.required` and set to `false`.
