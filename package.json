@@ -24,7 +24,7 @@
     "gulp": "^4.0.2",
     "json-merger": "^1.1.10",
     "prettier": "^3.2.5",
-    "web-ext": "^7.11.0",
+    "web-ext": "^7.12.0",
     "webextension-polyfill": "^0.10.0"
   }
 }
