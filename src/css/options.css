@@ -1,10 +1,5 @@
 /* CSS for options.html */
 
-body {
-    margin: 0;
-    background: #000;
-}
-
 video {
     position: fixed;
     top: 50%;
@@ -15,16 +10,16 @@ video {
     height: auto;
     z-index: -100;
     transform: translateX(-50%) translateY(-50%);
-    background: url("../media/loop.jpg") no-repeat;
+    background: url('../media/loop.jpg') no-repeat;
     background-size: cover;
     filter: blur(150px);
 }
 
 .card {
     min-width: 400px;
+    background: rgba(0 0 0 / 70%);
 }
 
-.card,
 table tr {
     background: rgba(0 0 0 / 30%);
 }

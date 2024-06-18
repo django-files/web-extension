@@ -32,6 +32,7 @@ async function initOptions() {
 
     const { options } = await chrome.storage.sync.get(['options'])
     console.debug('options:', options)
+    setBackground(options)
     updateOptions(options)
     if (!options?.siteUrl) {
         const siteUrl = document.getElementById('siteUrl')
@@ -48,10 +49,34 @@ async function initOptions() {
  */
 function onChanged(changes, namespace) {
     // console.debug('onChanged:', changes, namespace)
-    for (const [key, { newValue }] of Object.entries(changes)) {
+    for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
         if (namespace === 'sync' && key === 'options') {
             updateOptions(newValue)
+            if (oldValue.radioBackground !== newValue.radioBackground) {
+                setBackground(newValue)
+            }
         }
+    }
+}
+
+function setBackground(options) {
+    if (options.radioBackground === 'bgPicture') {
+        console.debug('setBackground:', options)
+        document.body.style.background =
+            "url('https://picsum.photos/1920/1080') no-repeat center fixed"
+        document.body.style.webkitBackgroundSize = 'cover'
+        document.body.style.mozBackgroundSize = 'cover'
+        document.body.style.oBackgroundSize = 'cover'
+        document.body.style.backgroundSize = 'cover'
+
+        document.querySelector('video').classList.add('d-none')
+    } else if (options.radioBackground === 'bgVideo') {
+        document.querySelector('video').classList.remove('d-none')
+
+        document.body.style.cssText = ''
+    } else {
+        document.body.style.cssText = ''
+        document.querySelector('video').classList.add('d-none')
     }
 }
 
@@ -63,11 +88,13 @@ function onChanged(changes, namespace) {
 async function saveOptions(event) {
     // console.debug('saveOptions:', event)
     const { options } = await chrome.storage.sync.get(['options'])
+    let key = event.target.id
+    let value
     if (event.target.type === 'checkbox') {
-        options[event.target.id] = event.target.checked
+        value = event.target.checked
     } else if (event.target.id === 'siteUrl') {
         event.target.value = event.target.value.replace(/\/+$/, '')
-        options[event.target.id] = event.target.value
+        value = event.target.value
     } else if (event.target.type === 'number') {
         const number = parseInt(event.target.value, 10)
         let min = 0
@@ -80,18 +107,31 @@ async function saveOptions(event) {
         }
         if (!isNaN(number) && number >= min && number <= max) {
             event.target.value = number.toString()
-            options[event.target.id] = number
+            value = number
         } else {
             event.target.value = options[event.target.id]
             // TODO: Add Error Handling
             // showToast(`Value ${number} Out of Range for ${event.target.id}`,'warning')
         }
+    } else if (event.target.type === 'radio') {
+        key = event.target.name
+        const radios = document.getElementsByName(key)
+        for (const input of radios) {
+            if (input.checked) {
+                value = input.id
+                break
+            }
+        }
     } else {
-        options[event.target.id] = event.target.value
+        value = event.target.value
     }
-    console.info(`Set: "${event.target.id}" to target:`, event.target)
-    console.debug('options:', options)
-    await chrome.storage.sync.set({ options })
+    if (value !== undefined) {
+        options[key] = value
+        console.info(`Set: ${key}:`, value)
+        await chrome.storage.sync.set({ options })
+    } else {
+        console.warn('No Value for key:', key)
+    }
 }
 
 /**
@@ -117,7 +157,7 @@ function updateOptions(options) {
         }
         if (el.tagName !== 'INPUT') {
             el.textContent = value.toString()
-        } else if (el.type === 'checkbox') {
+        } else if (['checkbox', 'radio'].includes(el.type)) {
             el.checked = value
         } else {
             el.value = value

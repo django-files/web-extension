@@ -49,6 +49,7 @@ async function onInstalled(details) {
             deleteConfirm: true,
             contextMenu: true,
             showUpdate: false,
+            radioBackground: 'bgPicture',
         })
     )
     console.log('options:', options)
