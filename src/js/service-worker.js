@@ -90,6 +90,11 @@ async function onCommand(command) {
             const url = `${options.siteUrl}/uppy/`
             await chrome.tabs.create({ active: true, url })
         }
+    } else if (command === 'openGallery') {
+        if (options.siteUrl) {
+            const url = `${options.siteUrl}/gallery/`
+            await chrome.tabs.create({ active: true, url })
+        }
     } else {
         console.warn('Unknown Command:', command)
     }

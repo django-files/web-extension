@@ -17,6 +17,12 @@
         "default": "Alt+Shift+A"
       },
       "description": "Upload Files"
+    },
+    "openGallery": {
+      "suggested_key": {
+        "default": "Alt+Shift+G"
+      },
+      "description": "Upload Files"
     }
   },
   "permissions": [
