@@ -49,6 +49,7 @@ async function onInstalled(details) {
             deleteConfirm: true,
             contextMenu: true,
             showUpdate: false,
+            radioBackground: 'bgPicture',
         })
     )
     console.log('options:', options)
@@ -87,6 +88,11 @@ async function onCommand(command) {
     if (command === 'uploadFile') {
         if (options.siteUrl) {
             const url = `${options.siteUrl}/uppy/`
+            await chrome.tabs.create({ active: true, url })
+        }
+    } else if (command === 'openGallery') {
+        if (options.siteUrl) {
+            const url = `${options.siteUrl}/gallery/`
             await chrome.tabs.create({ active: true, url })
         }
     } else {

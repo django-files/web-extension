@@ -12,13 +12,13 @@
 </head>
 <body class="h-100">
 
-<video poster="../media/loop.jpg" id="bgvid" playsinline autoplay muted loop>
+<video poster="../media/loop.jpg" id="bgvid" class="d-none" playsinline autoplay muted loop>
     <source src="../media/loop.mp4" type="video/mp4">
 </video> <!-- video -->
 
 <div class="container-fluid p-2 h-100">
 <div class="d-flex align-items-center h-100">
-<div class="col-xxl-8 col-lg-10 col-12 m-auto">
+<div class="col-xl-8 col-lg-10 col-12 m-auto">
 <div class="card p-2 mb-2">
 <div class="card-body">
     <div class="d-flex justify-content-center align-items-center">
@@ -69,17 +69,17 @@
         </div>
 
         <div class="row g-2">
-            <div class="col-sm-4 col-12 mb-2">
+            <div class="col-md-4 col-12 mb-2">
                 <label for="recentFiles" class="form-label"><i class="fa-solid fa-list-ol me-2"></i> Recent Files</label>
                 <input id="recentFiles" aria-describedby="recentFilesHelp" type="number" class="form-control" autocomplete="off">
                 <div class="form-text" id="recentFilesHelp">Popup Recent Files. <span class="d-inline-block">0 to Disable.</span></div>
             </div>
-            <div class="col-sm-4 col-12 mb-2">
+            <div class="col-md-4 col-12 mb-2">
                 <label for="popupWidth" class="form-label"><i class="fa-solid fa-arrows-left-right-to-line me-2"></i> Popup Width</label>
                 <input id="popupWidth" aria-describedby="popupWidthHelp" type="number" class="form-control" autocomplete="off" step="10">
                 <div class="form-text" id="popupWidthHelp">Popup Width in Pixels. <span class="d-inline-block">320-600.</span></div>
             </div>
-            <div class="col-sm-4 col-12 mb-2">
+            <div class="col-md-4 col-12 mb-2">
                 <label for="popupTimeout" class="form-label"><i class="fa-regular fa-clock me-2"></i> Preview Timeout</label>
                 <input id="popupTimeout" aria-describedby="popupTimeoutHelp" type="number" class="form-control" autocomplete="off">
                 <div class="form-text" id="popupTimeoutHelp">Popup Preview Timeout in Seconds.</div>
@@ -181,6 +181,35 @@
                 </label>
             </div>
         </div>
+
+        <h5>
+            Options Page Background
+            <span class="small" data-bs-toggle="tooltip" data-bs-title="Disabled, Random Picture or Video Loop.">
+                <i class="fa-solid fa-circle-info ms-1"></i>
+            </span>
+        </h5>
+        <div id="backgroundOptions" class="ms-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="radioBackground" id="bgNone" value="none">
+                <label class="form-check-label" for="bgNone">
+                    <i class="fa-regular fa-square"></i> None
+                </label>
+            </div>
+
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="radioBackground" id="bgPicture" value="picture">
+                <label class="form-check-label" for="bgPicture">
+                    <i class="fa-regular fa-image"></i> Picture
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="radioBackground" id="bgVideo" value="video">
+                <label class="form-check-label" for="bgVideo">
+                    <i class="fa-solid fa-video"></i> Video
+                </label>
+            </div>
+        </div>
+
     </form>
 
     <hr>
