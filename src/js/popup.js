@@ -73,14 +73,25 @@ async function initPopup() {
     const { options } = await chrome.storage.sync.get(['options'])
     console.debug('options:', options)
     document.getElementById('popupPreview').checked = options.popupPreview
-    document.body.style.width = `${options.popupWidth}px`
-
-    // Table Max Height
     const wrapper = document.getElementById('table-wrapper')
-    if (options.popupLinks) {
-        wrapper.style.maxHeight = '500px'
+    const platform = await chrome.runtime.getPlatformInfo()
+    if (platform.os !== 'android') {
+        document.body.style.width = `${options.popupWidth}px`
+        if (options.popupLinks) {
+            wrapper.style.maxHeight = '500px'
+        } else {
+            wrapper.style.maxHeight = '540px'
+        }
     } else {
-        wrapper.style.maxHeight = '540px'
+        if (options.popupLinks) {
+            wrapper.style.maxHeight = '82vh'
+        } else {
+            wrapper.style.maxHeight = '88vh'
+        }
+        document.documentElement.style.fontSize = '1.3rem'
+        document
+            .querySelectorAll('.hover-menu > a')
+            .forEach((el) => el.classList.add('px-1'))
     }
 
     // Manifest
@@ -88,7 +99,7 @@ async function initPopup() {
     const imgLink = document.querySelector('.head img').closest('a')
     imgLink.href = manifest.homepage_url
     imgLink.title = `v${manifest.version}`
-    const titleLink = document.querySelector('.head h3 a')
+    const titleLink = document.querySelector('.head h4 a')
     titleLink.href = manifest.homepage_url
 
     // Title Link
@@ -377,6 +388,11 @@ function updateTable(data, options) {
             thumbURL.searchParams.append('token', options.authToken)
         }
 
+        // Set mouseOver data on row
+        row.classList.add('mouse-link')
+        row.dataset.thumb = thumbURL?.href || rawURL.href
+        row.dataset.name = data[i].name
+
         // File Link -> 1
         const link = document.createElement('a')
         link.text = data[i].name
@@ -387,8 +403,8 @@ function updateTable(data, options) {
             'link-underline',
             'link-underline-opacity-0',
             'link-underline-opacity-75-hover',
-            'file-link',
-            'mouse-link'
+            'file-link'
+            // 'mouse-link'
         )
         link.target = '_blank'
         link.dataset.name = data[i].name
@@ -609,7 +625,7 @@ async function ctxMenu(event) {
 }
 
 async function togglePrivate() {
-    console.debug('togglePrivate')
+    console.debug(`togglePrivate: ${ctxMenuRow.value}`)
     // event.preventDefault()
     const file = fileData[ctxMenuRow.value]
     console.debug('file:', file)
@@ -641,7 +657,7 @@ async function togglePrivate() {
  * @param {SubmitEvent} event
  */
 async function passwordForm(event) {
-    console.debug('passwordForm:', event)
+    console.debug(`passwordForm: ${ctxMenuRow.value}:`, event)
     event.preventDefault()
     const file = fileData[ctxMenuRow.value]
     console.debug('file:', file)
@@ -679,7 +695,7 @@ async function passwordForm(event) {
  * @param {SubmitEvent} event
  */
 async function expireForm(event) {
-    console.debug('expireForm:', event)
+    console.debug(`expireForm: ${ctxMenuRow.value}:`, event)
     event.preventDefault()
     const file = fileData[ctxMenuRow.value]
     console.debug('file:', file)
@@ -717,7 +733,7 @@ async function expireForm(event) {
  * @param {MouseEvent} event
  */
 async function deleteConfirm(event) {
-    console.debug('deleteConfirm:', event)
+    console.debug(`deleteConfirm: ${ctxMenuRow.value}:`, event)
     event.preventDefault()
     const file = fileData[ctxMenuRow.value]
     console.debug('file:', file)
@@ -842,6 +858,8 @@ function initPopupMouseover() {
     })
 }
 
+let mouseRow
+
 function onMouseOver(event) {
     // console.debug('onMouseOver:', event)
     mediaError.classList.add('d-none')
@@ -853,12 +871,19 @@ function onMouseOver(event) {
         mediaOuter.classList.remove('bottom-0')
         mediaOuter.classList.add('top-0')
     }
-    const str = event.target.innerText
+    const tr = event.target.closest('tr')
+    if (tr.id === mouseRow) {
+        // console.debug('onMouseOver: return')
+        return
+    }
+    mouseRow = tr.id
+    // console.debug('tr:', tr)
     const imageExtensions = /\.(gif|ico|jpeg|jpg|png|svg|webp)$/i
-    if (str.match(imageExtensions)) {
+    if (tr.dataset.name.match(imageExtensions)) {
+        // console.log('onMouseOver: UPDATE SRC')
         mediaImage.src = loadingImage
-        mediaImage.src = event.target.dataset.thumb
-        // console.debug('dataset.thumb', event.target.dataset.thumb)
+        mediaImage.src = tr.dataset.thumb
+        // console.debug('dataset.thumb', tr.dataset.thumb)
         mediaOuter.classList.remove('d-none')
     } else {
         mediaOuter.classList.add('d-none')
@@ -869,8 +894,16 @@ function onMouseOver(event) {
     }
 }
 
-function onMouseOut() {
-    // console.debug('onMouseOut')
+function onMouseOut(event) {
+    // console.debug('onMouseOut:', event)
+    const tr = event.target.closest('tr')
+    // console.debug('tr:', tr)
+    // console.debug('mouseRow:', mouseRow)
+    if (tr.id === mouseRow) {
+        // console.debug('onMouseOut: return')
+        return
+    }
+    // console.debug('onMouseOut: START TIMEOUT')
     timeoutID = setTimeout(function () {
         mediaOuter.classList.add('d-none')
         mediaImage.src = loadingImage

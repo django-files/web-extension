@@ -2,8 +2,8 @@
 
 chrome.runtime.onStartup.addListener(onStartup)
 chrome.runtime.onInstalled.addListener(onInstalled)
-chrome.commands.onCommand.addListener(onCommand)
-chrome.contextMenus.onClicked.addListener(contextMenusClicked)
+chrome.commands?.onCommand.addListener(onCommand)
+chrome.contextMenus?.onClicked.addListener(contextMenusClicked)
 chrome.notifications.onClicked.addListener(notificationsClicked)
 chrome.storage.onChanged.addListener(onChanged)
 
@@ -38,7 +38,7 @@ async function onInstalled(details) {
             authToken: '',
             recentFiles: 14,
             popupWidth: 380,
-            popupTimeout: 5,
+            popupTimeout: 10,
             popupPreview: true,
             popupIcons: true,
             iconPrivate: true,
@@ -169,6 +169,9 @@ function onChanged(changes, namespace) {
  * @function createContextMenus
  */
 function createContextMenus() {
+    if (!chrome.contextMenus) {
+        return console.debug('Skipping: chrome.contextMenus')
+    }
     console.debug('createContextMenus')
     chrome.contextMenus.removeAll()
     const ctx = ['link', 'image', 'video', 'audio']

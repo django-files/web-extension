@@ -68,11 +68,9 @@ function setBackground(options) {
         document.body.style.mozBackgroundSize = 'cover'
         document.body.style.oBackgroundSize = 'cover'
         document.body.style.backgroundSize = 'cover'
-
         document.querySelector('video').classList.add('d-none')
     } else if (options.radioBackground === 'bgVideo') {
         document.querySelector('video').classList.remove('d-none')
-
         document.body.style.cssText = ''
     } else {
         document.body.style.cssText = ''
@@ -112,6 +110,7 @@ async function saveOptions(event) {
             event.target.value = options[event.target.id]
             // TODO: Add Error Handling
             // showToast(`Value ${number} Out of Range for ${event.target.id}`,'warning')
+            return
         }
     } else if (event.target.type === 'radio') {
         key = event.target.name
@@ -184,7 +183,12 @@ function hideShowElement(selector, show, speed = 'fast') {
  * @param {String} selector
  */
 async function setShortcuts(selector = '#keyboard-shortcuts') {
-    const tbody = document.querySelector(selector).querySelector('tbody')
+    if (!chrome.commands) {
+        return console.debug('Skipping: chrome.commands')
+    }
+    const table = document.querySelector(selector)
+    table.classList.remove('d-none')
+    const tbody = table.querySelector('tbody')
     const source = tbody.querySelector('tr.d-none').cloneNode(true)
     source.classList.remove('d-none')
     const commands = await chrome.commands.getAll()
