@@ -14,7 +14,7 @@
 <body>
 
 <div class="container-fluid p-2">
-    <div class="head mb-1">
+    <div class="head mb-2">
         <div class="form-check form-switch float-start form-select-lg pb-0" style="padding-top: 1px;"
              data-bs-title="Disable/Enable Mouseover Preview." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
             <input class="form-check-input" id="popupPreview" type="checkbox" role="switch">
@@ -25,9 +25,9 @@
         <a id="always-auth" class="d-none btn btn-sm btn-outline-warning float-end add-auth" role="button"
            data-bs-title="Update Authentication with Current Site." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
             <i class="fa-solid fa-key"></i></a>
-        <div class="d-flex align-items-center justify-content-center">
+        <div class="d-flex align-items-center overflow-hidden text-nowrap">
             <a href=""><img src="../media/logo32.png" class="me-1" height="32" width="32" alt="Django Files"></a>
-            <h3 class="my-0"><a class="link-body-emphasis text-decoration-none" href="">Django Files</a></h3>
+            <h4 class="my-0"><a class="link-body-emphasis text-decoration-none" href="">Django Files</a></h4>
         </div>
     </div>
 
@@ -90,31 +90,31 @@
     </div>
 
     <div class="toast align-items-center border-0 mb-3" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
-        <div class="toast-body text-break small"></div>
+        <div class="toast-body text-break"></div>
     </div>
 
     <input id="ctx-menu-row" type="hidden" value="">
 
     <ul class="dropdown-menu py-1">
-        <li class="small d-none "><a class="dropdown-item clip copy-link">
+        <li class="d-none "><a class="dropdown-item clip copy-link">
             <i class="fa-solid fa-copy link-body-emphasis me-3"></i> Copy Share Link</a></li>
-        <li class="small d-none "><a class="dropdown-item clip copy-raw">
+        <li class="d-none "><a class="dropdown-item clip copy-raw">
             <i class="fa-regular fa-copy link-body-emphasis me-3"></i> Copy Raw Link</a></li>
         <li class="d-none "><hr class="dropdown-divider my-1"></li>
-        <li class="small"><a class="dropdown-item clip raw" href="">
+        <li class=""><a class="dropdown-item clip raw" href="">
             <i class="fa-solid fa-arrow-up-right-from-square link-body-emphasis me-3"></i> Open Raw File</a></li>
-        <li class="small"><a class="dropdown-item" data-action="delete">
+        <li class=""><a class="dropdown-item" data-action="delete">
             <i class="fa-regular fa-trash-can link-danger me-3"></i> Delete File</a></li>
         <li><hr class="dropdown-divider my-1"></li>
-        <li class="dropdown-item-text text-center text-break small clip mouse-link py-0"></li>
+        <li class="dropdown-item-text text-center text-break  clip mouse-link py-0"></li>
         <li class="dropdown-item-text text-center file-icons">
-            <span class="text-body-tertiary view-text">0</span>
-            <i class="fa-solid fa-eye text-body-tertiary mx-1"></i>
-            <a  data-action="private"><i class="fa-solid fa-lock mx-1 text-body-tertiary"></i></a>
-            <a class="pass-link" data-action="password"><i class="fa-solid fa-key mx-1 text-body-tertiary"></i></a>
+            <span class="text-body-tertiary view-text me-1">0</span>
+            <i class="fa-solid fa-eye text-body-tertiary me-2"></i>
+            <a  data-action="private"><i class="fa-solid fa-lock mx-2 text-body-tertiary"></i></a>
+            <a class="pass-link" data-action="password"><i class="fa-solid fa-key mx-2 text-body-tertiary"></i></a>
             <a class="text-decoration-none link-body-emphasis" data-action="expire">
-                <i class="fa-solid fa-hourglass-start mx-1 text-body-tertiary"></i>
-                <span class="expr-text"></span></a>
+                <i class="fa-solid fa-hourglass-start ms-2 text-body-tertiary"></i>
+                <span class="expr-text ms-1"></span></a>
         </li>
     </ul>
     <i class="fa-solid fa-hourglass ms-1 d-none"></i>
