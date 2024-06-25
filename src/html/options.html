@@ -12,15 +12,14 @@
 </head>
 <body class="h-100">
 
-<video poster="../media/loop.jpg" id="bgvid" class="d-none" playsinline autoplay muted loop>
-    <source src="../media/loop.mp4" type="video/mp4">
+<video id="bgvid" class="d-none" playsinline autoplay muted loop>
+<!--    <source src="/media/loop.mp4" type="video/mp4">-->
 </video> <!-- video -->
 
-<div class="container-fluid p-2 h-100">
+<div class="container-fluid g-0 h-100">
 <div class="d-flex align-items-center h-100">
 <div class="col-xl-8 col-lg-10 col-12 m-auto">
-<div class="card p-2 mb-2">
-<div class="card-body">
+<div class="options-wrapper p-3 ms-2 mt-2 mb-3 me-3 rounded rounded-4">
     <div class="d-flex justify-content-center align-items-center">
         <img src="../media/logo48.png" class="me-2" height="48" width="48"
              alt="Django Files Extension" title="Django Files Extension">
@@ -68,7 +67,7 @@
             <div class="form-text mb-3" id="authTokenHelp">Token From Django Files Settings.</div>
         </div>
 
-        <div class="row g-2">
+        <div class="row g-2 mb-2">
             <div class="col-md-4 col-12 mb-2">
                 <label for="recentFiles" class="form-label"><i class="fa-solid fa-list-ol me-2"></i> Recent Files</label>
                 <input id="recentFiles" aria-describedby="recentFilesHelp" type="number" class="form-control" autocomplete="off">
@@ -86,132 +85,157 @@
             </div>
         </div>
 
-        <div class="my-3">
-            <div class="form-check form-switch mb-2">
-                <input class="form-check-input" id="popupPreview" type="checkbox" role="switch">
-                <label class="form-check-label" for="popupPreview" aria-describedby="popupPreviewHelp">
-                    Show Preview on Popup
-                    <span data-bs-toggle="tooltip" data-bs-title="Display Media Preview on Popup Mouseover.">
-                        <i class="fa-solid fa-circle-info ms-1"></i>
-                    </span>
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" id="popupPreview" type="checkbox" role="switch">
+            <label class="form-check-label" for="popupPreview" aria-describedby="popupPreviewHelp">
+                Show Preview on Popup
+                <span data-bs-toggle="tooltip" data-bs-title="Display Media Preview on Popup Mouseover.">
+                    <i class="fa-solid fa-circle-info ms-1"></i>
+                </span>
+            </label>
+        </div>
+
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" id="popupIcons" type="checkbox" role="switch" data-related="iconOptions">
+            <label class="form-check-label" for="popupIcons" aria-describedby="popupIconsHelp">
+                Show File Icons in Popup
+                <span data-bs-toggle="tooltip" data-bs-title="Show Private and Password Icons on Files in Popup.">
+                    <i class="fa-solid fa-circle-info ms-1"></i>
+                </span>
+            </label>
+        </div>
+        <div id="iconOptions" class="ms-5 mb-2" style="display: none;">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="iconPrivate" value="iconPrivate">
+                <label class="form-check-label" for="iconPrivate">
+                    <i class="fa-solid fa-lock text-danger-emphasis"></i>
+                    <span class="visually-hidden">Private Icon</span>
                 </label>
             </div>
-
-            <div class="form-check form-switch mb-2">
-                <input class="form-check-input" id="popupIcons" type="checkbox" role="switch" data-related="iconOptions">
-                <label class="form-check-label" for="popupIcons" aria-describedby="popupIconsHelp">
-                    Show File Icons in Popup
-                    <span data-bs-toggle="tooltip" data-bs-title="Show Private and Password Icons on Files in Popup.">
-                        <i class="fa-solid fa-circle-info ms-1"></i>
-                    </span>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="iconPassword" value="iconPassword">
+                <label class="form-check-label text-warning-emphasis" for="iconPassword">
+                    <i class="fa-solid fa-key"></i>
+                    <span class="visually-hidden">Password Icon</span>
                 </label>
             </div>
-            <div id="iconOptions" class="ms-5" style="display: none;">
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="iconPrivate" value="iconPrivate">
-                    <label class="form-check-label" for="iconPrivate">
-                        <i class="fa-solid fa-lock text-danger-emphasis"></i>
-                        <span class="visually-hidden">Private Icon</span>
-                    </label>
-                </div>
-
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="iconPassword" value="iconPassword">
-                    <label class="form-check-label text-warning-emphasis" for="iconPassword">
-                        <i class="fa-solid fa-key"></i>
-                        <span class="visually-hidden">Password Icon</span>
-                    </label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="iconExpire" value="iconExpire">
-                    <label class="form-check-label" for="iconExpire">
-                        <i class="fa-solid fa-hourglass"></i>
-                        <span class="visually-hidden">Expire Icon</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-check form-switch mb-2">
-                <input class="form-check-input" id="popupLinks" type="checkbox" role="switch">
-                <label class="form-check-label" for="popupLinks" aria-describedby="popupLinksHelp">
-                    Show Django File Links in Popup
-                    <span data-bs-toggle="tooltip" data-bs-title="Show or Hide Django File Links in Popup.">
-                        <i class="fa-solid fa-circle-info ms-1"></i>
-                    </span>
-                </label>
-            </div>
-
-            <div class="form-check form-switch mb-2">
-                <input class="form-check-input" id="checkAuth" type="checkbox" role="switch">
-                <label class="form-check-label" for="checkAuth" aria-describedby="checkAuthHelp">
-                    Always Check for Site Auth
-                    <span data-bs-toggle="tooltip" data-bs-title="Always Query Current Site for Auth Credentials.">
-                        <i class="fa-solid fa-circle-info ms-1"></i>
-                    </span>
-                </label>
-            </div>
-
-            <div class="form-check form-switch mb-2">
-                <input class="form-check-input" id="deleteConfirm" type="checkbox" role="switch">
-                <label class="form-check-label" for="deleteConfirm" aria-describedby="deleteConfirmHelp">
-                    Show Confirmation on Delete
-                    <span data-bs-toggle="tooltip" data-bs-title="Show a File Delete Confirmation Dialog.">
-                        <i class="fa-solid fa-circle-info ms-1"></i>
-                    </span>
-                </label>
-            </div>
-
-            <div class="form-check form-switch mb-2">
-                <input class="form-check-input" id="contextMenu" type="checkbox" role="switch">
-                <label class="form-check-label" for="contextMenu" aria-describedby="contextMenuHelp">
-                    Enable Context Menu
-                    <span data-bs-toggle="tooltip" data-bs-title="Show Right Click Context Menu.">
-                        <i class="fa-solid fa-circle-info ms-1"></i>
-                    </span>
-                </label>
-            </div>
-
-            <div class="form-check form-switch mb-2">
-                <input class="form-check-input" id="showUpdate" type="checkbox" role="switch">
-                <label class="form-check-label" for="showUpdate" aria-describedby="showUpdateHelp">
-                    Show Release Notes on Update
-                    <span data-bs-toggle="tooltip" data-bs-title="Show Release Notes on Version Update.">
-                        <i class="fa-solid fa-circle-info ms-1"></i>
-                    </span>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="iconExpire" value="iconExpire">
+                <label class="form-check-label" for="iconExpire">
+                    <i class="fa-solid fa-hourglass"></i>
+                    <span class="visually-hidden">Expire Icon</span>
                 </label>
             </div>
         </div>
 
-        <h5>
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" id="popupLinks" type="checkbox" role="switch">
+            <label class="form-check-label" for="popupLinks" aria-describedby="popupLinksHelp">
+                Show Django File Links in Popup
+                <span data-bs-toggle="tooltip" data-bs-title="Show or Hide Django File Links in Popup.">
+                    <i class="fa-solid fa-circle-info ms-1"></i>
+                </span>
+            </label>
+        </div>
+
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" id="checkAuth" type="checkbox" role="switch">
+            <label class="form-check-label" for="checkAuth" aria-describedby="checkAuthHelp">
+                Always Check for Site Auth
+                <span data-bs-toggle="tooltip" data-bs-title="Always Query Current Site for Auth Credentials.">
+                    <i class="fa-solid fa-circle-info ms-1"></i>
+                </span>
+            </label>
+        </div>
+
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" id="deleteConfirm" type="checkbox" role="switch">
+            <label class="form-check-label" for="deleteConfirm" aria-describedby="deleteConfirmHelp">
+                Show Confirmation on Delete
+                <span data-bs-toggle="tooltip" data-bs-title="Show a File Delete Confirmation Dialog.">
+                    <i class="fa-solid fa-circle-info ms-1"></i>
+                </span>
+            </label>
+        </div>
+
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" id="contextMenu" type="checkbox" role="switch" data-related="reloadMenu">
+            <label class="form-check-label" for="contextMenu" aria-describedby="contextMenuHelp">
+                Enable Context Menu
+                <span data-bs-toggle="tooltip" data-bs-title="Show Right Click Context Menu.">
+                    <i class="fa-solid fa-circle-info ms-1"></i>
+                </span>
+            </label>
+        </div>
+        <div id="reloadMenu" class="ms-5 mb-2" style="display: none;">
+            <div class="d-flex align-items-center">
+            <button id="reloadAlbums" class="btn btn-sm btn-outline-info" type="button">
+                <i class="fa-solid fa-arrows-rotate"></i> Reload Albums
+            </button>
+            <span id="albumsUpdated" class="text-success"  style="display: none;">
+                <i class="fa-regular fa-circle-check fa-xl ms-3"></i>
+                Updated
+            </span>
+            </div>
+        </div>
+
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" id="showUpdate" type="checkbox" role="switch">
+            <label class="form-check-label" for="showUpdate" aria-describedby="showUpdateHelp">
+                Show Release Notes on Update
+                <span data-bs-toggle="tooltip" data-bs-title="Show Release Notes on Version Update.">
+                    <i class="fa-solid fa-circle-info ms-1"></i>
+                </span>
+            </label>
+        </div>
+
+        <h5 class="mb-2">
             Options Page Background
             <span class="small" data-bs-toggle="tooltip" data-bs-title="Disabled, Random Picture or Video Loop.">
-                <i class="fa-solid fa-circle-info ms-1"></i>
-            </span>
+                        <i class="fa-solid fa-circle-info ms-1"></i>
+                    </span>
         </h5>
-        <div id="backgroundOptions" class="ms-3">
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="radioBackground" id="bgNone" value="none">
-                <label class="form-check-label" for="bgNone">
-                    <i class="fa-regular fa-square"></i> None
-                </label>
+        <div class="d-flex flex-column flex-md-row mb-2 align-items-md-center" style="min-height: 38px;">
+            <div class="flex-grow-0 mt-md-0">
+                <div class="ms-2 ms-md-0 mt-auto">
+                    <div class="d-grid d-sm-flex">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="radioBackground" id="bgNone" value="none">
+                            <label class="form-check-label" for="bgNone">
+                                <i class="fa-regular fa-square"></i> None
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="radioBackground" id="bgPicture" value="picture">
+                            <label class="form-check-label" for="bgPicture">
+                                <i class="fa-regular fa-image"></i> Picture
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="radioBackground" id="bgVideo" value="video">
+                            <label class="form-check-label" for="bgVideo">
+                                <i class="fa-solid fa-video"></i> Video
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="radioBackground" id="bgPicture" value="picture">
-                <label class="form-check-label" for="bgPicture">
-                    <i class="fa-regular fa-image"></i> Picture
-                </label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="radioBackground" id="bgVideo" value="video">
-                <label class="form-check-label" for="bgVideo">
-                    <i class="fa-solid fa-video"></i> Video
-                </label>
+            <div class="flex-fill mt-2 mt-md-0 ms-2 ms-md-0">
+                <div id="bgPictureInput" class="input-group d-none">
+                    <span class="input-group-text" id="picture-addon" data-bs-toggle="tooltip" data-bs-title="URL to a Web Image or empty for default.">
+                        <i class="fa-solid fa-circle-info"></i></span>
+                    <input type="text" class="form-control" placeholder="Background Picture URL" aria-label="Background Picture URL"
+                           id="pictureURL" name="pictureURL" aria-describedby="picture-addon">
+                </div>
+                <div id="bgVideoInput" class="input-group d-none">
+                    <span class="input-group-text" id="video-addon" data-bs-toggle="tooltip" data-bs-title="URL to a Web Video or empty for default.">
+                        <i class="fa-solid fa-circle-exclamation"></i></span>
+                    <input type="text" class="form-control" placeholder="Background Video URL" aria-label="Background Video URL"
+                           id="videoURL" name="videoURL" aria-describedby="video-addon">
+                </div>
             </div>
         </div>
-
     </form>
-
     <hr>
     <div class="text-center">
         <a class="link-body-emphasis text-decoration-none" target="_blank" rel="noopener"
@@ -223,8 +247,7 @@
         <a class="link-body-emphasis text-decoration-none" target="_blank" rel="noopener"
            href="https://django-files.github.io/">Django Files</a>
     </div>
-</div> <!-- card-body -->
-</div> <!-- card -->
+</div> <!-- options-wrapper -->
 </div> <!-- col -->
 </div> <!-- flex -->
 </div> <!-- container -->

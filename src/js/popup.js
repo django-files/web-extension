@@ -310,6 +310,9 @@ async function authCredentials(event) {
         alwaysAuth.classList.add('d-none')
         mediaOuter.classList.add('d-none')
         await initPopup()
+        if (options.contextMenu) {
+            await chrome.runtime.sendMessage('createContextMenus')
+        }
     } else {
         displayAlert({ message: 'Error Getting or Setting Credentials.' })
     }
@@ -322,7 +325,7 @@ async function authCredentials(event) {
  */
 function genLoadingData(rows) {
     console.debug('genLoadingData:', rows)
-    const number = parseInt(rows, 10)
+    const number = parseInt(rows, 10) // parseInt is redundant
     if (number > 0) {
         filesTable.classList.remove('d-none')
         const tbody = filesTable.querySelector('tbody')
