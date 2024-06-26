@@ -7,14 +7,26 @@ const screenshotsDir = 'tests/screenshots'
 
 const siteUrl = process.env.DF_URL
 const authToken = process.env.DF_TOKEN
+// const dfUser = process.env.DF_USER
+// const dfPass = process.env.DF_PASS
 
 if (!siteUrl || !authToken) {
-    throw new Error('Missing siteUrl or authToken env')
+    throw new Error('Missing siteUrl or authToken Environment!')
 }
+
+/** @type {import('puppeteer').Browser}*/
+let browser
+/** @type {import('puppeteer').Page}*/
+let page
 
 let count = 1
 
-async function screenshot(page, name) {
+/**
+ * @function screenshot
+ * @param {String} name
+ * @return {Promise<void>}
+ */
+async function screenshot(name) {
     if (!fs.existsSync(screenshotsDir)) {
         fs.mkdirSync(screenshotsDir)
     }
@@ -22,10 +34,35 @@ async function screenshot(page, name) {
     count++
 }
 
+/**
+ * @function getPage
+ * @param {String} name
+ * @param {Boolean=} log
+ * @param {String=} size
+ * @return {import('puppeteer').Page}
+ */
+async function getPage(name, log, size) {
+    const target = await browser.waitForTarget(
+        (target) => target.type() === 'page' && target.url().endsWith(name)
+    )
+    page = await target.asPage()
+    await page.emulateMediaFeatures([
+        { name: 'prefers-color-scheme', value: 'dark' },
+    ])
+    if (size) {
+        const [width, height] = size.split('x').map((x) => parseInt(x))
+        await page.setViewport({ width, height })
+    }
+    if (log) {
+        page.on('console', (msg) => console.log(`${name}:`, msg.text()))
+    }
+    return page
+}
+
 ;(async () => {
     const pathToExtension = path.join(process.cwd(), sourceDir)
     console.log('pathToExtension:', pathToExtension)
-    const browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
         args: [
             `--disable-extensions-except=${pathToExtension}`,
             `--load-extension=${pathToExtension}`,
@@ -47,57 +84,38 @@ async function screenshot(page, name) {
 
     // Popup
     await worker.evaluate('chrome.action.openPopup();')
-    let popupTarget = await browser.waitForTarget(
-        (target) =>
-            target.type() === 'page' && target.url().endsWith('popup.html')
-    )
-    let popupPage = await popupTarget.asPage()
-    await popupPage.emulateMediaFeatures([
-        { name: 'prefers-color-scheme', value: 'dark' },
-    ])
-    console.log('popupPage:', popupPage)
-    // popupPage.on('console', (msg) => console.log('LOG: Popup:', msg.text()))
-    await popupPage.waitForNetworkIdle()
-    await screenshot(popupPage, 'popup')
-    await popupPage.locator('[href="../html/options.html"]').click()
+    page = await getPage('popup.html')
+    console.log('page:', page)
+    await page.waitForNetworkIdle()
+    await screenshot('popup')
+    await page.locator('[href="../html/options.html"]').click()
 
     // Options
     // await worker.evaluate('chrome.runtime.openOptionsPage();')
-    const optionsTarget = await browser.waitForTarget(
-        (target) =>
-            target.type() === 'page' && target.url().endsWith('options.html')
-    )
-    const optionsPage = await optionsTarget.asPage()
-    console.log('optionsPage:', optionsPage)
-    // optionsPage.on('console', (msg) => console.log('LOG: Options:', msg.text()))
-    // await optionsPage.setViewport({ width: 1920, height: 1080 })
-    await optionsPage.waitForNetworkIdle()
-    await screenshot(optionsPage, 'options')
+    page = await getPage('options.html', false, '1080x1080')
+    console.log('page:', page)
+    // await page.setViewport({ width: 1920, height: 1080 })
+    await page.waitForNetworkIdle()
+    await screenshot('options')
 
-    await optionsPage.locator('#siteUrl').fill(siteUrl)
-    // await optionsPage.type('#siteUrl', siteUrl)
-    await optionsPage.keyboard.press('Enter')
-    await optionsPage.locator('#authToken').fill(authToken)
-    // await optionsPage.type('#authToken', authToken)
-    await optionsPage.keyboard.press('Enter')
-    // await optionsPage.locator('.show-hide').click()
-    await screenshot(optionsPage, 'options')
-    await optionsPage.close()
-    // await optionsPage.close()
+    await page.locator('#siteUrl').fill(siteUrl)
+    await page.keyboard.press('Enter')
+    await page.locator('#authToken').fill(authToken)
+    // await page.type('#authToken', authToken)
+    await page.keyboard.press('Enter')
+    // await page.locator('.show-hide').click()
+    await screenshot('options')
+    await page.close()
 
     // Popup
     await worker.evaluate('chrome.action.openPopup();')
-    popupTarget = await browser.waitForTarget(
-        (target) =>
-            target.type() === 'page' && target.url().endsWith('popup.html')
-    )
-    popupPage = await popupTarget.asPage()
-    await popupPage.emulateMediaFeatures([
+    page = await getPage('popup.html')
+    await page.emulateMediaFeatures([
         { name: 'prefers-color-scheme', value: 'dark' },
     ])
-    console.log('popupPage:', popupPage)
-    await popupPage.waitForNetworkIdle()
-    await screenshot(popupPage, 'popup')
+    console.log('page:', page)
+    await page.waitForNetworkIdle()
+    await screenshot('popup')
 
     await browser.close()
 })()
