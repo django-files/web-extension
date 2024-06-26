@@ -25,6 +25,10 @@ video {
     background: rgba(0 0 0 / 50%);
 }
 
-table tr {
-    background: rgba(0 0 0 / 30%);
+#table-wrapper {
+    background: rgba(0 0 0 / 50%);
 }
+
+/*table tr {*/
+/*    background: rgba(0 0 0 / 30%);*/
+/*}*/
