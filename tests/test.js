@@ -9,6 +9,7 @@ const siteUrl = process.env.DF_URL
 const authToken = process.env.DF_TOKEN
 // const dfUser = process.env.DF_USER
 // const dfPass = process.env.DF_PASS
+// const dfSite = process.env.DF_SITE
 
 if (!siteUrl || !authToken) {
     throw new Error('Missing siteUrl or authToken Environment!')
@@ -112,7 +113,7 @@ async function getPage(name, log, size) {
 
     // // DF -https://github.com/puppeteer/puppeteer/issues/2486
     // page = await browser.newPage()
-    // await page.goto('https://f-dev.cssnr.com/')
+    // await page.goto(dfSite)
     // await page.locator('#username').fill(dfUser)
     // await page.locator('#password').fill(dfPass)
     // await page.locator('#login-button').click()
