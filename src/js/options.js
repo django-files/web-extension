@@ -16,15 +16,14 @@ document
     .querySelectorAll('.show-hide')
     .forEach((el) => el.addEventListener('click', showHidePassword))
 document
+    .querySelectorAll('.copy-password')
+    .forEach((el) => el.addEventListener('click', copyPassword))
+document
     .getElementsByName('radioBackground')
     .forEach((el) => el.addEventListener('change', loginBackgroundChange))
 
 const bgPictureInput = document.getElementById('bgPictureInput')
 const bgVideoInput = document.getElementById('bgVideoInput')
-
-const clipboard = new ClipboardJS('.clip')
-// clipboard.on('success', () => showToast('Copied to Clipboard'))
-// clipboard.on('error', () => showToast('Clipboard Copy Failed', 'warning'))
 
 /**
  * Initialize Options
@@ -278,12 +277,18 @@ function showHidePassword(event) {
     console.debug('showHidePassword:', event)
     const element = event.target.closest('button')
     const input = document.querySelector(element.dataset.selector)
-    const button = document.querySelector(element.dataset.button)
     if (input.type === 'password') {
         input.type = 'text'
-        button?.classList.remove('disabled')
     } else {
         input.type = 'password'
-        button?.classList.add('disabled')
     }
+}
+
+async function copyPassword(event) {
+    console.debug('copyPassword:', event)
+    const element = event.target.closest('button')
+    const input = document.querySelector(element.dataset.selector)
+    console.debug('input:', input)
+    await navigator.clipboard.writeText(input.value)
+    // showToast('Copied to Clipboard.')
 }

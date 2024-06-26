@@ -54,13 +54,12 @@
             <label for="authToken" class="form-label"><i class="fa-solid fa-key me-2"></i> Auth Token</label>
             <div class="input-group col-12 ">
                 <input id="authToken" aria-describedby="authTokenHelp" type="password" class="form-control" autocomplete="off">
-                <button class="btn btn-outline-success show-hide" type="button" data-bs-toggle="tooltip" data-selector="#authToken" data-button="#authTokenCopy"
+                <button class="btn btn-outline-success show-hide" type="button" data-bs-toggle="tooltip" data-selector="#authToken"
                         data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Show/Hide Auth Token.">
                     <i class="fa-regular fa-eye"></i>
                 </button>
-                <button id="authTokenCopy" class="btn btn-outline-primary clip disabled" type="button"
-                        data-clipboard-target="#authToken" data-bs-toggle="tooltip"
-                        data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Copy to Clipboard.">
+                <button id="authTokenCopy" class="btn btn-outline-primary copy-password" type="button" data-selector="#authToken"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Copy to Clipboard.">
                     <i class="fa-solid fa-copy"></i>
                 </button>
             </div>
@@ -229,7 +228,7 @@
                 </div>
                 <div id="bgVideoInput" class="input-group d-none">
                     <span class="input-group-text" id="video-addon" data-bs-toggle="tooltip" data-bs-title="URL to a Web Video or empty for default.">
-                        <i class="fa-solid fa-circle-exclamation"></i></span>
+                        <i class="fa-solid fa-circle-info"></i></span>
                     <input type="text" class="form-control" placeholder="Background Video URL" aria-label="Background Video URL"
                            id="videoURL" name="videoURL" aria-describedby="video-addon">
                 </div>
@@ -265,7 +264,6 @@
 <script type="text/javascript" src="../dist/polyfill/browser-polyfill.min.js"></script>
 <script type="text/javascript" src="../dist/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="../dist/bootstrap/bootstrap.bundle.min.js"></script>
-<script type="text/javascript" src="../dist/clipboard/clipboard.min.js"></script>
 <script type="text/javascript" src="../js/options.js"></script>
 
 </body>
