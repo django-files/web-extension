@@ -55,7 +55,7 @@ Mobile browser support available for
 *   Right Click any Image, Video, or Audio to Upload.
 *   Upload Directly to Albums with Context Menu.
 *   Right Click any URL to Shorten.
-*   Automatically Auth with Django Files.
+*   Automatically Authenticate with Django Files.
 *   Automatic Dark/Light Mode based on Browser Settings.
 
 > [!TIP]  
