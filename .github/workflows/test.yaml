@@ -28,3 +28,22 @@ jobs:
           npm install
           npm run manifest:firefox
           npm run lint
+
+      - name: "Puppeteer"
+        working-directory: "test"
+        run: |
+          npm install
+          npm run manifest:chrome
+          node puppeteer.js
+
+      - name: "Push Artifacts"
+        uses: cssnr/push-artifacts-action@master
+        with:
+          path: "test/screenshots/"
+          host: ${{ secrets.ARTIFACTS_HOST }}
+          user: ${{ secrets.RSYNC_USER }}
+          pass: ${{ secrets.RSYNC_PASS }}
+          port: ${{ secrets.RSYNC_PORT }}
+          base: "/static"
+          webhost: "https://artifacts.hosted-domains.com"
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
