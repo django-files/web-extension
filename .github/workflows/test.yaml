@@ -23,8 +23,30 @@ jobs:
         with:
           node-version: 20
 
-      - name: "Lint"
+      - name: "Install"
         run: |
           npm install
+
+      - name: "Lint"
+        run: |
           npm run manifest:firefox
           npm run lint
+
+      - name: "Test"
+        env:
+          DF_URL: ${{ secrets.DF_URL }}
+          DF_TOKEN: ${{ secrets.DF_TOKEN }}
+        run: |
+          npm run test
+
+      - name: "Push Artifacts"
+        uses: cssnr/push-artifacts-action@master
+        with:
+          path: "tests/screenshots/"
+          host: ${{ secrets.ARTIFACTS_HOST }}
+          user: ${{ secrets.RSYNC_USER }}
+          pass: ${{ secrets.RSYNC_PASS }}
+          port: ${{ secrets.RSYNC_PORT }}
+          base: "/static"
+          webhost: "https://artifacts.hosted-domains.com"
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}

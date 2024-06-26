@@ -34,13 +34,7 @@ gulp.task('jquery', () => {
         .pipe(gulp.dest('src/dist/jquery'))
 })
 
-gulp.task('polyfill', () => {
-    return gulp
-        .src('node_modules/webextension-polyfill/dist/browser-polyfill.min.js')
-        .pipe(gulp.dest('src/dist/polyfill'))
-})
-
 gulp.task(
     'default',
-    gulp.parallel('bootstrap', 'clipboard', 'fontawesome', 'jquery', 'polyfill')
+    gulp.parallel('bootstrap', 'clipboard', 'fontawesome', 'jquery')
 )
