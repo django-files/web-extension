@@ -31,7 +31,8 @@ async function screenshot(name) {
     if (!fs.existsSync(screenshotsDir)) {
         fs.mkdirSync(screenshotsDir)
     }
-    await page.screenshot({ path: `${screenshotsDir}/${count}_${name}.png` })
+    const n = count.toString().padStart(2, '0')
+    await page.screenshot({ path: `${screenshotsDir}/${n}_${name}.png` })
     count++
 }
 
