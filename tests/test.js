@@ -3,7 +3,7 @@ const path = require('path')
 const fs = require('fs')
 
 const sourceDir = 'src'
-const screenshotsDir = 'test/screenshots'
+const screenshotsDir = 'tests/screenshots'
 
 const siteUrl = process.env.DF_URL
 const authToken = process.env.DF_TOKEN
@@ -77,7 +77,7 @@ async function screenshot(page, name) {
     await optionsPage.locator('#authToken').fill(authToken)
     // await optionsPage.type('#authToken', authToken)
     await optionsPage.keyboard.press('Enter')
-    await optionsPage.locator('.show-hide').click()
+    // await optionsPage.locator('.show-hide').click()
     await screenshot(optionsPage, 'options')
     await optionsPage.close()
     // await optionsPage.close()

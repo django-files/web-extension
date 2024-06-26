@@ -2,7 +2,6 @@ name: "Test"
 
 on:
   push:
-    branches: ["master"]
   pull_request:
     branches: ["master"]
   workflow_dispatch:
@@ -23,23 +22,23 @@ jobs:
         with:
           node-version: 20
 
-      - name: "Lint"
+      - name: "Install"
         run: |
           npm install
+
+      - name: "Lint"
+        run: |
           npm run manifest:firefox
           npm run lint
 
-      - name: "Puppeteer"
-        working-directory: "test"
+      - name: "Test"
         run: |
-          npm install
-          npm run manifest:chrome
-          node puppeteer.js
+          npm run test
 
       - name: "Push Artifacts"
         uses: cssnr/push-artifacts-action@master
         with:
-          path: "test/screenshots/"
+          path: "tests/screenshots/"
           host: ${{ secrets.ARTIFACTS_HOST }}
           user: ${{ secrets.RSYNC_USER }}
           pass: ${{ secrets.RSYNC_PASS }}

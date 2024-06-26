@@ -5,5 +5,5 @@
 build/
 node_modules/
 web-ext-artifacts/
-test/screenshots/
+tests/screenshots/
 src/manifest.json
