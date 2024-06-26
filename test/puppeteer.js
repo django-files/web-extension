@@ -2,21 +2,28 @@ const puppeteer = require('puppeteer')
 const path = require('path')
 const fs = require('fs')
 
+const sourceDir = 'src'
+const screenshotsDir = 'test/screenshots'
+
 const siteUrl = process.env.DF_URL
 const authToken = process.env.DF_TOKEN
+
+if (!siteUrl || !authToken) {
+    throw new Error('Missing siteUrl or authToken env')
+}
 
 let count = 1
 
 async function screenshot(page, name) {
-    if (!fs.existsSync('screenshots')) {
-        fs.mkdirSync('screenshots')
+    if (!fs.existsSync(screenshotsDir)) {
+        fs.mkdirSync(screenshotsDir)
     }
-    await page.screenshot({ path: `screenshots/${count}_${name}.png` })
+    await page.screenshot({ path: `${screenshotsDir}/${count}_${name}.png` })
     count++
 }
 
 ;(async () => {
-    const pathToExtension = path.join(process.cwd(), '../src')
+    const pathToExtension = path.join(process.cwd(), sourceDir)
     console.log('pathToExtension:', pathToExtension)
     const browser = await puppeteer.launch({
         args: [
