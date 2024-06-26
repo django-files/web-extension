@@ -14,7 +14,7 @@
 [Django Files](https://github.com/django-files/django-files) to view recent uploads, shorten URLs,
 and upload any Image, Video or Audio files with right click.
 
-> [!TIP]  
+> [!IMPORTANT]  
 > This Web Extension is designed to work with [Django Files](https://github.com/django-files/django-files).
 
 ## Table of Contents
@@ -44,20 +44,21 @@ All Chromium Based Browsers can install the extension from the
 
 Mobile browser support available for
 [Firefox](https://addons.mozilla.org/addon/link-extractor) and
-[Kiwi](https://chromewebstore.google.com/detail/link-extractor/ifefifghpkllfibejafbakmflidjcjfp).  
-(Yandex is unable to download the extension)
+[Kiwi](https://chromewebstore.google.com/detail/link-extractor/ifefifghpkllfibejafbakmflidjcjfp).
 
 ## Features
 
 *   View Recent Uploads on Popup
 *   Preview Popup Images on Hover.
 *   Set Private, Password, and Expiration.
+*   Customize Popup Icons, Width and Number of Files.
 *   Right Click any Image, Video, or Audio to Upload.
+*   Upload Directly to Albums with Context Menu.
 *   Right Click any URL to Shorten.
-*   Automatic Dark/Light Mode based on Browser Settings.
 *   Automatically Auth with Django Files.
+*   Automatic Dark/Light Mode based on Browser Settings.
 
-> [!TIP]
+> [!TIP]  
 > **Don't see your feature here?**
 > Request one on the [Feature Request Discussion](https://github.com/django-files/web-extension/discussions/categories/feature-requests).
 
@@ -66,6 +67,8 @@ Mobile browser support available for
 You can pin the Addon by clicking the `Puzzle Piece`, find the `Django Files icon`, then;  
 **Firefox**, click the `Settings Wheel` and `Pin to Toolbar`.  
 **Chrome**, click the `Pin` icon.
+
+More Information on the Website: [https://django-files.github.io/extension/](https://django-files.github.io/extension/#configure)
 
 ## Setup
 
