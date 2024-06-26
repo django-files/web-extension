@@ -52,6 +52,9 @@ async function screenshot(page, name) {
             target.type() === 'page' && target.url().endsWith('popup.html')
     )
     let popupPage = await popupTarget.asPage()
+    await popupPage.emulateMediaFeatures([
+        { name: 'prefers-color-scheme', value: 'dark' },
+    ])
     console.log('popupPage:', popupPage)
     // popupPage.on('console', (msg) => console.log('LOG: Popup:', msg.text()))
     await popupPage.waitForNetworkIdle()
@@ -89,6 +92,9 @@ async function screenshot(page, name) {
             target.type() === 'page' && target.url().endsWith('popup.html')
     )
     popupPage = await popupTarget.asPage()
+    await popupPage.emulateMediaFeatures([
+        { name: 'prefers-color-scheme', value: 'dark' },
+    ])
     console.log('popupPage:', popupPage)
     await popupPage.waitForNetworkIdle()
     await screenshot(popupPage, 'popup')
