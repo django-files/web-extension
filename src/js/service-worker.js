@@ -201,25 +201,11 @@ async function createContextMenus() {
     }
     console.debug('createContextMenus')
     chrome.contextMenus.removeAll()
-    const ctx = ['link', 'image', 'video', 'audio']
-    const contexts = [
-        [['image'], 'upload-image', 'normal', 'Upload Image'],
-        [['video'], 'upload-video', 'normal', 'Upload Video'],
-        [['audio'], 'upload-audio', 'normal', 'Upload Audio'],
-        [['link'], 'short', 'normal', 'Create Short URL'],
-        [['image', 'video', 'audio'], 'copy', 'normal', 'Copy Source URL'],
-        [ctx, 'separator-1', 'separator', 'separator'],
-        [ctx, 'options', 'normal', 'Open Options'],
-    ]
+    // Albums
     const albums = await getAlbums()
     console.debug('ctx: albums:', albums)
     if (albums?.length) {
-        addContext([
-            ['image', 'video'],
-            'upload-album',
-            'normal',
-            'Upload to Album',
-        ])
+        addContext([['image', 'video'], 'upload-album', 'Upload to Album'])
         for (const album of albums) {
             // console.debug('ctx: album:', album)
             chrome.contextMenus.create({
@@ -230,33 +216,45 @@ async function createContextMenus() {
             })
         }
     }
-    contexts.forEach((context) => {
-        addContext(context)
-    })
+    // General
+    const ctx = ['link', 'image', 'video', 'audio']
+    const contexts = [
+        [['image'], 'upload-image', 'Upload Image'],
+        [['video'], 'upload-video', 'Upload Video'],
+        [['audio'], 'upload-audio', 'Upload Audio'],
+        [['link'], 'short', 'Create Short URL'],
+        [['image', 'video', 'audio'], 'copy', 'Copy Source URL'],
+        [ctx, 'separator'],
+        [ctx, 'options', 'Open Options'],
+    ]
+    contexts.forEach(addContext)
 }
 
 /**
  * Add Context from Array or Separator from String
  * @function addContext
- * @param {Array,String} context
+ * @param {[[String],String,String]} context
+ * TODO: Update to handle parentId contexts
  */
 function addContext(context) {
-    if (typeof context === 'string') {
+    if (context[1] === 'separator') {
         const id = Math.random().toString().substring(2, 7)
-        context = [[context], id, 'separator', 'separator']
+        // context = [[context], id, 'separator', 'separator']
+        context[1] = `${id}`
+        context.push('separator', 'separator')
     }
     // console.debug('menus.create:', context)
     chrome.contextMenus.create({
         contexts: context[0],
         id: context[1],
-        type: context[2] || 'normal',
-        title: context[3],
+        title: context[2],
+        type: context[3] || 'normal',
     })
 }
 
 /**
  * @function getAlbums
- * @return {Array[String]}
+ * @return {[String]}
  */
 async function getAlbums() {
     const { options } = await chrome.storage.sync.get(['options'])
@@ -286,8 +284,12 @@ async function getAlbums() {
         console.warn('Error Fetching:', url)
         return
     }
-    /** @type {Array[String]} */
+    /** @type {[String]} */
     const albums = []
+    /**
+     * @type {Object}
+     * @property {[String]} albums
+     */
     for (const album of data.albums) {
         albums.push(album.name)
     }
