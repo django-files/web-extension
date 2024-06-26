@@ -6,6 +6,7 @@ chrome.commands?.onCommand.addListener(onCommand)
 chrome.contextMenus?.onClicked.addListener(contextMenusClicked)
 chrome.notifications.onClicked.addListener(notificationsClicked)
 chrome.storage.onChanged.addListener(onChanged)
+chrome.runtime.onMessage.addListener(onMessage)
 
 /**
  * On Startup Callback
@@ -50,6 +51,8 @@ async function onInstalled(details) {
             contextMenu: true,
             showUpdate: false,
             radioBackground: 'bgPicture',
+            pictureURL: 'https://picsum.photos/1920/1080',
+            videoURL: '',
         })
     )
     console.log('options:', options)
@@ -113,6 +116,16 @@ async function contextMenusClicked(ctx) {
             type = type.charAt(0).toUpperCase() + type.slice(1)
             await processRemote('remote', ctx.srcUrl, `${type} Uploaded`)
         }
+    } else if (ctx.menuItemId.startsWith('album')) {
+        const album = ctx.menuItemId.split('-')[1]
+        console.debug(`album: ${album}`)
+        const kwargs = { albums: album }
+        await processRemote(
+            'remote',
+            ctx.srcUrl,
+            `Uploaded to ${album}`,
+            kwargs
+        )
     } else if (ctx.menuItemId === 'short') {
         if (ctx.linkUrl) {
             await processRemote('shorten', ctx.linkUrl, 'Short Created')
@@ -165,33 +178,124 @@ function onChanged(changes, namespace) {
 }
 
 /**
+ * On Message Callback
+ * @function onMessage
+ * @param {Object} message
+ * @param {MessageSender} sender
+ * @param {Function} sendResponse
+ */
+function onMessage(message, sender, sendResponse) {
+    console.debug('onMessage: message, sender:', message, sender)
+    if (message === 'createContextMenus') {
+        createContextMenus()
+    }
+}
+
+/**
  * Create Context Menus
  * @function createContextMenus
  */
-function createContextMenus() {
+async function createContextMenus() {
     if (!chrome.contextMenus) {
         return console.debug('Skipping: chrome.contextMenus')
     }
     console.debug('createContextMenus')
     chrome.contextMenus.removeAll()
+    // Albums
+    const albums = await getAlbums()
+    console.debug('ctx: albums:', albums)
+    if (albums?.length) {
+        addContext([['image', 'video'], 'upload-album', 'Upload to Album'])
+        for (const album of albums) {
+            // console.debug('ctx: album:', album)
+            chrome.contextMenus.create({
+                contexts: ['image', 'video'],
+                id: `album-${album}`,
+                parentId: 'upload-album',
+                title: album,
+            })
+        }
+    }
+    // General
     const ctx = ['link', 'image', 'video', 'audio']
     const contexts = [
-        [['image'], 'upload-image', 'normal', 'Upload Image'],
-        [['video'], 'upload-video', 'normal', 'Upload Video'],
-        [['audio'], 'upload-audio', 'normal', 'Upload Audio'],
-        [['link'], 'short', 'normal', 'Create Short URL'],
-        [['image', 'video', 'audio'], 'copy', 'normal', 'Copy Source URL'],
-        [ctx, 'separator-1', 'separator', 'separator'],
-        [ctx, 'options', 'normal', 'Open Options'],
+        [['image'], 'upload-image', 'Upload Image'],
+        [['video'], 'upload-video', 'Upload Video'],
+        [['audio'], 'upload-audio', 'Upload Audio'],
+        [['link'], 'short', 'Create Short URL'],
+        [['image', 'video', 'audio'], 'copy', 'Copy Source URL'],
+        [ctx, 'separator'],
+        [ctx, 'options', 'Open Options'],
     ]
-    contexts.forEach((context) => {
-        chrome.contextMenus.create({
-            contexts: context[0],
-            id: context[1],
-            type: context[2],
-            title: context[3],
-        })
+    contexts.forEach(addContext)
+}
+
+/**
+ * Add Context from Array or Separator from String
+ * @function addContext
+ * @param {[[String],String,String]} context
+ * TODO: Update to handle parentId contexts
+ */
+function addContext(context) {
+    if (context[1] === 'separator') {
+        const id = Math.random().toString().substring(2, 7)
+        // context = [[context], id, 'separator', 'separator']
+        context[1] = `${id}`
+        context.push('separator', 'separator')
+    }
+    // console.debug('menus.create:', context)
+    chrome.contextMenus.create({
+        contexts: context[0],
+        id: context[1],
+        title: context[2],
+        type: context[3] || 'normal',
     })
+}
+
+/**
+ * @function getAlbums
+ * @return {[String]}
+ */
+async function getAlbums() {
+    const { options } = await chrome.storage.sync.get(['options'])
+    // console.debug('options:', options)
+    if (!options.siteUrl) {
+        console.warn('No Site URL:', options.siteUrl)
+        return
+    }
+    const opts = {
+        method: 'GET',
+        headers: { Authorization: options.authToken },
+    }
+    console.debug('opts:', opts)
+    let response
+    let data
+    const url = new URL(`${options.siteUrl}/api/albums/`)
+    console.debug('url:', url)
+    try {
+        response = await fetch(url, opts)
+        console.debug(`response.status: ${response.status}`, response)
+        if (!response?.ok) {
+            console.warn('Error Fetching:', url)
+            return
+        }
+        data = await response.json()
+    } catch (e) {
+        console.warn(e)
+        return
+    }
+    /** @type {[String]} */
+    const albums = []
+    /**
+     * @type {Object}
+     * @property {[String]} albums
+     */
+    for (const album of data.albums) {
+        albums.push(album.name)
+    }
+    albums.sort()
+    console.debug('albums:', albums)
+    return albums
 }
 
 /**
@@ -199,17 +303,18 @@ function createContextMenus() {
  * @function postURL
  * @param {String} endpoint
  * @param {String} url
+ * @param {Object=} kwargs Additional Header Key/Value Pairs
  * @return {Response}
  */
-async function postURL(endpoint, url) {
+async function postURL(endpoint, url, kwargs = {}) {
     console.debug('postURL:', endpoint, url)
     const { options } = await chrome.storage.sync.get(['options'])
     console.debug('options:', options)
     if (!options?.siteUrl || !options?.authToken) {
         throw new Error('Missing URL or Token.')
     }
-
-    const headers = { Authorization: options.authToken }
+    const headers = { ...{ Authorization: options.authToken }, ...kwargs }
+    console.debug('headers:', headers)
     const body = JSON.stringify({ url: url })
     const opts = {
         method: 'POST',
@@ -228,12 +333,13 @@ async function postURL(endpoint, url) {
  * @param {String} endpoint
  * @param {String} url
  * @param {String} message
+ * @param {Object=} kwargs Additional Header Key/Value Pairs
  */
-async function processRemote(endpoint, url, message) {
-    console.debug('processRemote:', endpoint, url, message)
+async function processRemote(endpoint, url, message, kwargs) {
+    console.debug('processRemote:', endpoint, url, message, kwargs)
     let response
     try {
-        response = await postURL(endpoint, url)
+        response = await postURL(endpoint, url, kwargs)
     } catch (e) {
         console.info('error:', e)
         return await sendNotification('Fetch Error', `Error: ${e.message}`)

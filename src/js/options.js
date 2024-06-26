@@ -2,6 +2,7 @@
 
 chrome.storage.onChanged.addListener(onChanged)
 document.addEventListener('DOMContentLoaded', initOptions)
+document.getElementById('reloadAlbums').addEventListener('click', reloadAlbums)
 document
     .querySelectorAll('#options-form input')
     .forEach((el) => el.addEventListener('change', saveOptions))
@@ -14,10 +15,15 @@ document
 document
     .querySelectorAll('.show-hide')
     .forEach((el) => el.addEventListener('click', showHidePassword))
+document
+    .querySelectorAll('.copy-password')
+    .forEach((el) => el.addEventListener('click', copyPassword))
+document
+    .getElementsByName('radioBackground')
+    .forEach((el) => el.addEventListener('change', loginBackgroundChange))
 
-const clipboard = new ClipboardJS('.clip')
-// clipboard.on('success', () => showToast('Copied to Clipboard'))
-// clipboard.on('error', () => showToast('Clipboard Copy Failed', 'warning'))
+const bgPictureInput = document.getElementById('bgPictureInput')
+const bgVideoInput = document.getElementById('bgVideoInput')
 
 /**
  * Initialize Options
@@ -32,12 +38,63 @@ async function initOptions() {
 
     const { options } = await chrome.storage.sync.get(['options'])
     console.debug('options:', options)
-    setBackground(options)
     updateOptions(options)
+    setBackground(options)
+    updateBackgroundInput(options.radioBackground)
     if (!options?.siteUrl) {
         const siteUrl = document.getElementById('siteUrl')
         siteUrl.placeholder = 'https://example.com'
         siteUrl.focus()
+    }
+}
+
+/**
+ * Reload Albums Callback
+ * @function reloadAlbums
+ * @param {MouseEvent} event
+ */
+async function reloadAlbums(event) {
+    event.preventDefault()
+    console.debug('reloadAlbums:', event)
+    const button = event.target.closest('button')
+    const icon = event.target.closest('i') || event.target.querySelector('i')
+    console.debug('button:', button)
+    console.debug('icon:', icon)
+    button.classList.add('disabled')
+    icon.classList.add('fa-spin')
+    await chrome.runtime.sendMessage('createContextMenus')
+    button.classList.remove('disabled')
+    icon.classList.remove('fa-spin')
+    const albumsUpdated = $('#albumsUpdated')
+    albumsUpdated.fadeToggle()
+    setTimeout(() => albumsUpdated.fadeToggle(), 3000)
+}
+
+/**
+ * Login Background Change Callback
+ * @function loginBackgroundChange
+ * @param {InputEvent} event
+ */
+function loginBackgroundChange(event) {
+    console.debug('loginBackgroundChange:', event.target.id)
+    updateBackgroundInput(event.target.id)
+}
+
+/**
+ * Update Background Inputs
+ * @function updateBackgroundInput
+ * @param {Object} value
+ */
+function updateBackgroundInput(value) {
+    if (value === 'bgPicture') {
+        bgPictureInput.classList.remove('d-none')
+        bgVideoInput.classList.add('d-none')
+    } else if (value === 'bgVideo') {
+        bgPictureInput.classList.add('d-none')
+        bgVideoInput.classList.remove('d-none')
+    } else {
+        bgPictureInput.classList.add('d-none')
+        bgVideoInput.classList.add('d-none')
     }
 }
 
@@ -55,26 +112,35 @@ function onChanged(changes, namespace) {
             if (oldValue.radioBackground !== newValue.radioBackground) {
                 setBackground(newValue)
             }
+            if (
+                oldValue.pictureURL !== newValue.pictureURL ||
+                oldValue.videoURL !== newValue.videoURL
+            ) {
+                setBackground(newValue)
+            }
         }
     }
 }
 
 function setBackground(options) {
+    console.debug('setBackground:', options)
+    const video = document.querySelector('video')
     if (options.radioBackground === 'bgPicture') {
-        console.debug('setBackground:', options)
-        document.body.style.background =
-            "url('https://picsum.photos/1920/1080') no-repeat center fixed"
+        const url = options.pictureURL || 'https://picsum.photos/1920/1080'
+        document.body.style.background = `url('${url}') no-repeat center fixed`
         document.body.style.webkitBackgroundSize = 'cover'
         document.body.style.mozBackgroundSize = 'cover'
         document.body.style.oBackgroundSize = 'cover'
         document.body.style.backgroundSize = 'cover'
-        document.querySelector('video').classList.add('d-none')
+        video.classList.add('d-none')
     } else if (options.radioBackground === 'bgVideo') {
-        document.querySelector('video').classList.remove('d-none')
+        const src = options.videoURL || '/media/loop.mp4'
+        video.classList.remove('d-none')
+        video.src = src
         document.body.style.cssText = ''
     } else {
         document.body.style.cssText = ''
-        document.querySelector('video').classList.add('d-none')
+        video.classList.add('d-none')
     }
 }
 
@@ -168,6 +234,7 @@ function updateOptions(options) {
 }
 
 function hideShowElement(selector, show, speed = 'fast') {
+    // console.debug('hideShowElement:', selector, show, speed)
     const element = $(`${selector}`)
     // console.debug('hideShowElement:', show, element)
     if (show) {
@@ -210,12 +277,18 @@ function showHidePassword(event) {
     console.debug('showHidePassword:', event)
     const element = event.target.closest('button')
     const input = document.querySelector(element.dataset.selector)
-    const button = document.querySelector(element.dataset.button)
     if (input.type === 'password') {
         input.type = 'text'
-        button?.classList.remove('disabled')
     } else {
         input.type = 'password'
-        button?.classList.add('disabled')
     }
+}
+
+async function copyPassword(event) {
+    console.debug('copyPassword:', event)
+    const element = event.target.closest('button')
+    const input = document.querySelector(element.dataset.selector)
+    console.debug('input:', input)
+    await navigator.clipboard.writeText(input.value)
+    // showToast('Copied to Clipboard.')
 }
