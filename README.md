@@ -14,7 +14,7 @@
 [Django Files](https://github.com/django-files/django-files) to view recent uploads, shorten URLs,
 and upload any Image, Video or Audio files with right click.
 
-> [!TIP]  
+> [!IMPORTANT]  
 > This Web Extension is designed to work with [Django Files](https://github.com/django-files/django-files).
 
 ## Table of Contents
@@ -31,28 +31,34 @@ and upload any Image, Video or Audio files with right click.
 *   [Google Chrome Web Store](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
 *   [Mozilla Firefox Add-ons](https://addons.mozilla.org/addon/django-files)
 
-[![Chrome](https://raw.githubusercontent.com/alrra/browser-logos/main/src/chrome/chrome_48x48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
-[![Firefox](https://raw.githubusercontent.com/alrra/browser-logos/main/src/firefox/firefox_48x48.png)](https://addons.mozilla.org/addon/django-files)
-[![Edge](https://raw.githubusercontent.com/alrra/browser-logos/main/src/edge/edge_48x48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
-[![Chromium](https://raw.githubusercontent.com/alrra/browser-logos/main/src/chromium/chromium_48x48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
-[![Brave](https://raw.githubusercontent.com/alrra/browser-logos/main/src/brave/brave_48x48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
-[![Vivaldi](https://raw.githubusercontent.com/alrra/browser-logos/main/src/vivaldi/vivaldi_48x48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
-[![Opera](https://raw.githubusercontent.com/alrra/browser-logos/main/src/opera/opera_48x48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
+[![Chrome](https://raw.githubusercontent.com/smashedr/logo-icons/master/browsers/chrome_48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
+[![Firefox](https://raw.githubusercontent.com/smashedr/logo-icons/master/browsers/firefox_48.png)](https://addons.mozilla.org/addon/django-files)
+[![Edge](https://raw.githubusercontent.com/smashedr/logo-icons/master/browsers/edge_48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
+[![Chromium](https://raw.githubusercontent.com/smashedr/logo-icons/master/browsers/chromium_48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
+[![Brave](https://raw.githubusercontent.com/smashedr/logo-icons/master/browsers/brave_48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
+[![Opera](https://raw.githubusercontent.com/smashedr/logo-icons/master/browsers/opera_48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
+[![Kiwi](https://raw.githubusercontent.com/smashedr/logo-icons/master/browsers/kiwi_48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
 
 All Chromium Based Browsers can install the extension from the
 [Chrome Web Store](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej).
+
+Mobile browser support available for
+[Firefox](https://addons.mozilla.org/addon/link-extractor) and
+[Kiwi](https://chromewebstore.google.com/detail/link-extractor/ifefifghpkllfibejafbakmflidjcjfp).
 
 ## Features
 
 *   View Recent Uploads on Popup
 *   Preview Popup Images on Hover.
 *   Set Private, Password, and Expiration.
+*   Customize Popup Icons, Width and Number of Files.
 *   Right Click any Image, Video, or Audio to Upload.
+*   Upload Directly to Albums with Context Menu.
 *   Right Click any URL to Shorten.
-*   Automatic Dark/Light Mode based on Browser Settings.
 *   Automatically Auth with Django Files.
+*   Automatic Dark/Light Mode based on Browser Settings.
 
-> [!TIP]
+> [!TIP]  
 > **Don't see your feature here?**
 > Request one on the [Feature Request Discussion](https://github.com/django-files/web-extension/discussions/categories/feature-requests).
 
@@ -61,6 +67,8 @@ All Chromium Based Browsers can install the extension from the
 You can pin the Addon by clicking the `Puzzle Piece`, find the `Django Files icon`, then;  
 **Firefox**, click the `Settings Wheel` and `Pin to Toolbar`.  
 **Chrome**, click the `Pin` icon.
+
+More Information on the Website: [https://django-files.github.io/extension/](https://django-files.github.io/extension/#configure)
 
 ## Setup
 

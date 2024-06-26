@@ -109,6 +109,23 @@ async function getPage(name, log, size) {
     await page.keyboard.press('Enter')
     // await page.locator('.show-hide').click()
     await screenshot('options')
+
+    await page.locator('#reloadAlbums').click()
+    await page.waitForNetworkIdle()
+    await screenshot('options')
+
+    await page
+        .locator('.form-check:nth-of-type(3) input[name="radioBackground"]')
+        .click()
+    await page.waitForNetworkIdle()
+    await screenshot('options')
+
+    await page
+        .locator('.form-check:nth-of-type(1) input[name="radioBackground"]')
+        .click()
+    await page.waitForNetworkIdle()
+    await screenshot('options')
+
     await page.close()
 
     // // DF -https://github.com/puppeteer/puppeteer/issues/2486
@@ -123,6 +140,23 @@ async function getPage(name, log, size) {
     await worker.evaluate('chrome.action.openPopup();')
     page = await getPage('popup.html')
     console.log('page:', page)
+    await page.waitForNetworkIdle()
+    await screenshot('popup')
+
+    await page.hover('tr')
+    await page.locator('.ctx-button').click()
+    await page.waitForNetworkIdle()
+    await screenshot('popup')
+
+    await page.locator('[data-action="private"]').click()
+    await page.hover('tr')
+    await page.waitForNetworkIdle()
+    await screenshot('popup')
+
+    await page.hover('tr')
+    await page.locator('.ctx-button').click()
+    await page.locator('[data-action="private"]').click()
+    await page.hover('tr')
     await page.waitForNetworkIdle()
     await screenshot('popup')
 
