@@ -126,5 +126,22 @@ async function getPage(name, log, size) {
     await page.waitForNetworkIdle()
     await screenshot('popup')
 
+    await page.hover('tr')
+    await page.locator('.ctx-button').click()
+    await page.waitForNetworkIdle()
+    await screenshot('popup')
+
+    await page.locator('[data-action="private"]').click()
+    await page.hover('tr')
+    await page.waitForNetworkIdle()
+    await screenshot('popup')
+
+    await page.hover('tr')
+    await page.locator('.ctx-button').click()
+    await page.locator('[data-action="private"]').click()
+    await page.hover('tr')
+    await page.waitForNetworkIdle()
+    await screenshot('popup')
+
     await browser.close()
 })()
