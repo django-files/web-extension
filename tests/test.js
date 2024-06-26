@@ -109,6 +109,23 @@ async function getPage(name, log, size) {
     await page.keyboard.press('Enter')
     // await page.locator('.show-hide').click()
     await screenshot('options')
+
+    await page.locator('#reloadAlbums').click()
+    await page.waitForNetworkIdle()
+    await screenshot('options')
+
+    await page
+        .locator('.form-check:nth-of-type(3) input[name="radioBackground"]')
+        .click()
+    await page.waitForNetworkIdle()
+    await screenshot('options')
+
+    await page
+        .locator('.form-check:nth-of-type(1) input[name="radioBackground"]')
+        .click()
+    await page.waitForNetworkIdle()
+    await screenshot('options')
+
     await page.close()
 
     // // DF -https://github.com/puppeteer/puppeteer/issues/2486
