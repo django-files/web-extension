@@ -2,8 +2,8 @@ const puppeteer = require('puppeteer')
 const path = require('path')
 const fs = require('fs')
 
-const siteUrl = 'https://intranet.cssnr.com'
-const authToken = ''
+const siteUrl = process.env.DF_URL
+const authToken = process.env.DF_TOKEN
 
 let count = 1
 
@@ -38,20 +38,20 @@ async function screenshot(page, name) {
     const worker = await workerTarget.worker()
     console.log('worker:', worker)
 
-    // Open Popup
+    // Popup
     await worker.evaluate('chrome.action.openPopup();')
-    const popupTarget = await browser.waitForTarget(
+    let popupTarget = await browser.waitForTarget(
         (target) =>
             target.type() === 'page' && target.url().endsWith('popup.html')
     )
-    const popupPage = await popupTarget.asPage()
+    let popupPage = await popupTarget.asPage()
     console.log('popupPage:', popupPage)
     popupPage.on('console', (msg) => console.log('LOG: Popup:', msg.text()))
     await popupPage.waitForNetworkIdle()
     await screenshot(popupPage, 'popup')
     await popupPage.locator('[href="../html/options.html"]').click()
 
-    // Open Options
+    // Options
     // await worker.evaluate('chrome.runtime.openOptionsPage();')
     const optionsTarget = await browser.waitForTarget(
         (target) =>
@@ -73,8 +73,18 @@ async function screenshot(page, name) {
     await optionsPage.locator('.show-hide').click()
     await screenshot(optionsPage, 'options')
     await optionsPage.close()
-
     // await optionsPage.close()
+
+    // Popup
+    await worker.evaluate('chrome.action.openPopup();')
+    popupTarget = await browser.waitForTarget(
+        (target) =>
+            target.type() === 'page' && target.url().endsWith('popup.html')
+    )
+    popupPage = await popupTarget.asPage()
+    console.log('popupPage:', popupPage)
+    await popupPage.waitForNetworkIdle()
+    await screenshot(popupPage, 'popup')
 
     await browser.close()
 })()
