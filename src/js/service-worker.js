@@ -274,14 +274,14 @@ async function getAlbums() {
     console.debug('url:', url)
     try {
         response = await fetch(url, opts)
+        console.debug(`response.status: ${response.status}`, response)
+        if (!response?.ok) {
+            console.warn('Error Fetching:', url)
+            return
+        }
         data = await response.json()
     } catch (e) {
         console.warn(e)
-        return
-    }
-    console.debug(`response.status: ${response.status}`, response, data)
-    if (!response?.ok) {
-        console.warn('Error Fetching:', url)
         return
     }
     /** @type {[String]} */
@@ -303,7 +303,7 @@ async function getAlbums() {
  * @function postURL
  * @param {String} endpoint
  * @param {String} url
- * @param {Object} [kwargs] Additional Header Key/Value Pairs
+ * @param {Object=} kwargs Additional Header Key/Value Pairs
  * @return {Response}
  */
 async function postURL(endpoint, url, kwargs = {}) {
@@ -333,7 +333,7 @@ async function postURL(endpoint, url, kwargs = {}) {
  * @param {String} endpoint
  * @param {String} url
  * @param {String} message
- * @param {Object} [kwargs] Additional Header Key/Value Pairs
+ * @param {Object=} kwargs Additional Header Key/Value Pairs
  */
 async function processRemote(endpoint, url, message, kwargs) {
     console.debug('processRemote:', endpoint, url, message, kwargs)
