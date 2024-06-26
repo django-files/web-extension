@@ -42,6 +42,7 @@ async function screenshot(name) {
  * @return {import('puppeteer').Page}
  */
 async function getPage(name, log, size) {
+    console.debug(`getPage: ${name}`, log, size)
     const target = await browser.waitForTarget(
         (target) => target.type() === 'page' && target.url().endsWith(name)
     )
@@ -54,7 +55,10 @@ async function getPage(name, log, size) {
         await page.setViewport({ width, height })
     }
     if (log) {
-        page.on('console', (msg) => console.log(`${name}:`, msg.text()))
+        console.debug(`Adding Logger: ${name}`)
+        page.on('console', (msg) =>
+            console.log(`console: ${name}:`, msg.text())
+        )
     }
     return page
 }
@@ -67,9 +71,9 @@ async function getPage(name, log, size) {
             `--disable-extensions-except=${pathToExtension}`,
             `--load-extension=${pathToExtension}`,
         ],
+        dumpio: true,
         // headless: false,
-        // slowMo: 100,
-        // dumpio: true,
+        // slowMo: 150,
     })
     console.log('browser:', browser)
 
@@ -97,7 +101,6 @@ async function getPage(name, log, size) {
     // await page.setViewport({ width: 1920, height: 1080 })
     await page.waitForNetworkIdle()
     await screenshot('options')
-
     await page.locator('#siteUrl').fill(siteUrl)
     await page.keyboard.press('Enter')
     await page.locator('#authToken').fill(authToken)
@@ -107,12 +110,17 @@ async function getPage(name, log, size) {
     await screenshot('options')
     await page.close()
 
+    // // DF -https://github.com/puppeteer/puppeteer/issues/2486
+    // page = await browser.newPage()
+    // await page.goto('https://f-dev.cssnr.com/')
+    // await page.locator('#username').fill(dfUser)
+    // await page.locator('#password').fill(dfPass)
+    // await page.locator('#login-button').click()
+    // await page.waitForSelector('#navbarDropdown', { visible: true })
+
     // Popup
     await worker.evaluate('chrome.action.openPopup();')
     page = await getPage('popup.html')
-    await page.emulateMediaFeatures([
-        { name: 'prefers-color-scheme', value: 'dark' },
-    ])
     console.log('page:', page)
     await page.waitForNetworkIdle()
     await screenshot('popup')
