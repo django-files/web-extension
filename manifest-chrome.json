@@ -2,6 +2,9 @@
   "background": {
     "service_worker": "js/service-worker.js"
   },
-  "permissions": ["offscreen"],
+  "permissions": ["offscreen", "sidePanel"],
+  "side_panel": {
+    "default_path": "html/sidepanel.html"
+  },
   "minimum_chrome_version": "109"
 }

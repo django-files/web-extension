@@ -98,6 +98,8 @@ async function onCommand(command) {
             const url = `${options.siteUrl}/gallery/`
             await chrome.tabs.create({ active: true, url })
         }
+    } else if (command === 'showSidePanel') {
+        await openSidePanel()
     } else {
         console.warn('Unknown Command:', command)
     }
@@ -134,6 +136,8 @@ async function contextMenusClicked(ctx) {
         if (ctx.srcUrl) {
             await clipboardWrite(ctx.srcUrl)
         }
+    } else if (ctx.menuItemId === 'side-panel') {
+        await openSidePanel()
     } else if (ctx.menuItemId === 'options') {
         chrome.runtime.openOptionsPage()
     } else {
@@ -217,15 +221,15 @@ async function createContextMenus() {
         }
     }
     // General
-    const ctx = ['link', 'image', 'video', 'audio']
     const contexts = [
         [['image'], 'upload-image', 'Upload Image'],
         [['video'], 'upload-video', 'Upload Video'],
         [['audio'], 'upload-audio', 'Upload Audio'],
         [['link'], 'short', 'Create Short URL'],
         [['image', 'video', 'audio'], 'copy', 'Copy Source URL'],
-        [ctx, 'separator'],
-        [ctx, 'options', 'Open Options'],
+        [['all'], 'separator'],
+        [['all'], 'side-panel', 'Show Side Panel'],
+        [['all'], 'options', 'Open Options'],
     ]
     contexts.forEach(addContext)
 }
@@ -411,6 +415,30 @@ async function clipboardWrite(value) {
             data: value,
         })
     }
+}
+
+/**
+ * Open Side Panel Callback
+ * @function openSidePanel
+ * @param {MouseEvent} [event]
+ */
+async function openSidePanel(event) {
+    console.debug('openSidePanel:', event)
+    if (chrome.sidePanel) {
+        chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+            chrome.sidePanel.open({ windowId: tab.windowId })
+        })
+    } else if (chrome.sidebarAction) {
+        await chrome.sidebarAction.open()
+    } else {
+        console.log('Side Panel Not Supported')
+        // if (event) {
+        //     return
+        // }
+    }
+    // if (event) {
+    //     window.close()
+    // }
 }
 
 /**
