@@ -64,6 +64,7 @@ clipboard.on('success', () => showToast('Copied to Clipboard'))
 clipboard.on('error', () => showToast('Clipboard Copy Failed', 'warning'))
 
 const loadingImage = '../media/loading.gif'
+let uppyInit = false
 let authError = false
 let timeoutID
 let timeout
@@ -151,49 +152,7 @@ async function initPopup() {
     genLoadingData(options.recentFiles)
 
     // Init Uppy
-    const uppy = new Uppy({ debug: true, autoProceed: false })
-        .use(Dashboard, {
-            inline: true,
-            theme: 'auto',
-            target: '#uppy',
-            showProgressDetails: true,
-            showLinkToFileUploadResult: true,
-            autoOpenFileEditor: true,
-            proudlyDisplayPoweredByUppy: false,
-            note: 'Django Files Upload',
-            height: 260,
-            width: '100%',
-            metaFields: [
-                { id: 'name', name: 'Name', placeholder: 'File Name' },
-                {
-                    id: 'Expires-At',
-                    name: 'Expires At',
-                    placeholder: 'File Expiration Time.',
-                },
-                {
-                    id: 'info',
-                    name: 'Info',
-                    placeholder: 'Information about the file.',
-                },
-            ],
-            browserBackButtonClose: false,
-        })
-        .use(XHRUpload, {
-            endpoint: options.siteUrl + '/upload/',
-            headers: {
-                Authorization: options.authToken,
-            },
-            // getResponseError: getResponseError,
-        })
-        .use(DropTarget, {
-            target: document.body,
-        })
-
-    uppy.on('file-added', (file) => {
-        console.debug('file-added:', file)
-        uppyModal.show()
-        mediaOuter.classList.add('d-none')
-    })
+    initUppy(options)
 
     // Check Django Files API for recent files
     const opts = {
@@ -257,6 +216,52 @@ async function initPopup() {
     if (options.popupPreview) {
         initPopupMouseover()
     }
+}
+
+function initUppy(options) {
+    if (uppyInit) {
+        return console.debug('Uppy Already Initialized')
+    }
+    uppyInit = true
+    const uppy = new Uppy({ debug: true, autoProceed: false })
+        .use(Dashboard, {
+            inline: true,
+            theme: 'auto',
+            target: '#uppy',
+            showProgressDetails: true,
+            showLinkToFileUploadResult: true,
+            autoOpenFileEditor: true,
+            proudlyDisplayPoweredByUppy: false,
+            note: 'Django Files Upload',
+            height: 260,
+            width: '100%',
+            browserBackButtonClose: false,
+        })
+        .use(XHRUpload, {
+            endpoint: options.siteUrl + '/upload/',
+            headers: {
+                Authorization: options.authToken,
+            },
+            // getResponseError: getResponseError,
+        })
+        .use(DropTarget, {
+            target: document.body,
+        })
+
+    uppy.on('file-added', (file) => {
+        console.debug('file-added:', file)
+        uppyModal.show()
+        mediaOuter.classList.add('d-none')
+    })
+
+    uppy.on('complete', async (fileCount) => {
+        console.debug('complete:', fileCount)
+        await initPopup()
+    })
+
+    uppy.on('dashboard:modal-closed', () => {
+        console.log('dashboard:modal-closed')
+    })
 }
 
 /**
