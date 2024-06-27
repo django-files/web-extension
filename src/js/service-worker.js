@@ -227,7 +227,7 @@ async function createContextMenus() {
         [['audio'], 'upload-audio', 'Upload Audio'],
         [['link'], 'short', 'Create Short URL'],
         [['image', 'video', 'audio'], 'copy', 'Copy Source URL'],
-        [['all'], 'separator'],
+        [['image', 'video', 'audio', 'link'], 'separator'],
         [['all'], 'side-panel', 'Show Side Panel'],
         [['all'], 'options', 'Open Options'],
     ]
