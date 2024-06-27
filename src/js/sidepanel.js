@@ -35,7 +35,7 @@ async function domContentLoaded() {
             autoOpenFileEditor: true,
             proudlyDisplayPoweredByUppy: false,
             note: 'Django Files Upload',
-            height: 200,
+            height: 260,
             width: '100%',
             metaFields: [
                 { id: 'name', name: 'Name', placeholder: 'File Name' },
@@ -60,7 +60,9 @@ async function domContentLoaded() {
             headers: {
                 Authorization: options.authToken,
             },
-            getResponseError: getResponseError,
+            getResponseError: function (responseText, response) {
+                return new Error(JSON.parse(responseText).message)
+            },
         })
         .use(DropTarget, {
             target: document.body,
@@ -85,11 +87,6 @@ async function domContentLoaded() {
     uppy.on('error', (error) => {
         console.debug('error:', error)
     })
-}
-
-function getResponseError(responseText, response) {
-    console.log('getResponseError:', responseText, response)
-    return new Error(JSON.parse(responseText).message)
 }
 
 /**

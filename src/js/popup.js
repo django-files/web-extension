@@ -1,5 +1,12 @@
 // JS for popup.html
 
+import {
+    Uppy,
+    Dashboard,
+    DropTarget,
+    XHRUpload,
+} from '../dist/uppy/uppy.min.mjs'
+
 chrome.runtime.onMessage.addListener(onMessage)
 document.addEventListener('DOMContentLoaded', initPopup)
 document.getElementById('expire-form').addEventListener('submit', expireForm)
@@ -46,6 +53,7 @@ const passwordInput = document.getElementById('password-input')
 const deleteModal = bootstrap.Modal.getOrCreateInstance('#delete-modal')
 const expireModal = bootstrap.Modal.getOrCreateInstance('#expire-modal')
 const passwordModal = bootstrap.Modal.getOrCreateInstance('#password-modal')
+const uppyModal = bootstrap.Modal.getOrCreateInstance('#uppy-modal')
 
 const faHourglass = document.querySelector('.clone > i.fa-hourglass')
 const faLock = document.querySelector('.clone > i.fa-lock')
@@ -141,6 +149,51 @@ async function initPopup() {
     }
     filesTable.classList.remove('d-none')
     genLoadingData(options.recentFiles)
+
+    // Init Uppy
+    const uppy = new Uppy({ debug: true, autoProceed: false })
+        .use(Dashboard, {
+            inline: true,
+            theme: 'auto',
+            target: '#uppy',
+            showProgressDetails: true,
+            showLinkToFileUploadResult: true,
+            autoOpenFileEditor: true,
+            proudlyDisplayPoweredByUppy: false,
+            note: 'Django Files Upload',
+            height: 260,
+            width: '100%',
+            metaFields: [
+                { id: 'name', name: 'Name', placeholder: 'File Name' },
+                {
+                    id: 'Expires-At',
+                    name: 'Expires At',
+                    placeholder: 'File Expiration Time.',
+                },
+                {
+                    id: 'info',
+                    name: 'Info',
+                    placeholder: 'Information about the file.',
+                },
+            ],
+            browserBackButtonClose: false,
+        })
+        .use(XHRUpload, {
+            endpoint: options.siteUrl + '/upload/',
+            headers: {
+                Authorization: options.authToken,
+            },
+            // getResponseError: getResponseError,
+        })
+        .use(DropTarget, {
+            target: document.body,
+        })
+
+    uppy.on('file-added', (file) => {
+        console.debug('file-added:', file)
+        uppyModal.show()
+        mediaOuter.classList.add('d-none')
+    })
 
     // Check Django Files API for recent files
     const opts = {
