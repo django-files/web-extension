@@ -1,4 +1,5 @@
 const gulp = require('gulp')
+const download = require('gulp-download2')
 
 gulp.task('bootstrap', () => {
     return gulp
@@ -34,7 +35,14 @@ gulp.task('jquery', () => {
         .pipe(gulp.dest('src/dist/jquery'))
 })
 
+gulp.task('uppy', () => {
+    return download([
+        'https://releases.transloadit.com/uppy/v3.27.0/uppy.min.mjs',
+        'https://releases.transloadit.com/uppy/v3.27.0/uppy.min.css',
+    ]).pipe(gulp.dest('src/dist/uppy'))
+})
+
 gulp.task(
     'default',
-    gulp.parallel('bootstrap', 'clipboard', 'fontawesome', 'jquery')
+    gulp.parallel('bootstrap', 'clipboard', 'fontawesome', 'jquery', 'uppy')
 )
