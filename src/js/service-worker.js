@@ -1,5 +1,7 @@
 // JS Background Service Worker
 
+import { openSidePanel } from './exports.js'
+
 chrome.runtime.onStartup.addListener(onStartup)
 chrome.runtime.onInstalled.addListener(onInstalled)
 chrome.commands?.onCommand.addListener(onCommand)
@@ -19,7 +21,7 @@ async function onStartup() {
         const { options } = await chrome.storage.sync.get(['options'])
         console.debug('options:', options)
         if (options.contextMenu) {
-            createContextMenus()
+            createContextMenus(options)
         }
     }
 }
@@ -46,8 +48,10 @@ async function onInstalled(details) {
             iconPassword: true,
             iconExpire: false,
             popupLinks: true,
+            popupSidePanel: true,
             checkAuth: true,
             deleteConfirm: true,
+            ctxSidePanel: true,
             contextMenu: true,
             showUpdate: false,
             radioBackground: 'bgPicture',
@@ -57,7 +61,7 @@ async function onInstalled(details) {
     )
     console.log('options:', options)
     if (options.contextMenu) {
-        createContextMenus()
+        createContextMenus(options)
     }
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage()
@@ -87,17 +91,20 @@ async function onInstalled(details) {
  */
 async function onCommand(command) {
     console.debug(`onCommand: ${command}`)
-    const { options } = await chrome.storage.sync.get(['options'])
     if (command === 'uploadFile') {
+        const { options } = await chrome.storage.sync.get(['options'])
         if (options.siteUrl) {
             const url = `${options.siteUrl}/uppy/`
             await chrome.tabs.create({ active: true, url })
         }
     } else if (command === 'openGallery') {
+        const { options } = await chrome.storage.sync.get(['options'])
         if (options.siteUrl) {
             const url = `${options.siteUrl}/gallery/`
             await chrome.tabs.create({ active: true, url })
         }
+    } else if (command === 'showSidePanel') {
+        await openSidePanel()
     } else {
         console.warn('Unknown Command:', command)
     }
@@ -134,6 +141,8 @@ async function contextMenusClicked(ctx) {
         if (ctx.srcUrl) {
             await clipboardWrite(ctx.srcUrl)
         }
+    } else if (ctx.menuItemId === 'side-panel') {
+        await openSidePanel()
     } else if (ctx.menuItemId === 'options') {
         chrome.runtime.openOptionsPage()
     } else {
@@ -164,13 +173,16 @@ function onChanged(changes, namespace) {
     // console.debug('onChanged:', changes, namespace)
     for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
         if (key === 'options' && namespace === 'sync' && oldValue && newValue) {
-            if (oldValue.contextMenu !== newValue.contextMenu) {
+            if (
+                oldValue.contextMenu !== newValue.contextMenu ||
+                oldValue.ctxSidePanel !== newValue.ctxSidePanel
+            ) {
                 if (newValue?.contextMenu) {
                     console.log('Enabled contextMenu...')
-                    createContextMenus()
+                    createContextMenus(newValue)
                 } else {
                     console.log('Disabled contextMenu...')
-                    chrome.contextMenus.removeAll()
+                    chrome.contextMenus?.removeAll()
                 }
             }
         }
@@ -187,7 +199,9 @@ function onChanged(changes, namespace) {
 function onMessage(message, sender, sendResponse) {
     console.debug('onMessage: message, sender:', message, sender)
     if (message === 'createContextMenus') {
-        createContextMenus()
+        chrome.storage.sync.get(['options'], (items) => {
+            createContextMenus(items.options)
+        })
     }
 }
 
@@ -195,11 +209,11 @@ function onMessage(message, sender, sendResponse) {
  * Create Context Menus
  * @function createContextMenus
  */
-async function createContextMenus() {
+async function createContextMenus(options) {
     if (!chrome.contextMenus) {
         return console.debug('Skipping: chrome.contextMenus')
     }
-    console.debug('createContextMenus')
+    console.debug('createContextMenus:', options)
     chrome.contextMenus.removeAll()
     // Albums
     const albums = await getAlbums()
@@ -217,7 +231,7 @@ async function createContextMenus() {
         }
     }
     // General
-    const ctx = ['link', 'image', 'video', 'audio']
+    const ctx = ['image', 'video', 'audio', 'link']
     const contexts = [
         [['image'], 'upload-image', 'Upload Image'],
         [['video'], 'upload-video', 'Upload Video'],
@@ -225,8 +239,15 @@ async function createContextMenus() {
         [['link'], 'short', 'Create Short URL'],
         [['image', 'video', 'audio'], 'copy', 'Copy Source URL'],
         [ctx, 'separator'],
-        [ctx, 'options', 'Open Options'],
     ]
+    if (options.ctxSidePanel) {
+        contexts.push(
+            [['all'], 'side-panel', 'Show Side Panel'],
+            [['all'], 'options', 'Open Options']
+        )
+    } else {
+        contexts.push([ctx, 'options', 'Open Options'])
+    }
     contexts.forEach(addContext)
 }
 

@@ -7,6 +7,7 @@
     <link rel="icon" href="../media/logo16.png" sizes="any">
     <link rel="stylesheet" type="text/css" href="../dist/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../dist/fontawesome/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="../dist/uppy/uppy.min.css">
     <link rel="stylesheet" type="text/css" href="../css/main.css">
     <link rel="stylesheet" type="text/css" href="../css/popup.css">
     <script type="text/javascript" src="../js/theme.js"></script>
@@ -22,12 +23,14 @@
         </div>
         <a class="btn btn-sm btn-outline-primary float-end ms-2" role="button" href="../html/options.html" title="Options">
             <i class="fa-solid fa-gears"></i></a>
+        <button id="side-panel" class="btn btn-sm btn-outline-info float-end ms-2 d-none" type="button" title="Side Panel">
+            <i class="fa-solid fa-table-columns"></i></button>
         <a id="always-auth" class="d-none btn btn-sm btn-outline-warning float-end add-auth" role="button"
            data-bs-title="Update Authentication with Current Site." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
             <i class="fa-solid fa-key"></i></a>
-        <div class="d-flex align-items-center overflow-hidden text-nowrap">
+        <div class="d-flex align-items-center text-nowrap">
             <a href=""><img src="../media/logo32.png" class="me-1" height="32" width="32" alt="Django Files"></a>
-            <h4 class="my-0"><a class="link-body-emphasis text-decoration-none" href="">Django Files</a></h4>
+            <h4 class="my-0 popup-heading"><a class="link-body-emphasis text-decoration-none" href="">Django Files</a></h4>
         </div>
     </div>
 
@@ -51,16 +54,14 @@
         To automatically authenticate, visit your Django Files Website, then check back here...
     </div>
 
-    <div id="table-wrapper">
-        <table id="files-table" class="d-none table table-striped table-hover table-sm small align-middle mb-1">
-            <caption class="visually-hidden">Recent Uploads</caption>
-            <thead class="visually-hidden"><tr><th>File URL</th></tr></thead>
-            <tbody></tbody>
-            <tfoot class="d-none">
-            <tr><td class="placeholder-glow"><span class="placeholder" style="width: 100%;"></span></td></tr>
-            </tfoot>
-        </table>
-    </div>
+    <table id="files-table" class="d-none table table-striped table-hover table-sm small align-middle mb-1">
+        <caption class="visually-hidden">Recent Uploads</caption>
+        <thead class="visually-hidden"><tr><th>File URL</th></tr></thead>
+        <tbody></tbody>
+        <tfoot class="d-none">
+        <tr><td class="placeholder-glow"><span class="placeholder" style="width: 100%;"></span></td></tr>
+        </tfoot>
+    </table>
 </div> <!-- container-fluid -->
 
 <div id="media-outer" class="d-none position-fixed top-0 p-1 w-100">
@@ -137,7 +138,7 @@
     </div>
 </div> <!-- modal-content -->
 </div> <!-- modal-dialog -->
-</div> <!-- modal -->
+</div> <!-- delete-modal -->
 
 <div class="modal fade" id="expire-modal" tabindex="-1" aria-hidden="true">
 <div class="modal-dialog modal-dialog-centered">
@@ -164,7 +165,7 @@
     </div>
 </div> <!-- modal-content -->
 </div> <!-- modal-dialog -->
-</div> <!-- modal -->
+</div> <!-- expire-modal -->
 
 <div class="modal fade" id="password-modal" tabindex="-1" aria-hidden="true">
 <div class="modal-dialog modal-dialog-centered">
@@ -186,12 +187,22 @@
     </div>
 </div> <!-- modal-content -->
 </div> <!-- modal-dialog -->
-</div> <!-- modal -->
+</div> <!-- password-modal -->
+
+<div class="modal fade" id="uppy-modal" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content">
+    <div class="modal-body p-2">
+        <div id="uppy" class="my-2"></div>
+    </div>
+</div> <!-- modal-content -->
+</div> <!-- modal-dialog -->
+</div> <!-- uppy-modal -->
 
 <script type="text/javascript" src="../dist/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="../dist/bootstrap/bootstrap.bundle.min.js"></script>
 <script type="text/javascript" src="../dist/clipboard/clipboard.min.js"></script>
-<script type="text/javascript" src="../js/popup.js"></script>
+<script type="module" src="../js/popup.js"></script>
 
 </body>
 </html>

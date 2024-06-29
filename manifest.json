@@ -12,6 +12,12 @@
       },
       "description": "Show Popup"
     },
+    "showSidePanel": {
+      "suggested_key": {
+        "default": "Alt+Shift+S"
+      },
+      "description": "Show Side Panel"
+    },
     "uploadFile": {
       "suggested_key": {
         "default": "Alt+Shift+A"
@@ -33,7 +39,7 @@
     "scripting",
     "storage"
   ],
-  "background": {},
+  "background": { "type": "module" },
   "options_ui": {
     "page": "html/options.html",
     "open_in_tab": true
