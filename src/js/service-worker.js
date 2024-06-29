@@ -182,7 +182,7 @@ function onChanged(changes, namespace) {
                     createContextMenus(newValue)
                 } else {
                     console.log('Disabled contextMenu...')
-                    chrome.contextMenus.removeAll()
+                    chrome.contextMenus?.removeAll()
                 }
             }
         }

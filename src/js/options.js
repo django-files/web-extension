@@ -46,6 +46,14 @@ async function initOptions() {
         siteUrl.placeholder = 'https://example.com'
         siteUrl.focus()
     }
+
+    const platform = await chrome.runtime.getPlatformInfo()
+    if (platform.os === 'android') {
+        document.querySelectorAll('.non-mobile').forEach((el) => {
+            console.log('non-mobile el:', el)
+            el.classList.add('d-none')
+        })
+    }
 }
 
 /**
@@ -253,8 +261,8 @@ async function setShortcuts(selector = '#keyboard-shortcuts') {
     if (!chrome.commands) {
         return console.debug('Skipping: chrome.commands')
     }
+    document.getElementById('table-wrapper').classList.remove('d-none')
     const table = document.querySelector(selector)
-    table.classList.remove('d-none')
     const tbody = table.querySelector('tbody')
     const source = tbody.querySelector('tr.d-none').cloneNode(true)
     source.classList.remove('d-none')

@@ -17,6 +17,9 @@ chrome.storage.onChanged.addListener(onChanged)
 // chrome.runtime.onMessage.addListener(onMessage)
 document.addEventListener('DOMContentLoaded', domContentLoaded)
 document.getElementById('close').addEventListener('click', closePanel)
+document
+    .getElementById('options')
+    .addEventListener('click', () => chrome.runtime.openOptionsPage())
 
 const wsStatus = document.getElementById('ws-status')
 
