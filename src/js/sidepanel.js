@@ -187,7 +187,7 @@ function wsConnect(options) {
             const data = JSON.parse(event.data)
             console.log('data:', data)
             if (data.username) {
-                wsStatus.textContent = `WS Connected as ${data.first_name || data.username}`
+                wsStatus.textContent = `Connected as ${data.first_name || data.username}`
                 wsStatus.className = ''
                 wsStatus.classList.add('text-success')
             }
