@@ -21,7 +21,7 @@ async function onStartup() {
         const { options } = await chrome.storage.sync.get(['options'])
         console.debug('options:', options)
         if (options.contextMenu) {
-            createContextMenus()
+            createContextMenus(options)
         }
     }
 }
@@ -51,6 +51,7 @@ async function onInstalled(details) {
             popupSidePanel: true,
             checkAuth: true,
             deleteConfirm: true,
+            ctxSidePanel: true,
             contextMenu: true,
             showUpdate: false,
             radioBackground: 'bgPicture',
@@ -60,7 +61,7 @@ async function onInstalled(details) {
     )
     console.log('options:', options)
     if (options.contextMenu) {
-        createContextMenus()
+        createContextMenus(options)
     }
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage()
@@ -172,10 +173,13 @@ function onChanged(changes, namespace) {
     // console.debug('onChanged:', changes, namespace)
     for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
         if (key === 'options' && namespace === 'sync' && oldValue && newValue) {
-            if (oldValue.contextMenu !== newValue.contextMenu) {
+            if (
+                oldValue.contextMenu !== newValue.contextMenu ||
+                oldValue.ctxSidePanel !== newValue.ctxSidePanel
+            ) {
                 if (newValue?.contextMenu) {
                     console.log('Enabled contextMenu...')
-                    createContextMenus()
+                    createContextMenus(newValue)
                 } else {
                     console.log('Disabled contextMenu...')
                     chrome.contextMenus.removeAll()
@@ -195,7 +199,9 @@ function onChanged(changes, namespace) {
 function onMessage(message, sender, sendResponse) {
     console.debug('onMessage: message, sender:', message, sender)
     if (message === 'createContextMenus') {
-        createContextMenus()
+        chrome.storage.sync.get(['options'], (items) => {
+            createContextMenus(items.options)
+        })
     }
 }
 
@@ -203,11 +209,11 @@ function onMessage(message, sender, sendResponse) {
  * Create Context Menus
  * @function createContextMenus
  */
-async function createContextMenus() {
+async function createContextMenus(options) {
     if (!chrome.contextMenus) {
         return console.debug('Skipping: chrome.contextMenus')
     }
-    console.debug('createContextMenus')
+    console.debug('createContextMenus:', options)
     chrome.contextMenus.removeAll()
     // Albums
     const albums = await getAlbums()
@@ -225,16 +231,23 @@ async function createContextMenus() {
         }
     }
     // General
+    const ctx = ['image', 'video', 'audio', 'link']
     const contexts = [
         [['image'], 'upload-image', 'Upload Image'],
         [['video'], 'upload-video', 'Upload Video'],
         [['audio'], 'upload-audio', 'Upload Audio'],
         [['link'], 'short', 'Create Short URL'],
         [['image', 'video', 'audio'], 'copy', 'Copy Source URL'],
-        [['image', 'video', 'audio', 'link'], 'separator'],
-        [['all'], 'side-panel', 'Show Side Panel'],
-        [['all'], 'options', 'Open Options'],
+        [ctx, 'separator'],
     ]
+    if (options.ctxSidePanel) {
+        contexts.push(
+            [['all'], 'side-panel', 'Show Side Panel'],
+            [['all'], 'options', 'Open Options']
+        )
+    } else {
+        contexts.push([ctx, 'options', 'Open Options'])
+    }
     contexts.forEach(addContext)
 }
 
