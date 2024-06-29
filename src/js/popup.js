@@ -224,12 +224,17 @@ async function initPopup(event) {
     }
 }
 
+/**
+ * Initialize Uppy if not already Initialized
+ * @function initUppy
+ * @param {Object} options
+ */
 function initUppy(options) {
     if (uppyInit) {
         return console.debug('Uppy Already Initialized')
     }
     uppyInit = true
-    const uppy = new Uppy({ debug: true, autoProceed: false })
+    const uppy = new Uppy({ debug: false, autoProceed: false })
         .use(Dashboard, {
             inline: true,
             theme: 'auto',
@@ -937,13 +942,13 @@ function onMouseOver(event) {
     // }
     if (tr && tr.id === mouseRow) {
         clearTimeout(timeoutID)
-        return console.debug('onMouseOver: return')
+        // return console.debug('onMouseOver: return')
     }
     mouseRow = tr.id
     // console.debug('tr:', tr)
     const imageExtensions = /\.(gif|ico|jpeg|jpg|png|svg|webp)$/i
     if (tr.dataset.name.match(imageExtensions)) {
-        console.log(`onMouseOver: UPDATE SRC: ${tr.dataset.thumb}`)
+        // console.log(`onMouseOver: src: ${tr.dataset.thumb}`)
         mediaImage.src = loadingImage
         mediaImage.src = tr.dataset.thumb
         // console.debug('dataset.thumb', tr.dataset.thumb)
@@ -953,7 +958,7 @@ function onMouseOver(event) {
         mediaImage.src = loadingImage
     }
     if (timeoutID) {
-        console.debug(`onMouseOver: clearTimeout: ${timeoutID}`)
+        // console.debug(`onMouseOver: clearTimeout: ${timeoutID}`)
         clearTimeout(timeoutID)
     }
 }
@@ -972,7 +977,7 @@ function onMouseLeave(event) {
     //     // console.debug('onMouseLeave: return')
     //     return
     // }
-    console.debug('onMouseLeave: START TIMEOUT')
+    // console.debug('onMouseLeave: setTimeout')
     document.getElementById(`menu-${menuShown}`)?.classList.add('d-none')
     menuShown = null
     mouseRow = null

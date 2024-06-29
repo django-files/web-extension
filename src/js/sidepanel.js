@@ -34,7 +34,7 @@ async function domContentLoaded() {
 
     // new Uppy().use(DragDrop, { target: document.body })
 
-    const uppy = new Uppy({ debug: true, autoProceed: false })
+    const uppy = new Uppy({ debug: false, autoProceed: false })
         .use(Dashboard, {
             inline: true,
             theme: 'auto',

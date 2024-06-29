@@ -107,6 +107,33 @@ function updateBackgroundInput(value) {
 }
 
 /**
+ * Set Background
+ * @function setBackground
+ * @param {Object} options
+ */
+function setBackground(options) {
+    console.debug('setBackground:', options)
+    const video = document.querySelector('video')
+    if (options.radioBackground === 'bgPicture') {
+        const url = options.pictureURL || 'https://picsum.photos/1920/1080'
+        document.body.style.background = `url('${url}') no-repeat center fixed`
+        document.body.style.webkitBackgroundSize = 'cover'
+        document.body.style.mozBackgroundSize = 'cover'
+        document.body.style.oBackgroundSize = 'cover'
+        document.body.style.backgroundSize = 'cover'
+        video.classList.add('d-none')
+    } else if (options.radioBackground === 'bgVideo') {
+        const src = options.videoURL || '/media/loop.mp4'
+        video.classList.remove('d-none')
+        video.src = src
+        document.body.style.cssText = ''
+    } else {
+        document.body.style.cssText = ''
+        video.classList.add('d-none')
+    }
+}
+
+/**
  * On Changed Callback
  * @function onChanged
  * @param {Object} changes
@@ -127,28 +154,6 @@ function onChanged(changes, namespace) {
                 setBackground(newValue)
             }
         }
-    }
-}
-
-function setBackground(options) {
-    console.debug('setBackground:', options)
-    const video = document.querySelector('video')
-    if (options.radioBackground === 'bgPicture') {
-        const url = options.pictureURL || 'https://picsum.photos/1920/1080'
-        document.body.style.background = `url('${url}') no-repeat center fixed`
-        document.body.style.webkitBackgroundSize = 'cover'
-        document.body.style.mozBackgroundSize = 'cover'
-        document.body.style.oBackgroundSize = 'cover'
-        document.body.style.backgroundSize = 'cover'
-        video.classList.add('d-none')
-    } else if (options.radioBackground === 'bgVideo') {
-        const src = options.videoURL || '/media/loop.mp4'
-        video.classList.remove('d-none')
-        video.src = src
-        document.body.style.cssText = ''
-    } else {
-        document.body.style.cssText = ''
-        video.classList.add('d-none')
     }
 }
 
