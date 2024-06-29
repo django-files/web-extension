@@ -1,5 +1,7 @@
 // JS for popup.html
 
+import { showToast } from './exports.js'
+
 import {
     Uppy,
     Dashboard,
@@ -38,6 +40,7 @@ document.querySelectorAll('.modal').forEach((el) =>
     })
 )
 
+// const tableWrapper = document.getElementById('table-wrapper')
 const filesTable = document.getElementById('files-table')
 const authAlert = document.getElementById('auth-alert')
 const errorAlert = document.getElementById('error-alert')
@@ -66,6 +69,7 @@ clipboard.on('error', () => showToast('Clipboard Copy Failed', 'warning'))
 const loadingImage = '../media/loading.gif'
 let uppyInit = false
 let authError = false
+let mouseRow
 let timeoutID
 let timeout
 let fileData
@@ -75,28 +79,19 @@ let fileData
  * TODO: Overhaul this function
  * @function initPopup
  */
-async function initPopup() {
-    console.debug('initPopup')
+async function initPopup(event) {
+    console.debug('initPopup:', event)
+    mouseRow = null
+    errorAlert.classList.add('d-none')
 
     // Options
     const { options } = await chrome.storage.sync.get(['options'])
     console.debug('options:', options)
     document.getElementById('popupPreview').checked = options.popupPreview
-    const wrapper = document.getElementById('table-wrapper')
     const platform = await chrome.runtime.getPlatformInfo()
     if (platform.os !== 'android') {
         document.body.style.width = `${options.popupWidth}px`
-        if (options.popupLinks) {
-            wrapper.style.maxHeight = '500px'
-        } else {
-            wrapper.style.maxHeight = '540px'
-        }
     } else {
-        if (options.popupLinks) {
-            wrapper.style.maxHeight = '82vh'
-        } else {
-            wrapper.style.maxHeight = '88vh'
-        }
         document.documentElement.style.fontSize = '1.3rem'
         document
             .querySelectorAll('.hover-menu > a')
@@ -193,10 +188,17 @@ async function initPopup() {
     // if (fileData.length < 8) {
     //     document.body.style.minHeight = '340px'
     // }
-    document.body.style.minHeight = '320px'
+    // document.body.style.minHeight = '320px'
 
     // Update table should only be called here, changes should use initPopup()
     updateTable(fileData, options)
+
+    if (platform.os !== 'android') {
+        if (document.documentElement.scrollHeight > 600) {
+            document.body.style.marginRight = '15px'
+            document.body.style.width = `${document.body.clientWidth - 15}px`
+        }
+    }
 
     // CTX menus are re-generated, eventListener re-addd
     document
@@ -233,7 +235,7 @@ function initUppy(options) {
             autoOpenFileEditor: true,
             proudlyDisplayPoweredByUppy: false,
             note: 'Django Files Upload',
-            height: 260,
+            height: 200,
             width: '100%',
             browserBackButtonClose: false,
         })
@@ -256,11 +258,19 @@ function initUppy(options) {
 
     uppy.on('complete', async (fileCount) => {
         console.debug('complete:', fileCount)
+        document
+            .querySelector('.uppy-StatusBar-actionBtn--done')
+            .addEventListener('click', (el) => uppyModal.hide())
         await initPopup()
     })
 
-    uppy.on('dashboard:modal-closed', () => {
-        console.log('dashboard:modal-closed')
+    uppy.on('dashboard:modal-open', () => {
+        console.log('Modal is open')
+    })
+
+    uppyModal._element.addEventListener('hidden.bs.modal', (event) => {
+        console.debug('hidden.bs.modal:', event)
+        uppy.cancelAll()
     })
 }
 
@@ -340,7 +350,7 @@ async function saveOptions(event) {
             console.debug('popupPreview Disabled. Removing Event Listeners...')
             document.querySelectorAll('.link-underline').forEach((el) => {
                 el.removeEventListener('mouseover', onMouseOver)
-                el.removeEventListener('mouseout', onMouseOut)
+                el.removeEventListener('mouseleave', onMouseLeave)
             })
             mediaOuter.classList.add('d-none')
         }
@@ -841,29 +851,6 @@ async function handleFile(name, method, data = null) {
 }
 
 /**
- * Show Bootstrap Toast
- * @function showToast
- * @param {String} message
- * @param {String} type
- */
-function showToast(message, type = 'success') {
-    console.debug(`showToast: ${type}: ${message}`)
-    const clone = document.querySelector('.d-none .toast')
-    const container = document.getElementById('toast-container')
-    if (clone && container) {
-        const element = clone.cloneNode(true)
-        element.querySelector('.toast-body').innerHTML = message
-        element.classList.add(`text-bg-${type}`)
-        container.appendChild(element)
-        const toast = new bootstrap.Toast(element)
-        element.addEventListener('mousemove', () => toast.hide())
-        toast.show()
-    } else {
-        console.info('Missing clone or container:', clone, container)
-    }
-}
-
-/**
  * Display Popup Error Message
  * @function displayAlert
  * @param {String} message
@@ -900,7 +887,7 @@ async function checkSiteAuth() {
 
 function initPopupMouseover() {
     console.debug('initPopupMouseover')
-    mediaOuter.addEventListener('mouseover', () => {
+    mediaOuter.addEventListener('mousemove', () => {
         mediaOuter.classList.add('d-none')
         mediaImage.src = loadingImage
         if (timeoutID) {
@@ -913,35 +900,46 @@ function initPopupMouseover() {
         mediaError.classList.remove('d-none')
         mediaImage.src = '../media/loading.gif'
     })
+    filesTable.addEventListener('mouseleave', onMouseLeave)
     document.querySelectorAll('.mouse-link').forEach((el) => {
         el.addEventListener('mouseover', onMouseOver)
-        el.addEventListener('mouseout', onMouseOut)
+        // el.addEventListener('mouseout', onMouseLeave)
     })
 }
 
-let mouseRow
-
 function onMouseOver(event) {
-    // console.debug('onMouseOver:', event)
+    // console.debug(`onMouseOver: ${mouseRow}`, event.target)
     mediaError.classList.add('d-none')
     mediaImage.classList.remove('d-none')
-    if (event.pageY < window.innerHeight / 2) {
+    // console.debug(
+    //     `event.pageY: ${event.pageY}`,
+    //     `event.clientY: ${event.clientY}`,
+    //     `window.innerHeight/2: ${window.innerHeight / 2}`
+    // )
+    if (event.clientY < window.innerHeight / 2) {
         mediaOuter.classList.remove('top-0')
         mediaOuter.classList.add('bottom-0')
+        // console.debug('bottom')
     } else {
         mediaOuter.classList.remove('bottom-0')
         mediaOuter.classList.add('top-0')
+        // console.debug('top')
     }
-    const tr = event.target.closest('tr')
-    if (tr.id === mouseRow) {
-        // console.debug('onMouseOver: return')
-        return
+    const tr = event.target?.closest('tr')
+    // console.debug(`onMouseOver: mouseRow = ${mouseRow}: tr.id = ${tr.id}`)
+    // if (!tr.contains(event.target)) {
+    //     mouseRow = null
+    //     return console.debug('element is NOT child of row...')
+    // }
+    if (tr && tr.id === mouseRow) {
+        clearTimeout(timeoutID)
+        return console.debug('onMouseOver: return')
     }
     mouseRow = tr.id
     // console.debug('tr:', tr)
     const imageExtensions = /\.(gif|ico|jpeg|jpg|png|svg|webp)$/i
     if (tr.dataset.name.match(imageExtensions)) {
-        // console.log('onMouseOver: UPDATE SRC')
+        console.log(`onMouseOver: UPDATE SRC: ${tr.dataset.thumb}`)
         mediaImage.src = loadingImage
         mediaImage.src = tr.dataset.thumb
         // console.debug('dataset.thumb', tr.dataset.thumb)
@@ -951,23 +949,32 @@ function onMouseOver(event) {
         mediaImage.src = loadingImage
     }
     if (timeoutID) {
+        console.debug(`onMouseOver: clearTimeout: ${timeoutID}`)
         clearTimeout(timeoutID)
     }
 }
 
-function onMouseOut(event) {
-    // console.debug('onMouseOut:', event)
-    const tr = event.target.closest('tr')
+function onMouseLeave(event) {
+    // console.debug(`onMouseLeave: ${mouseRow}:`, event.target)
+    // const tr = event.target.closest('tr')
+    // const tr = document.getElementById(mouseRow)
+    // if (filesTable.contains(event.target)) {
+    //     // mouseRow = null
+    //     return console.debug('element is child of table...')
+    // }
     // console.debug('tr:', tr)
     // console.debug('mouseRow:', mouseRow)
-    if (tr.id === mouseRow) {
-        // console.debug('onMouseOut: return')
-        return
-    }
-    // console.debug('onMouseOut: START TIMEOUT')
+    // if (tr.id === mouseRow) {
+    //     // console.debug('onMouseLeave: return')
+    //     return
+    // }
+    console.debug('onMouseLeave: START TIMEOUT')
+    document.getElementById(`menu-${menuShown}`)?.classList.add('d-none')
+    menuShown = null
+    mouseRow = null
     timeoutID = setTimeout(function () {
         mediaOuter.classList.add('d-none')
         mediaImage.src = loadingImage
-        timeoutID = undefined
+        timeoutID = null
     }, timeout)
 }

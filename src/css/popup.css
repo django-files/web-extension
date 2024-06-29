@@ -1,11 +1,9 @@
 /* CSS for popup.html */
 
 body {
-    overflow-x: hidden;
-}
-
-#table-wrapper {
+    overflow-x: clip;
     overflow-y: auto;
+    min-height: 300px;
 }
 
 #media-outer {
@@ -18,7 +16,7 @@ body {
 }
 
 ul.dropdown-menu {
-    width: 260px;
+    width: 280px;
 }
 
 .hover-menu {

@@ -1,5 +1,7 @@
 // JS for sidepanel.html
 
+import { showToast } from './exports.js'
+
 import {
     Uppy,
     Dashboard,
@@ -11,8 +13,12 @@ import {
     XHRUpload,
 } from '../dist/uppy/uppy.min.mjs'
 
+chrome.storage.onChanged.addListener(onChanged)
+// chrome.runtime.onMessage.addListener(onMessage)
 document.addEventListener('DOMContentLoaded', domContentLoaded)
 document.getElementById('close').addEventListener('click', closePanel)
+
+const wsStatus = document.getElementById('ws-status')
 
 /**
  * DOMContentLoaded
@@ -87,7 +93,42 @@ async function domContentLoaded() {
     uppy.on('error', (error) => {
         console.debug('error:', error)
     })
+
+    wsConnect(options)
 }
+
+/**
+ * On Changed Callback
+ * @function onChanged
+ * @param {Object} changes
+ * @param {String} namespace
+ */
+function onChanged(changes, namespace) {
+    // console.debug('onChanged:', changes, namespace)
+    for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
+        if (namespace === 'sync' && key === 'options') {
+            if (
+                oldValue.siteUrl !== newValue.siteUrl ||
+                oldValue.authToken !== newValue.authToken
+            ) {
+                console.info('siteUrl or authToken changed:', ws)
+                ws?.close(1000, 'new-auth')
+                if (newValue.siteUrl && newValue.authToken) {
+                    wsConnect(newValue)
+                }
+            }
+        }
+    }
+}
+
+// /**
+//  * On Message Callback
+//  * @function onMessage
+//  * @param {Object} message
+//  */
+// async function onMessage(message) {
+//     console.log('onMessage:', message)
+// }
 
 /**
  * Close Side Panel
@@ -100,5 +141,91 @@ async function closePanel(event) {
         await browser.sidebarAction.close()
     } else {
         window.close()
+    }
+}
+
+let ws
+
+function wsConnect(options) {
+    console.log('wsConnect:', options)
+    console.log(`siteUrl: ${options.siteUrl}`)
+    console.log(`authToken: ${options.authToken}`)
+    const url = new URL(options.siteUrl)
+    url.protocol = 'wss://'
+    url.pathname = 'ws/home/'
+    console.log(`url: ${url}`)
+    ws = new WebSocket(url.href)
+    ws.onopen = (event) => {
+        console.log('ws.onopen:', event)
+        wsStatus.textContent = ''
+        ws.send(
+            JSON.stringify({
+                method: 'authorize',
+                authorization: options.authToken,
+            })
+        )
+        keepAlive()
+    }
+    ws.onmessage = (event) => {
+        // console.log('ws.onmessage:', event)
+        // console.log('event.data:', event.data)
+        if (event.data === 'pong') {
+            return
+        }
+        try {
+            console.log('event.data:', event.data)
+            const data = JSON.parse(event.data)
+            console.log('data:', data)
+            if (data.username) {
+                wsStatus.textContent = `WS Connected as ${data.first_name || data.username}`
+                wsStatus.className = ''
+                wsStatus.classList.add('text-success')
+            }
+            if (data.event) {
+                processMessage(data)
+            }
+        } catch (e) {
+            console.warn(e)
+        }
+    }
+    ws.onclose = (event) => {
+        console.log(`ws.onclose: ${event.code}: ${event.reason}`, event)
+        wsStatus.textContent = 'WS Closed, Reconnecting...'
+        wsStatus.className = ''
+        wsStatus.classList.add('text-danger')
+        if (![1000, 1001].includes(event.code)) {
+            setTimeout(function () {
+                console.log('Reconnecting...')
+                wsConnect(options)
+            }, 20 * 1000)
+        }
+    }
+}
+
+function keepAlive() {
+    const keepAliveIntervalId = setInterval(() => {
+        if (ws.readyState === 1) {
+            ws.send('ping')
+        } else {
+            clearInterval(keepAliveIntervalId)
+        }
+    }, 20 * 1000)
+}
+
+function processMessage(data) {
+    console.log('processMessage:', data.event)
+    if (data.event === 'file-new') {
+        showToast(`Added: ${data.name}`, 'success')
+    } else if (data.event === 'file-update') {
+        showToast(`Updated: ${data.name}`, 'primary')
+    } else if (data.event === 'file-delete') {
+        showToast(`Deleted: ${data.name}`, 'warning')
+    } else if (data.event === 'album-delete') {
+        showToast(`Updated: ${data.name}`, 'primary')
+    } else if (data.event === 'album-new') {
+        showToast(`Album: ${data.name}`, 'primary')
+    } else if (data.event === 'message') {
+        console.log('data.message:', data.message)
+        showToast(`Message: ${data.message}`, 'primary')
     }
 }

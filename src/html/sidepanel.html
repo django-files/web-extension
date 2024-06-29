@@ -25,14 +25,27 @@
 
 <footer class="flex-shrink-0">
     <div class="container-fluid mb-2">
+        <div class="text-center">
+            <span id="ws-status">Connecting to WS.</span>
+        </div>
         <div class="row">
             <div class="col-12">
-                <a class="btn btn-primary w-100" role="button" id="close">
+                <a class="btn btn-sm btn-outline-primary w-100" role="button" id="close">
                     Close Panel <i class="fa-regular fa-circle-xmark ms-2"></i></a>
             </div>
         </div>
     </div>
 </footer>
+
+<div aria-live="polite" aria-atomic="true" class="">
+    <div id="toast-container" class="toast-container d-flex flex-column-reverse bottom-0 start-0 p-3"></div>
+</div> <!-- toast-container -->
+
+<div class="d-none clone">
+    <div class="toast align-items-center border-0 mb-3" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+        <div class="toast-body text-break"></div>
+    </div>
+</div> <!-- d-none -->
 
 <script type="text/javascript" src="../dist/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="../dist/bootstrap/bootstrap.bundle.min.js"></script>
