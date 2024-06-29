@@ -1,6 +1,6 @@
 // JS for popup.html
 
-import { showToast } from './exports.js'
+import { openSidePanel, showToast } from './exports.js'
 
 import {
     Uppy,
@@ -12,7 +12,6 @@ import {
 chrome.runtime.onMessage.addListener(onMessage)
 document.addEventListener('DOMContentLoaded', initPopup)
 document.getElementById('expire-form').addEventListener('submit', expireForm)
-
 document
     .getElementById('password-form')
     .addEventListener('submit', passwordForm)
@@ -40,7 +39,6 @@ document.querySelectorAll('.modal').forEach((el) =>
     })
 )
 
-// const tableWrapper = document.getElementById('table-wrapper')
 const filesTable = document.getElementById('files-table')
 const authAlert = document.getElementById('auth-alert')
 const errorAlert = document.getElementById('error-alert')
@@ -52,6 +50,9 @@ const mediaError = document.getElementById('media-error')
 const ctxMenuRow = document.getElementById('ctx-menu-row')
 const expireInput = document.getElementById('expire-input')
 const passwordInput = document.getElementById('password-input')
+const sidePanel = document.getElementById('side-panel')
+
+sidePanel.addEventListener('click', openSidePanel)
 
 const deleteModal = bootstrap.Modal.getOrCreateInstance('#delete-modal')
 const expireModal = bootstrap.Modal.getOrCreateInstance('#expire-modal')
@@ -91,6 +92,9 @@ async function initPopup(event) {
     const platform = await chrome.runtime.getPlatformInfo()
     if (platform.os !== 'android') {
         document.body.style.width = `${options.popupWidth}px`
+        if (options.popupSidePanel) {
+            sidePanel.classList.remove('d-none')
+        }
     } else {
         document.documentElement.style.fontSize = '1.3rem'
         document

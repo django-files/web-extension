@@ -93,8 +93,13 @@ async function domContentLoaded() {
     uppy.on('error', (error) => {
         console.debug('error:', error)
     })
-
-    wsConnect(options)
+    if (options.siteUrl && options.authToken) {
+        wsConnect(options)
+    } else {
+        wsStatus.textContent = `Missing Site URL or Token`
+        wsStatus.className = ''
+        wsStatus.classList.add('text-warning')
+    }
 }
 
 /**
@@ -145,6 +150,7 @@ async function closePanel(event) {
 }
 
 let ws
+let reconnectTimeout
 
 function wsConnect(options) {
     console.log('wsConnect:', options)
@@ -158,6 +164,7 @@ function wsConnect(options) {
     ws.onopen = (event) => {
         console.log('ws.onopen:', event)
         wsStatus.textContent = ''
+        clearInterval(reconnectTimeout)
         ws.send(
             JSON.stringify({
                 method: 'authorize',
@@ -193,8 +200,9 @@ function wsConnect(options) {
         wsStatus.textContent = 'WS Closed, Reconnecting...'
         wsStatus.className = ''
         wsStatus.classList.add('text-danger')
-        if (![1000, 1001].includes(event.code)) {
-            setTimeout(function () {
+        // We should not have to check 1001 here since side panel does not navigate
+        if (![1000].includes(event.code)) {
+            reconnectTimeout = setTimeout(function () {
                 console.log('Reconnecting...')
                 wsConnect(options)
             }, 20 * 1000)

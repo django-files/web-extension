@@ -1,5 +1,7 @@
 // JS Background Service Worker
 
+import { openSidePanel } from './exports.js'
+
 chrome.runtime.onStartup.addListener(onStartup)
 chrome.runtime.onInstalled.addListener(onInstalled)
 chrome.commands?.onCommand.addListener(onCommand)
@@ -46,6 +48,7 @@ async function onInstalled(details) {
             iconPassword: true,
             iconExpire: false,
             popupLinks: true,
+            popupSidePanel: true,
             checkAuth: true,
             deleteConfirm: true,
             contextMenu: true,
@@ -87,13 +90,14 @@ async function onInstalled(details) {
  */
 async function onCommand(command) {
     console.debug(`onCommand: ${command}`)
-    const { options } = await chrome.storage.sync.get(['options'])
     if (command === 'uploadFile') {
+        const { options } = await chrome.storage.sync.get(['options'])
         if (options.siteUrl) {
             const url = `${options.siteUrl}/uppy/`
             await chrome.tabs.create({ active: true, url })
         }
     } else if (command === 'openGallery') {
+        const { options } = await chrome.storage.sync.get(['options'])
         if (options.siteUrl) {
             const url = `${options.siteUrl}/gallery/`
             await chrome.tabs.create({ active: true, url })
@@ -415,30 +419,6 @@ async function clipboardWrite(value) {
             data: value,
         })
     }
-}
-
-/**
- * Open Side Panel Callback
- * @function openSidePanel
- * @param {MouseEvent} [event]
- */
-async function openSidePanel(event) {
-    console.debug('openSidePanel:', event)
-    if (chrome.sidePanel) {
-        chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-            chrome.sidePanel.open({ windowId: tab.windowId })
-        })
-    } else if (chrome.sidebarAction) {
-        await chrome.sidebarAction.open()
-    } else {
-        console.log('Side Panel Not Supported')
-        // if (event) {
-        //     return
-        // }
-    }
-    // if (event) {
-    //     window.close()
-    // }
 }
 
 /**

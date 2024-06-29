@@ -1,6 +1,30 @@
 // JS Exports
 
 /**
+ * Open Side Panel Callback
+ * @function openSidePanel
+ * @param {MouseEvent} [event]
+ */
+export async function openSidePanel(event) {
+    console.debug('openSidePanel:', event)
+    if (chrome.sidePanel) {
+        chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+            chrome.sidePanel.open({ windowId: tab.windowId })
+        })
+    } else if (chrome.sidebarAction) {
+        await chrome.sidebarAction.open()
+    } else {
+        console.log('Side Panel Not Supported')
+        if (event) {
+            return
+        }
+    }
+    if (event) {
+        window.close()
+    }
+}
+
+/**
  * Show Bootstrap Toast
  * @function showToast
  * @param {String} message

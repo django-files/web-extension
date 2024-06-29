@@ -39,7 +39,7 @@
     "scripting",
     "storage"
   ],
-  "background": {},
+  "background": { "type": "module" },
   "options_ui": {
     "page": "html/options.html",
     "open_in_tab": true
