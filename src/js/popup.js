@@ -149,6 +149,7 @@ async function initPopup(event) {
     }
     filesTable.classList.remove('d-none')
     genLoadingData(options.recentFiles)
+    document.body.style.minHeight = '300px'
 
     // Init Uppy
     initUppy(options)

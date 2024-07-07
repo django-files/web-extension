@@ -3,7 +3,6 @@
 body {
     overflow-x: clip;
     overflow-y: auto;
-    min-height: 300px;
 }
 
 #media-outer {
