@@ -188,6 +188,7 @@ async function initPopup(event) {
     } else if (!fileData.length) {
         return displayAlert({ message: 'No Files Returned.' })
     }
+    document.body.style.minHeight = '300px'
 
     // if (fileData.length < 8) {
     //     document.body.style.minHeight = '340px'
@@ -424,7 +425,7 @@ function genLoadingData(rows) {
 /**
  * Update Popup Table with Data
  * @function updateTable
- * @param {Array} data
+ * @param {Object[]} data
  * @param {Object} options
  */
 function updateTable(data, options) {
@@ -558,7 +559,7 @@ function updateTable(data, options) {
 /**
  * @function updateFileIcons
  * @param {Object} file
- * @param {HTMLElement} [el]
+ * @param {HTMLElement=} el
  */
 async function updateFileIcons(file, el = null) {
     // console.debug('updateFileIcons:', file, el)
@@ -591,7 +592,7 @@ const hoverboard = document.getElementById('hover-menu')
 let menuShown
 
 /**
- * Like a Hover Board, but for links
+ * Like a hoverboard, but for links
  * @param {MouseEvent} event
  */
 function hoverLinks(event) {
@@ -648,12 +649,26 @@ async function updateContextMenu(ctx, data) {
     }
 }
 
+/**
+ * Enable Element with Selector by Adding add
+ * @function enableEl
+ * @param {HTMLElement} ctx
+ * @param {String} selector
+ * @param {String=} add
+ */
 function enableEl(ctx, selector, add = 'text-body-emphasis') {
     const el = ctx.querySelector(selector)
     el.classList.remove('text-body-tertiary')
     el.classList.add(add)
 }
 
+/**
+ * Disable Element with Selector by Removing remove
+ * @function disableEl
+ * @param {HTMLElement} ctx
+ * @param {String} selector
+ * @param {String=} remove
+ */
 function disableEl(ctx, selector, remove = 'text-body-emphasis') {
     const el = ctx.querySelector(selector)
     el.classList.remove(remove)
@@ -704,6 +719,10 @@ async function ctxMenu(event) {
     }
 }
 
+/**
+ * Toggle Private from ctxMenuRow.value
+ * @function togglePrivate
+ */
 async function togglePrivate() {
     console.debug(`togglePrivate: ${ctxMenuRow.value}`)
     // event.preventDefault()

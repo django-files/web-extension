@@ -3,8 +3,14 @@ name: "Test"
 on:
   push:
     branches: ["master"]
+    paths:
+      - "src/**"
+      - "tests/**"
   pull_request:
     branches: ["master"]
+    paths:
+      - "src/**"
+      - "tests/**"
   workflow_dispatch:
 
 jobs:
@@ -12,7 +18,7 @@ jobs:
     name: "Test"
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    if: ${{ !contains(github.event.head_commit.message, '[CI SKIP]') }}
+    if: ${{ !contains(github.event.head_commit.message, '#notest') }}
 
     steps:
       - name: "Checkout"
@@ -29,7 +35,6 @@ jobs:
 
       - name: "Lint"
         run: |
-          npm run manifest:firefox
           npm run lint
 
       - name: "Test"
@@ -43,7 +48,7 @@ jobs:
         uses: cssnr/push-artifacts-action@master
         with:
           path: "tests/screenshots/"
-          host: ${{ secrets.ARTIFACTS_HOST }}
+          host: ${{ secrets.RSYNC_HOST }}
           user: ${{ secrets.RSYNC_USER }}
           pass: ${{ secrets.RSYNC_PASS }}
           port: ${{ secrets.RSYNC_PORT }}
