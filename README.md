@@ -7,6 +7,7 @@
 [![Test](https://github.com/django-files/web-extension/actions/workflows/test.yaml/badge.svg)](https://github.com/django-files/web-extension/actions/workflows/test.yaml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/7842944ada6b4c7ebb4f9dc83ed6a654)](https://app.codacy.com/gh/django-files/web-extension/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=django-files_web-extension&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=django-files_web-extension)
+[![Discord](https://img.shields.io/discord/899171661457293343?logo=discord&logoColor=white&label=discord&color=7289da)](https://discord.gg/wXy6m2X8wY)
 # Django Files Web Extension
 
 [Chrome](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej) Web Extension and
@@ -23,6 +24,7 @@ and upload any Image, Video or Audio files with right click.
 *   [Features](#features)
 *   [Configure](#configure)
 *   [Setup](#setup)
+*   [Support](#support)
 *   [Building](#building)
 *   [Development](#development)
 
@@ -84,6 +86,25 @@ You can now click the Django Files icon to view your recent uploads or open Opti
 Right-click on any Image, Video, Audio, or URL upload to Django Files or Shorten URL.  
 
 Alternatively, you can open the Options page and add your URL and Token.
+
+# Support
+
+For help using the web extension, utilize any these resources:
+
+- Documentation: https://link-extractor.cssnr.com/docs/
+- Q&A Discussion: https://github.com/cssnr/link-extractor/discussions/categories/q-a
+- Request a Feature: https://github.com/cssnr/link-extractor/discussions/categories/feature-requests
+
+If you are experiencing an issue/bug or getting unexpected results, use:
+
+- Report an Issue: https://github.com/cssnr/link-extractor/issues
+- Chat with us on Discord: https://discord.gg/wXy6m2X8wY
+- Provide Anonymous Feedback: https://cssnr.github.io/feedback
+
+Logs can be found inspecting the page (Ctrl+Shift+I), clicking on the Console, and;
+Firefox: toggling Debug logs, Chrome: toggling Verbose from levels dropdown.
+
+Note: When providing anonymous feedback there is no way to follow up and get more information unless you provide a contact method.
 
 # Development
 

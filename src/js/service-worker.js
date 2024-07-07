@@ -208,6 +208,7 @@ function onMessage(message, sender, sendResponse) {
 /**
  * Create Context Menus
  * @function createContextMenus
+ * @param {Object} options
  */
 async function createContextMenus(options) {
     if (!chrome.contextMenus) {
@@ -275,7 +276,7 @@ function addContext(context) {
 
 /**
  * @function getAlbums
- * @return {[String]}
+ * @return {String[]}
  */
 async function getAlbums() {
     const { options } = await chrome.storage.sync.get(['options'])
