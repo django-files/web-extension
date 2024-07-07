@@ -149,7 +149,6 @@ async function initPopup(event) {
     }
     filesTable.classList.remove('d-none')
     genLoadingData(options.recentFiles)
-    document.body.style.minHeight = '300px'
 
     // Init Uppy
     initUppy(options)
@@ -189,6 +188,7 @@ async function initPopup(event) {
     } else if (!fileData.length) {
         return displayAlert({ message: 'No Files Returned.' })
     }
+    document.body.style.minHeight = '300px'
 
     // if (fileData.length < 8) {
     //     document.body.style.minHeight = '340px'
