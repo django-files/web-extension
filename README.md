@@ -91,7 +91,7 @@ Alternatively, you can open the Options page and add your URL and Token.
 
 For help using the web extension, utilize any these resources:
 
-- Documentation: https://link-extractor.cssnr.com/docs/
+- Documentation: https://django-files.github.io/extension/
 - Q&A Discussion: https://github.com/django-files/web-extension/discussions/categories/q-a
 - Request a Feature: https://github.com/django-files/web-extension/discussions/categories/feature-requests
 
