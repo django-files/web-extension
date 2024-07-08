@@ -99,7 +99,7 @@ If you are experiencing an issue/bug or getting unexpected results, use:
 
 - Report an Issue: https://github.com/django-files/web-extension/issues
 - Chat with us on Discord: https://discord.gg/wXy6m2X8wY
-- Provide Anonymous Feedback: https://cssnr.github.io/feedback
+- Provide Anonymous Feedback: [https://cssnr.github.io/feedback](https://cssnr.github.io/feedback?app=Django%20Files%20Extension)
 
 Logs can be found inspecting the page (Ctrl+Shift+I), clicking on the Console, and;
 Firefox: toggling Debug logs, Chrome: toggling Verbose from levels dropdown.
