@@ -19,8 +19,8 @@ document
     .querySelectorAll('.show-hide')
     .forEach((el) => el.addEventListener('click', showHidePassword))
 document
-    .querySelectorAll('.copy-password')
-    .forEach((el) => el.addEventListener('click', copyPassword))
+    .querySelectorAll('[data-copy-input]')
+    .forEach((el) => el.addEventListener('click', copyInput))
 document
     .getElementsByName('radioBackground')
     .forEach((el) => el.addEventListener('change', loginBackgroundChange))
@@ -120,9 +120,6 @@ function setBackground(options) {
     if (options.radioBackground === 'bgPicture') {
         const url = options.pictureURL || 'https://picsum.photos/1920/1080'
         document.body.style.background = `url('${url}') no-repeat center fixed`
-        document.body.style.webkitBackgroundSize = 'cover'
-        document.body.style.mozBackgroundSize = 'cover'
-        document.body.style.oBackgroundSize = 'cover'
         document.body.style.backgroundSize = 'cover'
         video.classList.add('d-none')
     } else if (options.radioBackground === 'bgVideo') {
@@ -300,13 +297,18 @@ function showHidePassword(event) {
     }
 }
 
-async function copyPassword(event) {
-    console.debug('copyPassword:', event)
+async function copyInput(event) {
+    console.debug('copyInput:', event)
     const element = event.target.closest('button')
-    const input = document.querySelector(element.dataset.selector)
+    console.debug('element.dataset.copyInput:', element.dataset.copyInput)
+    const input = document.querySelector(element.dataset.copyInput)
     console.debug('input:', input)
     await navigator.clipboard.writeText(input.value)
-    // showToast('Copied to Clipboard.')
+    if (element.dataset.copyText) {
+        showToast(element.dataset.copyText)
+    } else {
+        showToast('Copied to Clipboard.')
+    }
 }
 
 /**

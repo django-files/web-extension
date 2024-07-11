@@ -45,7 +45,8 @@
             <label for="siteUrl" class="form-label"><i class="fa-solid fa-globe me-2"></i> Django Files URL</label>
             <div class="input-group col-12 ">
                 <input id="siteUrl" aria-describedby="siteUrlHelp" type="text" class="form-control" autocomplete="off">
-                <button class="btn btn-outline-primary clip" data-clipboard-target="#siteUrl" type="button" data-bs-toggle="tooltip"
+                <button class="btn btn-outline-primary" type="button" data-bs-toggle="tooltip"
+                        data-copy-input="#authToken" data-copy-text="Site URL Copied to Clipboard."
                         data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Copy to Clipboard.">
                     <i class="fa-solid fa-copy"></i>
                 </button>
@@ -59,7 +60,8 @@
                         data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Show/Hide Auth Token.">
                     <i class="fa-regular fa-eye"></i>
                 </button>
-                <button id="authTokenCopy" class="btn btn-outline-primary copy-password" type="button" data-selector="#authToken"
+                <button id="authTokenCopy" class="btn btn-outline-primary" type="button"
+                        data-copy-input="#authToken" data-copy-text="Auth Token Copied to Clipboard."
                         data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Copy to Clipboard.">
                     <i class="fa-solid fa-copy"></i>
                 </button>
