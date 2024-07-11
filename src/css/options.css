@@ -1,7 +1,7 @@
 /* CSS for options.html */
 
 body {
-    min-width: 360px;
+    min-width: 340px;
 }
 
 video {
@@ -14,13 +14,13 @@ video {
     z-index: -1;
 }
 
-.options-wrapper {
+#options-wrapper {
     background: rgba(0 0 0 / 50%);
     filter: drop-shadow(15px 15px 12px #000000);
     backdrop-filter: blur(6px);
+    max-width: 960px;
 }
 
-.input-group-text,
 .form-control {
     background: rgba(0 0 0 / 50%);
 }
