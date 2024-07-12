@@ -16,51 +16,53 @@
 <!--    <source src="/media/loop.mp4" type="video/mp4">-->
 </video> <!-- video -->
 
-<div class="container-fluid g-0 h-100">
-<div class="d-flex align-items-center h-100">
-<div class="col-xl-8 col-lg-10 col-12 m-auto">
-<div class="options-wrapper p-3 ms-2 mt-2 mb-3 me-3 rounded rounded-4">
+<div class="d-flex align-items-center justify-content-center pt-3 px-1 px-sm-3 h-100">
+<div class="m-auto">
+<div id="options-wrapper" class="rounded rounded-4 p-3 mb-3 w-100">
+
     <div class="d-flex justify-content-center align-items-center">
         <img src="../media/logo48.png" class="me-2" height="48" width="48"
              alt="Django Files Extension" title="Django Files Extension">
-        <h1>Django Files Options</h1>
+        <h2>Django Files Options</h2>
     </div>
     <div class="clearfix"></div>
     <p class="text-center lead">v<span id="version"></span></p>
     <div id="table-wrapper" class="rounded rounded-3 p-2 mb-3 d-none">
-    <table id="keyboard-shortcuts" class="table table-sm table-borderless table-hover mb-0">
-        <caption class="visually-hidden">Keyboard Shortcuts</caption>
-        <thead class="visually-hidden"><tr><th>Description</th><th>Shortcut</th></tr></thead>
-        <tbody>
-        <tr class="d-none">
-            <td class="bg-transparent"><i class="fa-regular fa-keyboard me-1"></i> <span class="description"></span></td>
-            <td class="bg-transparent text-end" title="Keyboard Shortcut"><kbd>Unknown</kbd></td>
-        </tr>
-        </tbody>
-    </table>
+        <table id="keyboard-shortcuts" class="table table-sm table-borderless table-hover mb-0">
+            <caption class="visually-hidden">Keyboard Shortcuts</caption>
+            <thead class="visually-hidden"><tr><th>Description</th><th>Shortcut</th></tr></thead>
+            <tbody>
+            <tr class="d-none">
+                <td class="bg-transparent"><i class="fa-regular fa-keyboard me-1"></i> <span class="description"></span></td>
+                <td class="bg-transparent text-end" title="Keyboard Shortcut"><kbd>Unknown</kbd></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 
     <form id="options-form" class="options">
         <div class="row">
             <label for="siteUrl" class="form-label"><i class="fa-solid fa-globe me-2"></i> Django Files URL</label>
-            <div class="input-group col-12 ">
+            <div class="input-group col-12">
                 <input id="siteUrl" aria-describedby="siteUrlHelp" type="text" class="form-control" autocomplete="off">
-                <button class="btn btn-outline-primary clip" data-clipboard-target="#siteUrl" type="button" data-bs-toggle="tooltip"
-                        data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Copy to Clipboard.">
+                <button class="btn btn-outline-primary" type="button" data-bs-toggle="tooltip"
+                        data-copy-input="#authToken" data-copy-text="Site URL Copied to Clipboard."
+                        data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Copy Site URL.">
                     <i class="fa-solid fa-copy"></i>
                 </button>
             </div>
             <div class="form-text mb-3" id="siteUrlHelp" >The Full URL to your Django Files server.</div>
 
             <label for="authToken" class="form-label"><i class="fa-solid fa-key me-2"></i> Auth Token</label>
-            <div class="input-group col-12 ">
+            <div class="input-group col-12">
                 <input id="authToken" aria-describedby="authTokenHelp" type="password" class="form-control" autocomplete="off">
-                <button class="btn btn-outline-success show-hide" type="button" data-bs-toggle="tooltip" data-selector="#authToken"
+                <button class="btn btn-outline-success" type="button" data-bs-toggle="tooltip" data-show-hide="#authToken"
                         data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Show/Hide Auth Token.">
                     <i class="fa-regular fa-eye"></i>
                 </button>
-                <button id="authTokenCopy" class="btn btn-outline-primary copy-password" type="button" data-selector="#authToken"
-                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Copy to Clipboard.">
+                <button id="authTokenCopy" class="btn btn-outline-primary" type="button"
+                        data-copy-input="#authToken" data-copy-text="Auth Token Copied to Clipboard."
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover" data-bs-title="Copy Auth Token.">
                     <i class="fa-solid fa-copy"></i>
                 </button>
             </div>
@@ -181,20 +183,19 @@
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="ctxSidePanel" type="checkbox" role="switch">
                 <label class="form-check-label" for="ctxSidePanel" aria-describedby="ctxSidePanelHelp">
-                    Show Open Side Panel in Menu
+                    Show Open Side Panel
                     <span data-bs-toggle="tooltip" data-bs-title="Show Side Panel in Menu.">
-                    <i class="fa-solid fa-circle-info ms-1"></i>
-                </span>
+                        <i class="fa-solid fa-circle-info ms-1"></i>
+                    </span>
                 </label>
             </div>
             <div class="d-flex align-items-center">
                 <button id="reloadAlbums" class="btn btn-sm btn-outline-info" type="button"
-                        data-bs-toggle="tooltip" data-bs-title="Requires Django Files >= 0.15.0. Errors are only show in the console (Ctrl+Shift+I).">
+                        data-bs-trigger="hover" data-bs-toggle="tooltip" data-bs-title="Requires Django Files >=0.15.0 and errors are only shown in the console (Ctrl+Shift+I).">
                     <i class="fa-solid fa-arrows-rotate"></i> Reload Albums
                 </button>
                 <span id="albumsUpdated" class="text-success"  style="display: none;">
-                    <i class="fa-regular fa-circle-check fa-xl ms-3"></i>
-                    Updated
+                    <i class="fa-regular fa-circle-check fa-xl fw-bold ms-3"></i>
                 </span>
             </div>
         </div> <!-- #reloadMenu -->
@@ -258,14 +259,15 @@
     </form> <!-- options-form -->
 
     <p class="fst-italic small mt-3">
-        <a id="copy-support" href="#0">Copy Support Information</a> for issue reporting.
+        <a id="copy-support" class="link-offset-2-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="#0">
+            Copy Support Information</a> for issue reporting.
     </p>
 
     <hr class="mt-0">
 
     <div class="text-center">
         <a class="link-body-emphasis text-decoration-none" target="_blank" rel="noopener"
-           href="https://github.com/django-files/web-extension?tab=readme-ov-file#readme">Get Help</a>
+           href="https://django-files.github.io/extension/">Get Help</a>
         <span class="mx-2">&bull;</span>
         <a class="link-body-emphasis text-decoration-none" target="_blank" rel="noopener"
            href="https://github.com/django-files/web-extension/issues">Open Issue</a>
@@ -273,10 +275,10 @@
         <a class="link-body-emphasis text-decoration-none" target="_blank" rel="noopener"
            href="https://django-files.github.io/">Django Files</a>
     </div>
+
 </div> <!-- options-wrapper -->
-</div> <!-- col -->
-</div> <!-- flex -->
-</div> <!-- container -->
+</div> <!-- m-auto -->
+</div> <!-- d-flex -->
 
 <div aria-live="polite" aria-atomic="true" class="">
     <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>

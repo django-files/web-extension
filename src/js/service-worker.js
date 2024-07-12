@@ -35,6 +35,7 @@ async function onInstalled(details) {
     console.log('onInstalled:', details)
     const githubURL = 'https://github.com/django-files/web-extension'
     const installURL = 'https://django-files.github.io/extension/#configure'
+    const uninstallURL = new URL('https://django-files.github.io/uninstall/')
     const options = await Promise.resolve(
         setDefaultOptions({
             siteUrl: '',
@@ -63,11 +64,11 @@ async function onInstalled(details) {
     if (options.contextMenu) {
         createContextMenus(options)
     }
+    const manifest = chrome.runtime.getManifest()
     if (details.reason === 'install') {
         chrome.runtime.openOptionsPage()
         await chrome.tabs.create({ active: false, url: installURL })
     } else if (details.reason === 'update' && options.showUpdate) {
-        const manifest = chrome.runtime.getManifest()
         if (manifest.version !== details.previousVersion) {
             let { internal } = await chrome.storage.sync.get(['internal'])
             internal = internal || {}
@@ -81,7 +82,9 @@ async function onInstalled(details) {
             }
         }
     }
-    chrome.runtime.setUninstallURL(`${githubURL}/issues`)
+    uninstallURL.searchParams.append('version', manifest.version)
+    console.log('uninstallURL:', uninstallURL.href)
+    await chrome.runtime.setUninstallURL(uninstallURL.href)
 }
 
 /**
