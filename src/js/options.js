@@ -16,7 +16,7 @@ document
     .querySelectorAll('[data-bs-toggle="tooltip"]')
     .forEach((el) => new bootstrap.Tooltip(el))
 document
-    .querySelectorAll('.show-hide')
+    .querySelectorAll('[data-show-hide]')
     .forEach((el) => el.addEventListener('click', showHidePassword))
 document
     .querySelectorAll('[data-copy-input]')
@@ -71,10 +71,10 @@ async function reloadAlbums(event) {
     const icon = event.target.closest('i') || event.target.querySelector('i')
     console.debug('button:', button)
     console.debug('icon:', icon)
-    button.classList.add('disabled')
+    // button.classList.add('disabled')
     icon.classList.add('fa-spin')
     await chrome.runtime.sendMessage('createContextMenus')
-    button.classList.remove('disabled')
+    // button.classList.remove('disabled')
     icon.classList.remove('fa-spin')
     const albumsUpdated = $('#albumsUpdated')
     albumsUpdated.fadeToggle()
@@ -289,7 +289,7 @@ async function setShortcuts(selector = '#keyboard-shortcuts') {
 function showHidePassword(event) {
     console.debug('showHidePassword:', event)
     const element = event.target.closest('button')
-    const input = document.querySelector(element.dataset.selector)
+    const input = document.querySelector(element.dataset.showHide)
     if (input.type === 'password') {
         input.type = 'text'
     } else {

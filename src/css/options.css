@@ -18,7 +18,7 @@ video {
     background: rgba(0 0 0 / 50%);
     filter: drop-shadow(15px 15px 12px #000000);
     backdrop-filter: blur(6px);
-    max-width: 960px;
+    max-width: 800px;
 }
 
 .form-control {
@@ -27,4 +27,19 @@ video {
 
 #table-wrapper {
     background: rgba(0 0 0 / 50%);
+}
+
+.hvr-grow {
+    display: inline-block;
+    vertical-align: middle;
+    transform: translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    backface-visibility: hidden;
+    -moz-osx-font-smoothing: grayscale;
+    transition-duration: 0.3s;
+    transition-property: transform;
+}
+
+.hvr-grow:hover {
+    transform: scale(1.1);
 }
