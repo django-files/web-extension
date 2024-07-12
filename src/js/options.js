@@ -303,6 +303,10 @@ async function copyInput(event) {
     console.debug('element.dataset.copyInput:', element.dataset.copyInput)
     const input = document.querySelector(element.dataset.copyInput)
     console.debug('input:', input)
+    if (!input.value) {
+        showToast('No Data to Copy.', 'warning')
+        return
+    }
     await navigator.clipboard.writeText(input.value)
     if (element.dataset.copyText) {
         showToast(element.dataset.copyText)
