@@ -27,7 +27,7 @@
     "gulp-download2": "^1.1.0",
     "json-merger": "^1.1.10",
     "prettier": "^3.3.2",
-    "puppeteer": "^22.12.1",
+    "puppeteer": "^22.13.0",
     "web-ext": "^8.2.0"
   }
 }
