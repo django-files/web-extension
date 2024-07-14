@@ -16,7 +16,7 @@ video {
 
 #options-wrapper {
     width: 100%;
-    max-width: 800px;
+    max-width: 767px;
     backdrop-filter: blur(6px);
 }
 
