@@ -21,27 +21,27 @@ video {
 }
 
 [data-bs-theme='dark'] #options-wrapper {
-    background: rgba(0 0 0 / 50%);
+    background-color: rgba(0 0 0 / 50%);
     filter: drop-shadow(15px 15px 12px #000000);
 }
 
 [data-bs-theme='light'] #options-wrapper {
-    background: rgba(255 255 255 / 60%);
+    background-color: rgba(255 255 255 / 60%);
     border: 2px solid rgba(51, 51, 51, 60%);
 }
 
 [data-bs-theme='dark'] .form-control {
-    background: rgba(0 0 0 / 50%);
+    background-color: rgba(0 0 0 / 50%);
 }
 
 [data-bs-theme='light'] .form-control {
-    background: rgba(255 255 255 / 50%);
+    background-color: rgba(255 255 255 / 50%);
 }
 
 [data-bs-theme='dark'] #table-wrapper {
-    background: rgba(0 0 0 / 50%);
+    background-color: rgba(0 0 0 / 50%);
 }
 
 [data-bs-theme='light'] #table-wrapper {
-    background: rgba(255 255 255 / 50%);
+    background-color: rgba(255 255 255 / 50%);
 }
