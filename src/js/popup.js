@@ -20,7 +20,7 @@ document
     .addEventListener('click', deleteConfirm)
 document
     .querySelectorAll('a[href]')
-    .forEach((el) => el.addEventListener('click', popupLinks))
+    .forEach((el) => el.addEventListener('click', linkClick))
 document
     .querySelectorAll('input')
     .forEach((el) => el.addEventListener('change', saveOptions))
@@ -103,17 +103,17 @@ async function initPopup(event) {
     }
 
     // Manifest
-    const manifest = chrome.runtime.getManifest()
-    const imgLink = document.querySelector('.head img').closest('a')
-    imgLink.href = manifest.homepage_url
-    imgLink.title = `v${manifest.version}`
-    const titleLink = document.querySelector('.head h4 a')
-    titleLink.href = manifest.homepage_url
+    // const manifest = chrome.runtime.getManifest()
+    const imgLink = document.getElementById('img-link')
+    // imgLink.href = manifest.homepage_url
+    // imgLink.title = `v${manifest.version}`
 
     // Title Link
+    // const titleLink = document.querySelector('.head h4 a')
+    // titleLink.href = manifest.homepage_url
     if (options.siteUrl) {
-        titleLink.title = options.siteUrl
-        titleLink.href = options.siteUrl
+        imgLink.title = options.siteUrl
+        imgLink.href = options.siteUrl
     }
 
     // Ensure authError is set to false
@@ -285,21 +285,33 @@ function initUppy(options) {
 }
 
 /**
- * Popup Links Click Callback
- * Firefox requires a call to window.close()
- * @function popupLinks
+ * Link Click Callback
+ * Note: Firefox popup requires a call to window.close()
+ * @function linkClick
  * @param {MouseEvent} event
+ * @param {Boolean} [close]
  */
-async function popupLinks(event) {
-    console.debug('popupLinks:', event)
+export async function linkClick(event, close = true) {
+    console.debug('linkClick:', close, event)
     event.preventDefault()
-    const anchor = event.target.closest('a')
-    const href = anchor.getAttribute('href').replace(/^\.+/g, '')
-    console.debug(`href: ${href}`, anchor)
+    const href = event.currentTarget.getAttribute('href').replace(/^\.+/g, '')
+    console.debug('href:', href)
     let url
-    if (href.endsWith('html/options.html')) {
-        chrome.runtime.openOptionsPage()
-        return window.close()
+    if (href.startsWith('#')) {
+        console.debug('return on anchor link')
+        return
+    } else if (href.endsWith('html/options.html')) {
+        await chrome.runtime.openOptionsPage()
+        if (close) window.close()
+        return
+        // } else if (href.endsWith('html/panel.html')) {
+        //     await openExtPanel()
+        //     if (close) window.close()
+        //     return
+    } else if (href.endsWith('html/sidepanel.html')) {
+        await openSidePanel()
+        if (close) window.close()
+        return
     } else if (href.startsWith('http')) {
         url = href
     } else {
@@ -307,7 +319,7 @@ async function popupLinks(event) {
     }
     console.debug('url:', url)
     await chrome.tabs.create({ active: true, url })
-    return window.close()
+    if (close) window.close()
 }
 
 /**

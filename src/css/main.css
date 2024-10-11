@@ -1,5 +1,24 @@
 /* CSS for global */
 
 #toast-container {
-    z-index: 4;
+  z-index: 4;
 }
+
+.text-ellipsis {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/*[data-bs-theme='dark'] .btn-toggle-theme {*/
+/*  background-color: var(--bs-btn-light-bg);*/
+/*  color: var(--bs-btn-light-color);*/
+/*  border-color: var(--bs-btn-light-border-color);*/
+/*}*/
+
+/*[data-bs-theme='light'] .btn-toggle-theme {*/
+/*  background-color: var(--bs-btn-dark-bg);*/
+/*  color: var(--bs-btn-dark-color);*/
+/*  border-color: var(--bs-btn-dark-border-color);*/
+/*}*/

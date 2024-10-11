@@ -1,29 +1,23 @@
 /* CSS for popup.html */
 
 body {
-    overflow-x: clip;
-    overflow-y: auto;
+  overflow-x: clip;
+  overflow-y: auto;
 }
 
 #media-outer {
-    z-index: 3;
+  z-index: 3;
 }
 
 #media-image {
-    max-height: 44vh;
-    background-color: #303030;
-}
-
-.popup-heading {
-    overflow: hidden;
-    text-wrap: nowrap;
-    text-overflow: ellipsis;
-}
-
-ul.dropdown-menu {
-    width: 280px;
+  max-height: 44vh;
+  background-color: #303030;
 }
 
 .hover-menu {
-    position: absolute;
+  position: absolute;
+}
+
+ul.dropdown-menu {
+  width: 280px;
 }

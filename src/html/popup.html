@@ -15,25 +15,47 @@
 <body>
 
 <div class="container-fluid p-2">
-    <div class="head mb-2">
-        <div class="form-check form-switch float-start form-select-lg pb-0" style="padding-top: 1px;"
+    <div class="d-flex flex-row align-items-center gap-2">
+<!--        <div class="d-flex align-items-center justify-content-center text-nowrap">-->
+<!--            <a id="img-link"  href=""><img src="../media/logo32.png" class="" height="32" width="32" alt="Django Files"></a>-->
+<!--            <h4 class="my-0 text-ellipsis"><a class="link-body-emphasis text-decoration-none" href="">Files</a></h4>-->
+<!--        </div>-->
+        <a id="img-link"  href="#"><img src="../media/logo32.png" class="" height="32" width="32" alt="Django Files"></a>
+        <div class="dropdown">
+            <a class="link-body-emphasis text-decoration-none" id="bs-theme-dropdown" title="Theme Switcher" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="#">
+                <i id="theme-icon" class="fa-solid fa-circle-half-stroke fa-lg" style="min-width: 20px;"></i> <i class="fa-solid fa-caret-down fa-xs mx-1"></i></a>
+            <ul class="dropdown-menu auto dropdown-menu-end" aria-labelledby="bs-theme-dropdown">
+                <li><button class="dropdown-item" data-bs-theme-value="dark" aria-pressed="false">
+                    <i class="fa-regular fa-moon" style="min-width: 16px;"></i> <span class="ms-3">Dark</span></button></li>
+                <li><button class="dropdown-item" data-bs-theme-value="light" aria-pressed="false">
+                    <i class="fa-solid fa-sun" style="min-width: 16px;"></i> <span class="ms-3">Light</span></button></li>
+                <li><button class="dropdown-item" data-bs-theme-value="auto" aria-pressed="false">
+                    <i class="fa-solid fa-circle-half-stroke" style="min-width: 16px;"></i> <span class="ms-3">Auto</span></button></li>
+            </ul>
+        </div>
+        <div class="form-check form-switch form-select-lg pb-0" style="padding-top: 1px;"
              data-bs-title="Disable/Enable Mouseover Preview." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
             <input class="form-check-input" id="popupPreview" type="checkbox" role="switch">
             <label class="form-check-label visually-hidden" for="popupPreview" aria-describedby="popupPreviewHelp">Popup Preview</label>
         </div>
-        <a class="btn btn-sm btn-outline-primary float-end ms-2" role="button" href="../html/options.html" title="Options">
-            <i class="fa-solid fa-gears"></i></a>
-        <button id="side-panel" class="btn btn-sm btn-outline-info float-end ms-2 d-none" type="button" title="Side Panel">
-            <i class="fa-solid fa-table-columns"></i></button>
-        <a id="always-auth" class="d-none btn btn-sm btn-outline-warning float-end add-auth" role="button"
-           data-bs-title="Update Authentication with Current Site." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
-            <i class="fa-solid fa-key"></i></a>
-        <div class="d-flex align-items-center text-nowrap">
-            <a href=""><img src="../media/logo32.png" class="me-1" height="32" width="32" alt="Django Files"></a>
-            <h4 class="my-0 popup-heading"><a class="link-body-emphasis text-decoration-none" href="">Django Files</a></h4>
-        </div>
-    </div>
 
+        <div class="ms-auto">
+            <a id="always-auth" class="d-none btn btn-sm btn-outline-warning add-auth d-inline-block" role="button"
+               data-bs-title="Update Authentication with Current Site." data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-trigger="hover">
+                <i class="fa-solid fa-key"></i></a>
+            <a class="btn btn-sm btn-outline-light d-inline-block" role="button" title="Pop Out">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            <button id="side-panel" class="btn btn-sm btn-outline-info d-none" type="button" title="Side Panel">
+                <i class="fa-solid fa-table-columns"></i></button>
+            <a class="btn btn-sm btn-outline-primary" role="button" href="../html/options.html" title="Options">
+                <i class="fa-solid fa-gears"></i></a>
+        </div> <!-- ms-auto -->
+    </div> <!-- d-flex -->
+</div> <!-- container-fluid -->
+
+<hr class="my-0">
+
+<div class="container-fluid p-1">
     <div class="mb-1">
         <div id="django-files-links" class="d-none btn-group btn-group-sm w-100" role="group" aria-label="Django Files Links">
             <a role="button" class="btn btn-outline-success" href="" data-location="/files/">
@@ -45,10 +67,10 @@
         </div>
     </div>
 
-    <a id="auth-button" class="d-none btn btn-lg btn-success w-100 my-2 add-auth" role="button">
-        <i class="fa-solid fa-key"></i> Add Auth from Current Site</a>
+    <a id="auth-button" class="btn btn-lg btn-success w-100 mt-2 d-none add-auth" role="button">
+        <i class="fa-solid fa-key"></i> Auth with Current Site</a>
 
-    <div id="error-alert" class="d-none alert text-center p-1 my-2" role="alert"></div>
+    <div id="error-alert" class="d-none alert text-center p-1 mt-2 mb-0" role="alert"></div>
     <div id="auth-alert" class="d-none alert alert-success text-center p-1 my-2" role="alert">
         <i class="fa-solid fa-lightbulb me-2"></i>
         To automatically authenticate, visit your Django Files Website, then check back here...
