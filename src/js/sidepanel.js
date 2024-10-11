@@ -34,6 +34,7 @@ async function domContentLoaded() {
 
     // new Uppy().use(DragDrop, { target: document.body })
 
+    // noinspection JSUnusedGlobalSymbols
     const uppy = new Uppy({ debug: false, autoProceed: false })
         .use(Dashboard, {
             inline: true,
@@ -70,6 +71,7 @@ async function domContentLoaded() {
                 Authorization: options.authToken,
             },
             getResponseError: function (responseText, response) {
+                console.debug('response:', response)
                 return new Error(JSON.parse(responseText).message)
             },
         })
@@ -145,7 +147,9 @@ function onChanged(changes, namespace) {
 async function closePanel(event) {
     console.debug('closePanel:', event)
     event.preventDefault()
+    // noinspection JSUnresolvedReference
     if (typeof browser !== 'undefined') {
+        // noinspection JSUnresolvedReference
         await browser.sidebarAction.close()
     } else {
         window.close()
@@ -187,6 +191,7 @@ function wsConnect(options) {
             const data = JSON.parse(event.data)
             console.log('data:', data)
             if (data.username) {
+                // noinspection JSUnresolvedReference
                 wsStatus.textContent = `Connected as ${data.first_name || data.username}`
                 wsStatus.className = ''
                 wsStatus.classList.add('text-success')

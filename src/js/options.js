@@ -163,7 +163,9 @@ function onChanged(changes, namespace) {
  * @param {FormDataEvent} event
  */
 async function saveOptions(event) {
-    // console.debug('saveOptions:', event)
+    console.debug('saveOptions:', event)
+    console.debug('event.target:', event.target)
+    console.debug('event.currentTarget:', event.currentTarget)
     const { options } = await chrome.storage.sync.get(['options'])
     let key = event.target.id
     let value
@@ -225,8 +227,8 @@ function updateOptions(options) {
             continue
         }
         if (key.startsWith('radio')) {
-            key = value
-            value = true
+            key = value // NOSONAR
+            value = true // NOSONAR
         }
         // console.debug(`${key}: ${value}`)
         const el = document.getElementById(key)

@@ -1,6 +1,6 @@
 // JS for popup.html
 
-import { openSidePanel, showToast } from './exports.js'
+import { debounce, openExtPanel, openSidePanel, showToast } from './exports.js'
 
 import {
     Uppy,
@@ -33,11 +33,19 @@ document
 
 document.querySelectorAll('.modal').forEach((el) =>
     el.addEventListener('shown.bs.modal', (event) => {
+        // noinspection JSUnresolvedReference
         const input = event.target?.querySelector('input')
         input?.focus()
         input?.select()
     })
 )
+
+function windowResize() {
+    // console.debug('windowResize:', event)
+    const size = `${window.outerWidth}x${window.outerHeight}`
+    console.debug('size:', size)
+    localStorage.setItem('panel-size', size)
+}
 
 const filesTable = document.getElementById('files-table')
 const authAlert = document.getElementById('auth-alert')
@@ -51,8 +59,12 @@ const ctxMenuRow = document.getElementById('ctx-menu-row')
 const expireInput = document.getElementById('expire-input')
 const passwordInput = document.getElementById('password-input')
 const sidePanel = document.getElementById('side-panel')
+const popOut = document.getElementById('pop-out')
+const popIn = document.getElementById('pop-in')
 
 sidePanel.addEventListener('click', openSidePanel)
+popOut?.addEventListener('click', popOutClick)
+popIn?.addEventListener('click', popInClick)
 
 const deleteModal = bootstrap.Modal.getOrCreateInstance('#delete-modal')
 const expireModal = bootstrap.Modal.getOrCreateInstance('#expire-modal')
@@ -63,7 +75,8 @@ const faHourglass = document.querySelector('.clone > i.fa-hourglass')
 const faLock = document.querySelector('.clone > i.fa-lock')
 const faKey = document.querySelector('.clone > i.fa-key')
 
-const clipboard = new ClipboardJS('.clip')
+// noinspection TypeScriptUMDGlobal
+const clipboard = new ClipboardJS('.clip') // NOSONAR
 clipboard.on('success', () => showToast('Copied to Clipboard'))
 clipboard.on('error', () => showToast('Clipboard Copy Failed', 'warning'))
 
@@ -85,21 +98,34 @@ async function initPopup(event) {
     mouseRow = null
     errorAlert.classList.add('d-none')
 
+    const popup = localStorage.getItem('popup') !== 'panel'
+    console.debug('popup:', popup)
+
+    if (!popup) {
+        sidePanel.classList.add('d-none')
+        popOut.classList.add('d-none')
+        popIn.classList.remove('d-none')
+        window.addEventListener('resize', debounce(windowResize))
+    }
+
     // Options
     const { options } = await chrome.storage.sync.get(['options'])
     console.debug('options:', options)
     document.getElementById('popupPreview').checked = options.popupPreview
     const platform = await chrome.runtime.getPlatformInfo()
-    if (platform.os !== 'android') {
+    if (platform.os !== 'android' && popup) {
         document.body.style.width = `${options.popupWidth}px`
+        console.debug(`%c SET: width: ${options.popupWidth}`, 'color: Yellow')
         if (options.popupSidePanel) {
             sidePanel.classList.remove('d-none')
         }
-    } else {
+    }
+    if (platform.os === 'android') {
         document.documentElement.style.fontSize = '1.3rem'
         document
             .querySelectorAll('.hover-menu > a')
             .forEach((el) => el.classList.add('px-1'))
+        console.debug('%c SET: fontSize: 1.3rem + px-1', 'color: Orange')
     }
 
     // Manifest
@@ -188,7 +214,12 @@ async function initPopup(event) {
     } else if (!fileData.length) {
         return displayAlert({ message: 'No Files Returned.' })
     }
-    document.body.style.minHeight = '300px'
+    if (!popup) {
+        console.debug('%c SET: panel WxH', 'color: Lime')
+        document.body.style.width = '100%'
+    } else {
+        document.body.style.minHeight = '300px'
+    }
 
     // if (fileData.length < 8) {
     //     document.body.style.minHeight = '340px'
@@ -198,10 +229,14 @@ async function initPopup(event) {
     // Update table should only be called here, changes should use initPopup()
     updateTable(fileData, options)
 
-    if (platform.os !== 'android') {
+    if (platform.os !== 'android' && popup) {
         if (document.documentElement.scrollHeight > 600) {
             document.body.style.marginRight = '15px'
             document.body.style.width = `${document.body.clientWidth - 15}px`
+            console.debug(
+                `%c SET: width: ${document.body.clientWidth - 15}`,
+                'color: Yellow'
+            )
         }
     }
 
@@ -213,10 +248,11 @@ async function initPopup(event) {
     // File Links are re-generated, eventListener re-addd
     document
         .querySelectorAll('a[href]')
-        .forEach((el) => el.addEventListener('click', popupLinks))
+        .forEach((el) => el.addEventListener('click', linkClick))
 
     // Re-init clipboardJS after updateTable
-    new ClipboardJS('.clip')
+    // noinspection TypeScriptUMDGlobal
+    new ClipboardJS('.clip') // NOSONAR
 
     // Enable Popup Mouseover Preview if popupPreview
     timeout = options.popupTimeout * 1000
@@ -280,6 +316,7 @@ function initUppy(options) {
 
     uppyModal._element.addEventListener('hidden.bs.modal', (event) => {
         console.debug('hidden.bs.modal:', event)
+        // noinspection JSUnresolvedReference
         uppy.cancelAll()
     })
 }
@@ -309,7 +346,7 @@ export async function linkClick(event, close = true) {
         //     if (close) window.close()
         //     return
     } else if (href.endsWith('html/sidepanel.html')) {
-        await openSidePanel()
+        openSidePanel()
         if (close) window.close()
         return
     } else if (href.startsWith('http')) {
@@ -415,7 +452,7 @@ async function authCredentials(event) {
  */
 function genLoadingData(rows) {
     console.debug('genLoadingData:', rows)
-    const number = parseInt(rows, 10) // parseInt is redundant
+    const number = parseInt(rows.toString(), 10)
     if (number > 0) {
         filesTable.classList.remove('d-none')
         const tbody = filesTable.querySelector('tbody')
@@ -518,6 +555,7 @@ function updateTable(data, options) {
         div.appendChild(faHourglass.cloneNode(true))
 
         if (options.popupIcons) {
+            // noinspection JSIgnoredPromiseFromCall
             updateFileIcons(data[i], div)
         }
 
@@ -544,6 +582,7 @@ function updateTable(data, options) {
             .querySelector('.clone > .dropdown-menu')
             .cloneNode(true)
         drop.id = `ctx-${i}`
+        // noinspection JSIgnoredPromiseFromCall
         updateContextMenu(drop, data[i])
         const fileName = drop.querySelector('li.mouse-link')
         fileName.innerText = data[i].name
@@ -906,6 +945,7 @@ function displayAlert({ message, type = 'warning', auth = false } = {}) {
     if (auth) {
         authAlert.classList.remove('d-none')
         authError = true
+        // noinspection JSIgnoredPromiseFromCall
         checkSiteAuth()
     }
 }
@@ -994,7 +1034,7 @@ function onMouseOver(event) {
     }
 }
 
-function onMouseLeave(event) {
+function onMouseLeave() {
     // console.debug(`onMouseLeave: ${mouseRow}:`, event.target)
     // const tr = event.target.closest('tr')
     // const tr = document.getElementById(mouseRow)
@@ -1017,4 +1057,33 @@ function onMouseLeave(event) {
         mediaImage.src = loadingImage
         timeoutID = null
     }, timeout)
+}
+
+/**
+ * Open Pop Out Click Callback
+ * @function popOutClick
+ * @param {MouseEvent} event
+ * @param {Boolean} [close]
+ */
+async function popOutClick(event, close = true) {
+    console.debug('popOutClick:', event)
+    localStorage.setItem('popup', 'panel')
+    await chrome.action.setPopup({ popup: '' })
+    await openExtPanel()
+    if (close) window.close()
+}
+
+/**
+ * Open Pop Out Click Callback
+ * @function popInClick
+ * @param {MouseEvent} event
+ * @param {Boolean} [close]
+ */
+async function popInClick(event, close = true) {
+    console.debug('popInClick:', event)
+    localStorage.setItem('popup', '')
+    const popup = chrome.runtime.getURL('/html/popup.html')
+    await chrome.action.setPopup({ popup })
+    await chrome.action.openPopup()
+    if (close) window.close()
 }

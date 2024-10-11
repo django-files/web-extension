@@ -5,14 +5,16 @@
  * @function openSidePanel
  * @param {MouseEvent} [event]
  */
-export async function openSidePanel(event) {
+export function openSidePanel(event) {
     console.debug('openSidePanel:', event)
     if (chrome.sidePanel) {
         chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+            // noinspection JSIgnoredPromiseFromCall
             chrome.sidePanel.open({ windowId: tab.windowId })
         })
     } else if (chrome.sidebarAction) {
-        await chrome.sidebarAction.open()
+        // noinspection JSUnresolvedReference
+        chrome.sidebarAction.open()
     } else {
         console.log('Side Panel Not Supported')
         if (event) {
@@ -22,6 +24,37 @@ export async function openSidePanel(event) {
     if (event) {
         window.close()
     }
+}
+
+/**
+ * Open Extension Panel
+ * @function openExtPanel
+ * @param {String} [url]
+ * @param {Number} [width]
+ * @param {Number} [height]
+ * @return {Promise<chrome.windows.Window>}
+ */
+export async function openExtPanel(
+    url = '/html/popup.html',
+    width = 0,
+    height = 0
+) {
+    let size = localStorage.getItem('panel-size')?.split('x')
+    size = size || [0, 0]
+    console.debug('size:', size)
+    width = parseInt(width || size[0] || 340)
+    height = parseInt(height || size[1] || 600)
+    console.debug(`openExtPanel: ${url}`, width, height)
+    const windows = await chrome.windows.getAll({ populate: true })
+    // console.debug('windows:', windows)
+    for (const window of windows) {
+        // console.debug('window:', window)
+        if (window.tabs[0]?.url?.endsWith(url)) {
+            console.debug(`%c Panel found: ${window.id}`, 'color: Lime')
+            return chrome.windows.update(window.id, { focused: true })
+        }
+    }
+    return chrome.windows.create({ type: 'panel', url, width, height })
 }
 
 /**
@@ -44,5 +77,19 @@ export function showToast(message, type = 'success') {
         toast.show()
     } else {
         console.info('Missing clone or container:', clone, container)
+    }
+}
+
+/**
+ * DeBounce Function
+ * @function debounce
+ * @param {Function} fn
+ * @param {Number} timeout
+ */
+export function debounce(fn, timeout = 250) {
+    let timeoutID
+    return (...args) => {
+        clearTimeout(timeoutID)
+        timeoutID = setTimeout(() => fn(...args), timeout)
     }
 }
