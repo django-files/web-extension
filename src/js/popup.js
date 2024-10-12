@@ -43,7 +43,7 @@ document.querySelectorAll('.modal').forEach((el) =>
 function windowResize() {
     // console.debug('windowResize:', event)
     const size = `${window.outerWidth}x${window.outerHeight}`
-    console.debug('size:', size)
+    console.debug('localStorage.setItem: panel-size:', size)
     localStorage.setItem('panel-size', size)
 }
 
@@ -1083,7 +1083,12 @@ async function popInClick(event, close = true) {
     console.debug('popInClick:', event)
     localStorage.setItem('popup', '')
     const popup = chrome.runtime.getURL('/html/popup.html')
-    await chrome.action.setPopup({ popup })
-    await chrome.action.openPopup()
+    try {
+        await chrome.action.setPopup({ popup })
+        // await chrome.runtime.sendMessage('openPopup')
+        await chrome.action.openPopup() // TODO: Chrome Error: Browser window has no toolbar.
+    } catch (e) {
+        console.debug(e)
+    }
     if (close) window.close()
 }

@@ -39,8 +39,11 @@ export async function openExtPanel(
     width = 0,
     height = 0
 ) {
-    let size = localStorage.getItem('panel-size')?.split('x')
-    size = size || [0, 0]
+    // let size = localStorage.getItem('panel-size')?.split('x')
+    // let size = await sendOffscreen('storage', { key: 'panel-size' })
+    let size = await localStorageFn('panel-size')
+    console.debug('size:', size)
+    size = size?.split('x') || [0, 0]
     console.debug('size:', size)
     width = parseInt(width || size[0] || 340)
     height = parseInt(height || size[1] || 600)
@@ -91,5 +94,45 @@ export function debounce(fn, timeout = 250) {
     return (...args) => {
         clearTimeout(timeoutID)
         timeoutID = setTimeout(() => fn(...args), timeout)
+    }
+}
+
+/**
+ *
+ * @param {String} type
+ * @param {Object} [data]
+ * @return {Promise<Any>}
+ */
+export async function sendOffscreen(type, data = {}) {
+    await chrome.offscreen.createDocument({
+        url: 'html/offscreen.html',
+        reasons: [chrome.offscreen.Reason.LOCAL_STORAGE],
+        justification: 'Access local storage.',
+    })
+    const message = { target: 'offscreen', type, data }
+    // noinspection JSIgnoredPromiseFromCall
+    return chrome.runtime.sendMessage(message)
+}
+
+/**
+ * @function localStorageFn
+ * @param {String} key
+ * @param {String} [value]
+ * @return {Promise<String>}
+ */
+export async function localStorageFn(key, value) {
+    console.debug(`localStorageFn: ${key}`, value)
+    if (typeof localStorage !== 'undefined') {
+        console.debug('%c Firefox: localStorage', 'color: Orange')
+        if (value) {
+            localStorage.setItem(key, value)
+        }
+        return localStorage.getItem(key)
+    } else if (chrome.offscreen) {
+        console.debug('%c Chrome: offscreen', 'color: DodgerBlue')
+        if (value) {
+            await sendOffscreen('storage', { key, value })
+        }
+        return sendOffscreen('storage', { key })
     }
 }

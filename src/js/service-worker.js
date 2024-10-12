@@ -1,6 +1,6 @@
 // JS Background Service Worker
 
-import { openExtPanel, openSidePanel } from './exports.js'
+import { openExtPanel, openSidePanel, localStorageFn } from './exports.js'
 
 chrome.runtime.onStartup.addListener(onStartup)
 chrome.runtime.onInstalled.addListener(onInstalled)
@@ -74,6 +74,7 @@ async function onInstalled(details) {
             }
         }
     }
+    // noinspection ES6MissingAwait
     setPopup()
     setUninstallURL()
 }
@@ -93,6 +94,7 @@ async function onStartup() {
             await createContextMenus(options)
         }
     }
+    // noinspection ES6MissingAwait
     setPopup()
     setUninstallURL()
 }
@@ -105,13 +107,24 @@ function setUninstallURL() {
     console.debug(`setUninstallURL: ${url.href}`)
 }
 
-function setPopup() {
-    const popup = localStorage.getItem('popup') !== 'panel'
+async function setPopup() {
+    console.debug('setPopup')
+    const item = await localStorageFn('popup')
+    console.debug('item:', item)
+    const popup = item !== 'panel'
+    // if (typeof localStorage !== 'undefined') {
+    //     console.debug('%c Firefox: using localStorage', 'color: Orange')
+    //     popup = localStorage.getItem('popup') !== 'panel'
+    // } else {
+    //     console.debug('%c Chrome: using offscreen', 'color: DodgerBlue')
+    //     const response = await sendOffscreen('storage', { key: 'popup' })
+    //     console.debug('response:', response)
+    //     popup = response !== 'panel'
+    // }
     console.debug('popup:', popup)
     if (!popup) {
-        console.log('Popup Cleared')
-        // noinspection JSIgnoredPromiseFromCall
-        chrome.action.setPopup({
+        console.log('%c Clearing Popup...', 'color: Yellow')
+        await chrome.action.setPopup({
             popup: '',
         })
     }
@@ -237,6 +250,14 @@ function onMessage(message, sender) {
             createContextMenus(items.options)
         })
     }
+    if (message.type === 'log') {
+        console.log(message.data)
+    }
+    // TODO: Need to make this work in Firefox and Chrome
+    // if (message === 'openPopup') {
+    //     // noinspection JSIgnoredPromiseFromCall
+    //     chrome.action.openPopup()
+    // }
 }
 
 /**
@@ -465,8 +486,8 @@ async function clipboardWrite(value) {
             justification: 'Write text to the clipboard.',
         })
         await chrome.runtime.sendMessage({
-            type: 'copy-data-to-clipboard',
-            target: 'offscreen-doc',
+            target: 'offscreen',
+            type: 'clipboard',
             data: value,
         })
     }
