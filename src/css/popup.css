@@ -11,7 +11,8 @@ body {
 
 #media-image {
   max-height: 44vh;
-  background-color: #303030;
+  background-color: var(--bs-body-bg);
+  border-color: var(--bs-emphasis-color);
 }
 
 .hover-menu {

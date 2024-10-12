@@ -1,5 +1,16 @@
 /* CSS for global */
 
+:root,
+[data-bs-theme='light'] {
+  --bs-emphasis-bg: var(--bs-white);
+  --bs-emphasis-bg-rgb: var(--bs-white-rgb);
+}
+
+[data-bs-theme='dark'] {
+  --bs-emphasis-bg: var(--bs-black);
+  --bs-emphasis-bg-rgb: var(--bs-black-rgb);
+}
+
 #toast-container {
   z-index: 4;
 }
@@ -11,14 +22,10 @@
   text-overflow: ellipsis;
 }
 
-/*[data-bs-theme='dark'] .btn-toggle-theme {*/
-/*  background-color: var(--bs-btn-light-bg);*/
-/*  color: var(--bs-btn-light-color);*/
-/*  border-color: var(--bs-btn-light-border-color);*/
-/*}*/
-
-/*[data-bs-theme='light'] .btn-toggle-theme {*/
-/*  background-color: var(--bs-btn-dark-bg);*/
-/*  color: var(--bs-btn-dark-color);*/
-/*  border-color: var(--bs-btn-dark-border-color);*/
-/*}*/
+.btn-outline-body {
+  --bs-btn-border-color: var(--bs-body-color);
+  --bs-btn-color: var(--bs-body-color);
+  --bs-btn-bg: var(--bs-body-bg);
+  --bs-btn-hover-color: var(--bs-emphasis-bg);
+  --bs-btn-hover-bg: var(--bs-body-color);
+}
