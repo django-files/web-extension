@@ -243,7 +243,7 @@ function onMessage(message, sender) {
     if (message.type === 'log') {
         console.log(message.data)
     }
-    // TODO: Need to make this work in Firefox and Chrome
+    // TODO: Chrome: Get openPopup to work after Pop In
     // if (message === 'openPopup') {
     //     // noinspection JSIgnoredPromiseFromCall
     //     chrome.action.openPopup()

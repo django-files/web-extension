@@ -1085,8 +1085,10 @@ async function popInClick(event, close = true) {
     const popup = chrome.runtime.getURL('/html/popup.html')
     try {
         await chrome.action.setPopup({ popup })
+        // TODO: Chrome Error: Extension does not have a popup on the active tab
         // await chrome.runtime.sendMessage('openPopup')
-        await chrome.action.openPopup() // TODO: Chrome Error: Browser window has no toolbar.
+        // TODO: Chrome Error: Browser window has no toolbar.
+        await chrome.action.openPopup()
     } catch (e) {
         console.debug(e)
     }
