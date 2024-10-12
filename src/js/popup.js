@@ -40,11 +40,11 @@ document.querySelectorAll('.modal').forEach((el) =>
     })
 )
 
-function windowResize() {
+async function windowResize() {
     // console.debug('windowResize:', event)
-    const size = `${window.outerWidth}x${window.outerHeight}`
-    console.debug('localStorage.setItem: panel-size:', size)
-    localStorage.setItem('panel-size', size)
+    const panelSize = `${window.outerWidth}x${window.outerHeight}`
+    console.debug('panelSize:', panelSize)
+    await chrome.storage.local.set({ panelSize })
 }
 
 const filesTable = document.getElementById('files-table')
@@ -98,10 +98,10 @@ async function initPopup(event) {
     mouseRow = null
     errorAlert.classList.add('d-none')
 
-    const popup = localStorage.getItem('popup') !== 'panel'
-    console.debug('popup:', popup)
+    const { popupView } = await chrome.storage.local.get(['popupView'])
+    console.debug('popupView:', popupView)
 
-    if (!popup) {
+    if (popupView !== 'popup') {
         sidePanel.classList.add('d-none')
         popOut.classList.add('d-none')
         popIn.classList.remove('d-none')
@@ -113,7 +113,7 @@ async function initPopup(event) {
     console.debug('options:', options)
     document.getElementById('popupPreview').checked = options.popupPreview
     const platform = await chrome.runtime.getPlatformInfo()
-    if (platform.os !== 'android' && popup) {
+    if (platform.os !== 'android' && popupView === 'popup') {
         document.body.style.width = `${options.popupWidth}px`
         console.debug(`%c SET: width: ${options.popupWidth}`, 'color: Yellow')
         if (options.popupSidePanel) {
@@ -214,7 +214,7 @@ async function initPopup(event) {
     } else if (!fileData.length) {
         return displayAlert({ message: 'No Files Returned.' })
     }
-    if (!popup) {
+    if (popupView !== 'popup') {
         console.debug('%c SET: panel WxH', 'color: Lime')
         document.body.style.width = '100%'
     } else {
@@ -229,7 +229,7 @@ async function initPopup(event) {
     // Update table should only be called here, changes should use initPopup()
     updateTable(fileData, options)
 
-    if (platform.os !== 'android' && popup) {
+    if (platform.os !== 'android' && popupView === 'popup') {
         if (document.documentElement.scrollHeight > 600) {
             document.body.style.marginRight = '15px'
             document.body.style.width = `${document.body.clientWidth - 15}px`
@@ -1067,7 +1067,7 @@ function onMouseLeave() {
  */
 async function popOutClick(event, close = true) {
     console.debug('popOutClick:', event)
-    localStorage.setItem('popup', 'panel')
+    await chrome.storage.local.set({ popupView: 'panel' })
     await chrome.action.setPopup({ popup: '' })
     await openExtPanel()
     if (close) window.close()
@@ -1081,7 +1081,7 @@ async function popOutClick(event, close = true) {
  */
 async function popInClick(event, close = true) {
     console.debug('popInClick:', event)
-    localStorage.setItem('popup', '')
+    await chrome.storage.local.set({ popupView: 'popup' })
     const popup = chrome.runtime.getURL('/html/popup.html')
     try {
         await chrome.action.setPopup({ popup })

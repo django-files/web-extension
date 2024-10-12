@@ -1,6 +1,6 @@
 // JS Background Service Worker
 
-import { openExtPanel, openSidePanel, localStorageFn } from './exports.js'
+import { openExtPanel, openSidePanel } from './exports.js'
 
 chrome.runtime.onStartup.addListener(onStartup)
 chrome.runtime.onInstalled.addListener(onInstalled)
@@ -60,6 +60,7 @@ async function onInstalled(details) {
         // noinspection ES6MissingAwait
         chrome.runtime.openOptionsPage()
         await chrome.tabs.create({ active: false, url: installURL })
+        await chrome.storage.local.set({ popupView: 'popup' })
     } else if (details.reason === 'update' && options.showUpdate) {
         if (manifest.version !== details.previousVersion) {
             let { internal } = await chrome.storage.sync.get(['internal'])
@@ -109,20 +110,9 @@ function setUninstallURL() {
 
 async function setPopup() {
     console.debug('setPopup')
-    const item = await localStorageFn('popup')
-    console.debug('item:', item)
-    const popup = item !== 'panel'
-    // if (typeof localStorage !== 'undefined') {
-    //     console.debug('%c Firefox: using localStorage', 'color: Orange')
-    //     popup = localStorage.getItem('popup') !== 'panel'
-    // } else {
-    //     console.debug('%c Chrome: using offscreen', 'color: DodgerBlue')
-    //     const response = await sendOffscreen('storage', { key: 'popup' })
-    //     console.debug('response:', response)
-    //     popup = response !== 'panel'
-    // }
-    console.debug('popup:', popup)
-    if (!popup) {
+    const { popupView } = await chrome.storage.local.get(['popupView'])
+    console.debug('popupView:', popupView)
+    if (popupView !== 'popup') {
         console.log('%c Clearing Popup...', 'color: Yellow')
         await chrome.action.setPopup({
             popup: '',

@@ -41,17 +41,16 @@ export async function openExtPanel(
     height = 0,
     type = 'panel'
 ) {
-    // let size = localStorage.getItem('panel-size')?.split('x')
-    // let size = await sendOffscreen('storage', { key: 'panel-size' })
-    let size = await localStorageFn('panel-size')
-    console.debug('size:', size)
-    size = size?.split('x') || [0, 0]
+    let { lastPanelID, panelSize } = await chrome.storage.local.get([
+        'lastPanelID',
+        'panelSize',
+    ])
+    console.debug('lastPanelID, panelSize:', lastPanelID, panelSize)
+    const size = panelSize?.split('x') || [0, 0]
     console.debug('size:', size)
     width = parseInt(width || size[0] || 340)
     height = parseInt(height || size[1] || 600)
     console.debug(`openExtPanel: ${url}`, width, height)
-    const { lastPanelID } = await chrome.storage.local.get(['lastPanelID'])
-    console.debug('lastPanelID:', lastPanelID)
 
     try {
         const window = await chrome.windows.get(lastPanelID)
@@ -108,42 +107,42 @@ export function debounce(fn, timeout = 250) {
     }
 }
 
-/**
- *
- * @param {String} type
- * @param {Object} [data]
- * @return {Promise<Any>}
- */
-export async function sendOffscreen(type, data = {}) {
-    await chrome.offscreen.createDocument({
-        url: 'html/offscreen.html',
-        reasons: [chrome.offscreen.Reason.LOCAL_STORAGE],
-        justification: 'Access local storage.',
-    })
-    const message = { target: 'offscreen', type, data }
-    // noinspection JSIgnoredPromiseFromCall
-    return chrome.runtime.sendMessage(message)
-}
+// /**
+//  *
+//  * @param {String} type
+//  * @param {Object} [data]
+//  * @return {Promise<Any>}
+//  */
+// export async function sendOffscreen(type, data = {}) {
+//     await chrome.offscreen.createDocument({
+//         url: 'html/offscreen.html',
+//         reasons: [chrome.offscreen.Reason.LOCAL_STORAGE],
+//         justification: 'Access local storage.',
+//     })
+//     const message = { target: 'offscreen', type, data }
+//     // noinspection JSIgnoredPromiseFromCall
+//     return chrome.runtime.sendMessage(message)
+// }
 
-/**
- * @function localStorageFn
- * @param {String} key
- * @param {String} [value]
- * @return {Promise<String>}
- */
-export async function localStorageFn(key, value) {
-    console.debug(`localStorageFn: ${key}`, value)
-    if (typeof localStorage !== 'undefined') {
-        console.debug('%c Firefox: localStorage', 'color: Orange')
-        if (value) {
-            localStorage.setItem(key, value)
-        }
-        return localStorage.getItem(key)
-    } else if (chrome.offscreen) {
-        console.debug('%c Chrome: offscreen', 'color: DodgerBlue')
-        if (value) {
-            await sendOffscreen('storage', { key, value })
-        }
-        return sendOffscreen('storage', { key })
-    }
-}
+// /**
+//  * @function localStorageFn
+//  * @param {String} key
+//  * @param {String} [value]
+//  * @return {Promise<String>}
+//  */
+// export async function localStorageFn(key, value) {
+//     console.debug(`localStorageFn: ${key}`, value)
+//     if (typeof localStorage !== 'undefined') {
+//         console.debug('%c Firefox: localStorage', 'color: Orange')
+//         if (value) {
+//             localStorage.setItem(key, value)
+//         }
+//         return localStorage.getItem(key)
+//     } else if (chrome.offscreen) {
+//         console.debug('%c Chrome: offscreen', 'color: DodgerBlue')
+//         if (value) {
+//             await sendOffscreen('storage', { key, value })
+//         }
+//         return sendOffscreen('storage', { key })
+//     }
+// }

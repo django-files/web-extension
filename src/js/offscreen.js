@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener(onMessage)
  * @param {Function} sendResponse
  */
 function onMessage(message, sender, sendResponse) {
-    console.log('%c onMessage:', 'color: Lime', message)
+    console.debug('%c onMessage:', 'color: Lime', message)
     try {
         if (message.target !== 'offscreen') {
             console.debug('Not offscreen message.')
@@ -21,13 +21,6 @@ function onMessage(message, sender, sendResponse) {
         }
         if (message?.type === 'clipboard') {
             handleClipboardWrite(message.data)
-        } else if (message?.type === 'storage') {
-            console.debug('message.data:', message.data)
-            if (message.data.value) {
-                localStorage.setItem(message.data.key, message.data.value)
-            } else {
-                sendResponse(localStorage.getItem(message.data.key))
-            }
         } else {
             console.warn('Unknown Message: offscreen.js:', message)
         }
