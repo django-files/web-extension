@@ -1,24 +1,24 @@
 /* CSS for popup.html */
 
 body {
-  overflow-x: clip;
-  overflow-y: auto;
+    overflow-x: clip;
+    overflow-y: auto;
 }
 
 #media-outer {
-  z-index: 3;
+    z-index: 3;
 }
 
 #media-image {
-  max-height: 44vh;
-  background-color: var(--bs-body-bg);
-  border-color: var(--bs-emphasis-color);
+    max-height: 44vh;
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-emphasis-color);
 }
 
 .hover-menu {
-  position: absolute;
+    position: absolute;
 }
 
 ul.dropdown-menu {
-  width: 280px;
+    width: 280px;
 }

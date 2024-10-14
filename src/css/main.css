@@ -9,30 +9,30 @@
 
 :root,
 [data-bs-theme='light'] {
-  --bs-emphasis-bg: var(--bs-white);
-  --bs-emphasis-bg-rgb: var(--bs-white-rgb);
+    --bs-emphasis-bg: var(--bs-white);
+    --bs-emphasis-bg-rgb: var(--bs-white-rgb);
 }
 
 [data-bs-theme='dark'] {
-  --bs-emphasis-bg: var(--bs-black);
-  --bs-emphasis-bg-rgb: var(--bs-black-rgb);
+    --bs-emphasis-bg: var(--bs-black);
+    --bs-emphasis-bg-rgb: var(--bs-black-rgb);
 }
 
 #toast-container {
-  z-index: 4;
+    z-index: 4;
 }
 
 .text-ellipsis {
-  max-width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .btn-outline-body {
-  --bs-btn-border-color: var(--bs-body-color);
-  --bs-btn-color: var(--bs-body-color);
-  --bs-btn-bg: var(--bs-body-bg);
-  --bs-btn-hover-color: var(--bs-emphasis-bg);
-  --bs-btn-hover-bg: var(--bs-body-color);
+    --bs-btn-border-color: var(--bs-body-color);
+    --bs-btn-color: var(--bs-body-color);
+    --bs-btn-bg: var(--bs-body-bg);
+    --bs-btn-hover-color: var(--bs-emphasis-bg);
+    --bs-btn-hover-bg: var(--bs-body-color);
 }
