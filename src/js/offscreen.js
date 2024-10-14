@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener(onMessage)
  * @param {Function} sendResponse
  */
 function onMessage(message, sender, sendResponse) {
-    console.debug('%c onMessage:', 'color: Lime', message)
+    console.debug('%c onMessage:', 'color: Lime', message, sender)
     try {
         if (message.target !== 'offscreen') {
             console.debug('Not offscreen message.')
@@ -25,6 +25,7 @@ function onMessage(message, sender, sendResponse) {
             console.warn('Unknown Message: offscreen.js:', message)
         }
     } catch (e) {
+        sendResponse(e)
         console.error(e)
     } finally {
         console.debug('window.close')
@@ -37,11 +38,21 @@ function handleClipboardWrite(data) {
     if (typeof data !== 'string') {
         throw new TypeError(`Value must be "string" got: "${typeof data}"`)
     }
-    // const textEl = document.querySelector('#text')
-    const textEl = document.createElement('textarea')
-    textEl.value = data
-    textEl.select()
-    document.appendChild(textEl)
+    const el = document.getElementById('text')
+    // const textEl = document.createElement('textarea')
+    el.value = data
+    el.select()
+    // document.appendChild(textEl)
     document.execCommand('copy')
     console.debug('%c handleClipboardWrite: SUCCESS', 'color: Lime')
 }
+
+// function handleClipboardWrite(data) {
+//     console.debug('handleClipboardWrite2:', data)
+//     if (typeof data !== 'string') {
+//         throw new TypeError(`Value must be "string" got: "${typeof data}"`)
+//     }
+//     // noinspection JSIgnoredPromiseFromCall
+//     navigator.clipboard.writeText(data)
+//     console.debug('%c handleClipboardWrite: SUCCESS', 'color: Lime')
+// }

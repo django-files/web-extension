@@ -318,7 +318,7 @@ function addContext(context) {
             type: context[3] || 'normal',
         })
     } catch (e) {
-        console.log('%cError Adding Context:', 'color: Yellow', e)
+        console.log('%c Error Adding Context:', 'color: Yellow', e)
     }
 }
 
@@ -464,7 +464,7 @@ async function sendNotification(title, text, id = '', timeout = 10) {
  * @param {String} value
  */
 async function clipboardWrite(value) {
-    console.debug('clipboardWrite', value)
+    console.debug('clipboardWrite:', value)
     if (navigator.clipboard) {
         // Firefox
         await navigator.clipboard.writeText(value)
@@ -475,11 +475,15 @@ async function clipboardWrite(value) {
             reasons: [chrome.offscreen.Reason.CLIPBOARD],
             justification: 'Write text to the clipboard.',
         })
-        await chrome.runtime.sendMessage({
+        const response = await chrome.runtime.sendMessage({
             target: 'offscreen',
             type: 'clipboard',
             data: value,
         })
+        // console.debug('offscreen response:', response)
+        if (response instanceof Error) {
+            console.error(response)
+        }
     }
 }
 

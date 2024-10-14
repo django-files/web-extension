@@ -1,11 +1,13 @@
 /* CSS for global */
 
-/* Light Theme */
-/* White: var(--bs-emphasis-bg) */
-/* Black: var(--bs-emphasis-color) */
-/* Dark Theme */
-/* Black: var(--bs-emphasis-bg) */
-/* White: var(--bs-emphasis-color) */
+/**
+Light Theme
+    White: var(--bs-emphasis-bg)
+    Black: var(--bs-emphasis-color)
+Dark Theme
+    Black: var(--bs-emphasis-bg)
+    White: var(--bs-emphasis-color)
+**/
 
 :root,
 [data-bs-theme='light'] {
