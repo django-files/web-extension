@@ -407,10 +407,11 @@ async function saveOptions(event) {
             initPopupMouseover()
         } else {
             console.debug('popupPreview Disabled. Removing Event Listeners...')
-            document.querySelectorAll('.link-underline').forEach((el) => {
+            document.querySelectorAll('.mouse-link').forEach((el) => {
                 el.removeEventListener('mouseover', onMouseOver)
-                el.removeEventListener('mouseleave', onMouseLeave)
+                // el.removeEventListener('mouseleave', onMouseLeave)
             })
+            filesTable.removeEventListener('mouseleave', onMouseLeave)
             mediaOuter.classList.add('d-none')
         }
     }
