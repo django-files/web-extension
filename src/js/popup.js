@@ -1,6 +1,12 @@
 // JS for popup.html
 
-import { debounce, openExtPanel, openSidePanel, showToast } from './exports.js'
+import {
+    debounce,
+    openExtPanel,
+    openPopup,
+    openSidePanel,
+    showToast,
+} from './exports.js'
 
 import {
     Uppy,
@@ -93,7 +99,7 @@ let fileData
  * TODO: Overhaul this function
  * @function initPopup
  */
-async function initPopup(event) {
+async function initPopup(event) /* NOSONAR */ {
     console.debug('initPopup:', event)
     mouseRow = null
     errorAlert.classList.add('d-none')
@@ -306,7 +312,7 @@ function initUppy(options) {
         console.debug('complete:', fileCount)
         document
             .querySelector('.uppy-StatusBar-actionBtn--done')
-            .addEventListener('click', (el) => uppyModal.hide())
+            .addEventListener('click', () => uppyModal.hide())
         await initPopup()
     })
 
@@ -329,9 +335,16 @@ function initUppy(options) {
  * @param {Boolean} [close]
  */
 export async function linkClick(event, close = true) {
-    console.debug('linkClick:', close, event)
+    console.debug('linkClick:', event)
     event.preventDefault()
-    const href = event.currentTarget.getAttribute('href').replace(/^\.+/g, '')
+    const target = event.currentTarget || event.target
+    console.debug('target:', target)
+    const { popupView } = await chrome.storage.local.get(['popupView'])
+    if (popupView !== 'popup') {
+        close = false
+    }
+    console.debug('close:', close)
+    const href = target.getAttribute('href').replace(/^\.+/g, '')
     console.debug('href:', href)
     let url
     if (href.startsWith('#')) {
@@ -341,14 +354,14 @@ export async function linkClick(event, close = true) {
         await chrome.runtime.openOptionsPage()
         if (close) window.close()
         return
-        // } else if (href.endsWith('html/panel.html')) {
-        //     await openExtPanel()
-        //     if (close) window.close()
-        //     return
     } else if (href.endsWith('html/sidepanel.html')) {
         openSidePanel()
         if (close) window.close()
         return
+        // } else if (href.endsWith('html/panel.html')) {
+        //     await openExtPanel()
+        //     if (close) window.close()
+        //     return
     } else if (href.startsWith('http')) {
         url = href
     } else {
@@ -478,7 +491,7 @@ function genLoadingData(rows) {
  * @param {Object[]} data
  * @param {Object} options
  */
-function updateTable(data, options) {
+function updateTable(data, options) /* NOSONAR */ {
     console.debug('updateTable:', data)
     menuShown = false
     const tbody = filesTable.querySelector('tbody')
@@ -826,9 +839,9 @@ async function passwordForm(event) {
     if (response.ok) {
         showToast(`Password Updated: <b>${file.name}</b>`)
         const json = await response.json()
-        console.debug('json:', json)
+        // console.debug('json:', json)
         const ctx = document.getElementById(`ctx-${ctxMenuRow.value}`)
-        console.debug('ctx:', ctx)
+        // console.debug('ctx:', ctx)
         fileData[ctxMenuRow.value] = json
         await updateContextMenu(ctx, json)
         await updateFileIcons(json)
@@ -864,9 +877,9 @@ async function expireForm(event) {
     if (response.ok) {
         showToast(`Expire Updated: <b>${file.name}</b>`)
         const json = await response.json()
-        console.debug('json:', json)
+        // console.debug('json:', json)
         const ctx = document.getElementById(`ctx-${ctxMenuRow.value}`)
-        console.debug('ctx:', ctx)
+        // console.debug('ctx:', ctx)
         fileData[ctxMenuRow.value] = json
         await updateContextMenu(ctx, json)
         await updateFileIcons(json)
@@ -953,17 +966,40 @@ function displayAlert({ message, type = 'warning', auth = false } = {}) {
 
 async function checkSiteAuth() {
     console.debug('checkSiteAuth')
+
+    const { popupView } = await chrome.storage.local.get(['popupView'])
+    console.debug('popupView:', popupView)
     try {
-        const [tab] = await chrome.tabs.query({
-            currentWindow: true,
-            active: true,
-        })
-        console.debug('tab:', tab)
-        await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ['/js/auth.js'],
-        })
-    } catch (e) {} // eslint-disable-line no-empty
+        if (popupView === 'popup') {
+            const queryInfo = {
+                currentWindow: true,
+                active: true,
+            }
+            console.debug('queryInfo:', queryInfo)
+            const [tab] = await chrome.tabs.query(queryInfo)
+            console.debug('tab:', tab)
+            await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                files: ['/js/auth.js'],
+            })
+        } else {
+            const windows = await chrome.windows.getAll()
+            console.debug('windows:', windows)
+            const [tab] = await chrome.tabs.query({
+                windowId: windows[0].id,
+                active: true,
+            })
+            console.debug('tab:', tab)
+            await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                files: ['/js/auth.js'],
+            })
+        }
+    } catch (e) {
+        console.debug(e)
+    } // eslint-disable-line no-empty
+    // try {
+    // } catch (e) {} // eslint-disable-line no-empty
 }
 
 function initPopupMouseover() {
@@ -1089,7 +1125,7 @@ async function popInClick(event, close = true) {
         // TODO: Chrome Error: Extension does not have a popup on the active tab
         // await chrome.runtime.sendMessage('openPopup')
         // TODO: Chrome Error: Browser window has no toolbar.
-        await chrome.action.openPopup()
+        await openPopup()
     } catch (e) {
         console.debug(e)
     }

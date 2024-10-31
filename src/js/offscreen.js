@@ -38,11 +38,10 @@ function handleClipboardWrite(data) {
     if (typeof data !== 'string') {
         throw new TypeError(`Value must be "string" got: "${typeof data}"`)
     }
-    const el = document.getElementById('text')
-    // const textEl = document.createElement('textarea')
+    const el = document.createElement('textarea')
+    document.appendChild(el)
     el.value = data
     el.select()
-    // document.appendChild(textEl)
     document.execCommand('copy')
     console.debug('%c handleClipboardWrite: SUCCESS', 'color: Lime')
 }
