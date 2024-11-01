@@ -112,6 +112,11 @@ async function initPopup(event) /* NOSONAR */ {
         popOut.classList.add('d-none')
         popIn.classList.remove('d-none')
         window.addEventListener('resize', debounce(windowResize))
+        chrome.windows.getCurrent().then((window) => {
+            chrome.storage.local.set({ lastPanelID: window.id }).then(() => {
+                console.debug(`%c lastPanelID: ${window.id}`, 'color: Aqua')
+            })
+        })
     }
 
     // Options

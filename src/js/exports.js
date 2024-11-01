@@ -69,31 +69,22 @@ export async function openExtPanel(
     width = parseInt(width || size[0] || 340)
     height = parseInt(height || size[1] || 600)
     console.debug(`openExtPanel: ${url}`, width, height)
-    console.debug('%c 1', 'color: Lime')
     try {
-        console.debug('%c 2', 'color: Lime')
         const window = await chrome.windows.get(lastPanelID)
         if (window) {
-            console.debug('%c 11', 'color: Yellow')
             console.debug(`%c Window found: ${window.id}`, 'color: Lime')
             return await chrome.windows.update(lastPanelID, {
                 focused: true,
             })
         }
     } catch (e) {
-        console.debug('%c 3', 'color: Lime')
         console.log(e)
     }
-    console.debug('%c 4', 'color: Lime')
     const window = await chrome.windows.create({ type, url, width, height })
-    console.debug('%c 5', 'color: Lime')
-    console.debug(`%c Created new window: ${window.id}`, 'color: Yellow')
-    chrome.storage.local.set({ lastPanelID: window.id })
+    // NOTE: Code after windows.create is not executed on the first pop-out...
+    console.debug(`%c Created new window: ${window.id}`, 'color: Magenta')
+    // chrome.storage.local.set({ lastPanelID: window.id })
     return window
-    // chrome.windows.create({ type, url, width, height }).then((window) => {
-    //     console.debug(`%c Created new window: ${window.id}`, 'color: Yellow')
-    //     chrome.storage.local.set({ lastPanelID: window.id })
-    // })
 }
 
 /**
