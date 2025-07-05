@@ -19,14 +19,14 @@ function onMessage(message, sender, sendResponse) {
             console.debug('Not offscreen message.')
             return
         }
-        if (message?.type === 'clipboard') {
+        if (message.type === 'clipboard') {
             handleClipboardWrite(message.data)
         } else {
-            console.warn('Unknown Message: offscreen.js:', message)
+            console.warn('Unknown message for offscreen:', message)
         }
     } catch (e) {
-        sendResponse(e)
-        console.error(e)
+        console.error(e.toString())
+        sendResponse(e.toString())
     } finally {
         console.debug('window.close')
         window.close()
@@ -38,10 +38,11 @@ function handleClipboardWrite(data) {
     if (typeof data !== 'string') {
         throw new TypeError(`Value must be "string" got: "${typeof data}"`)
     }
-    const el = document.createElement('textarea')
-    document.appendChild(el)
-    el.value = data
-    el.select()
+    // const el = document.createElement('textarea')
+    // document.body.appendChild(el)
+    const textEl = document.getElementById('text')
+    textEl.value = data
+    textEl.select()
     document.execCommand('copy')
     console.debug('%c handleClipboardWrite: SUCCESS', 'color: Lime')
 }

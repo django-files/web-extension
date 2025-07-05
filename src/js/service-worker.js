@@ -374,7 +374,7 @@ async function getAlbums() {
  * @param {String} endpoint
  * @param {String} url
  * @param {Object=} kwargs Additional Header Key/Value Pairs
- * @return {Response}
+ * @return {Promise<Response>}
  */
 async function postURL(endpoint, url, kwargs = {}) {
     console.debug('postURL:', endpoint, url)
@@ -470,6 +470,7 @@ async function clipboardWrite(value) {
         await navigator.clipboard.writeText(value)
     } else {
         // Chrome
+        // await setupOffscreenDocument()
         await chrome.offscreen.createDocument({
             url: 'html/offscreen.html',
             reasons: [chrome.offscreen.Reason.CLIPBOARD],
@@ -480,12 +481,40 @@ async function clipboardWrite(value) {
             type: 'clipboard',
             data: value,
         })
-        // console.debug('offscreen response:', response)
+        console.debug('offscreen response:', response)
         if (response instanceof Error) {
             console.error(response)
         }
     }
 }
+
+// let creating
+// async function setupOffscreenDocument(path = 'html/offscreen.html') {
+//     const offscreenUrl = chrome.runtime.getURL(path)
+//     const existingContexts = await chrome.runtime.getContexts({
+//         contextTypes: ['OFFSCREEN_DOCUMENT'],
+//         documentUrls: [offscreenUrl],
+//     })
+//     console.log('existingContexts:', existingContexts)
+//     if (existingContexts.length > 0) {
+//         return
+//     }
+//
+//     console.log('creating:', creating)
+//     if (creating) {
+//         await creating
+//     } else {
+//         creating = chrome.offscreen.createDocument({
+//             url: path,
+//             reasons: [chrome.offscreen.Reason.CLIPBOARD],
+//             justification: 'Write text to the clipboard.',
+//         })
+//         console.log('creating:', creating)
+//         await creating
+//         console.log('creating:', creating)
+//         creating = null
+//     }
+// }
 
 /**
  * Set Default Options
