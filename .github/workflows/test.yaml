@@ -39,6 +39,9 @@ jobs:
 
       - name: "Test"
         id: test
+        env:
+          DF_URL: ${{ secrets.DF_URL }}
+          DF_TOKEN: ${{ secrets.DF_TOKEN }}
         run: |
           npm run test
 
