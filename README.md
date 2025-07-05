@@ -3,13 +3,14 @@
 [![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/abpbiefojfkekhkjnpakpekkpeibnjej?label=chrome&logo=googlechrome)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
 [![Mozilla Add-on Version](https://img.shields.io/amo/v/django-files?label=firefox&logo=firefox)](https://addons.mozilla.org/addon/django-files)
 [![GitHub Release Version](https://img.shields.io/github/v/release/django-files/web-extension?logo=github)](https://github.com/django-files/web-extension/releases/latest)
-[![Build](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/build.yaml?logo=github&logoColor=white&label=build)](https://github.com/django-files/web-extension/actions/workflows/build.yaml)
-[![Test](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/test.yaml?logo=github&logoColor=white&label=test)](https://github.com/django-files/web-extension/actions/workflows/test.yaml)
+[![Build](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/build.yaml?logo=github&label=build)](https://github.com/django-files/web-extension/actions/workflows/build.yaml)
+[![Test](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/test.yaml?logo=github&label=test)](https://github.com/django-files/web-extension/actions/workflows/test.yaml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/7842944ada6b4c7ebb4f9dc83ed6a654)](https://app.codacy.com/gh/django-files/web-extension/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=django-files_web-extension&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=django-files_web-extension)
-[![GitHub Last Commit](https://img.shields.io/github/last-commit/django-files/web-extension?logo=github&logoColor=white&label=updated)](https://github.com/django-files/web-extension/graphs/commit-activity)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/django-files/web-extension?logo=github&label=updated)](https://github.com/django-files/web-extension/graphs/commit-activity)
 [![GitHub Top Language](https://img.shields.io/github/languages/top/django-files/web-extension?logo=htmx&logoColor=white)](https://github.com/django-files/web-extension)
-[![GitHub Org Stars](https://img.shields.io/github/stars/django-files?style=flat&logo=github&logoColor=white&label=org%20stars)](https://cssnr.github.io/)
+[![GitHub Repo Size](https://img.shields.io/github/repo-size/django-files/web-extension?logo=bookstack&logoColor=white&label=repo%20size)](https://github.com/django-files/web-extension)
+[![GitHub Org Stars](https://img.shields.io/github/stars/django-files?style=flat&logo=github&label=org%20stars)](https://cssnr.github.io/)
 [![Discord](https://img.shields.io/discord/899171661457293343?logo=discord&logoColor=white&label=discord&color=7289da)](https://discord.gg/wXy6m2X8wY)
 
 # Django Files Web Extension
