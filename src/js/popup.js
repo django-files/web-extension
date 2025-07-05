@@ -1002,9 +1002,7 @@ async function checkSiteAuth() {
         }
     } catch (e) {
         console.debug(e)
-    } // eslint-disable-line no-empty
-    // try {
-    // } catch (e) {} // eslint-disable-line no-empty
+    }
 }
 
 function initPopupMouseover() {
