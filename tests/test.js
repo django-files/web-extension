@@ -72,6 +72,7 @@ async function getPage(name, log, size) {
         args: [
             `--disable-extensions-except=${pathToExtension}`,
             `--load-extension=${pathToExtension}`,
+            '--no-sandbox',
         ],
         dumpio: true,
         // headless: false,
@@ -87,6 +88,9 @@ async function getPage(name, log, size) {
     )
     const worker = await workerTarget.worker()
     console.log('worker:', worker)
+    worker.on('console', (msg) => console.log(`worker:`, msg.text()))
+
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // Popup
     await worker.evaluate('chrome.action.openPopup();')
