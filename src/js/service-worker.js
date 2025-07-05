@@ -481,9 +481,8 @@ async function clipboardWrite(value) {
             type: 'clipboard',
             data: value,
         })
-        console.debug('offscreen response:', response)
-        if (response instanceof Error) {
-            console.error(response)
+        if (response) {
+            console.warn('offscreen error:', response)
         }
     }
 }
