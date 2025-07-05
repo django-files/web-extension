@@ -105,7 +105,7 @@ async function initPopup(event) /* NOSONAR */ {
     errorAlert.classList.add('d-none')
 
     const { popupView } = await chrome.storage.local.get(['popupView'])
-    console.debug('popupView:', popupView)
+    console.debug('%c popupView:', 'color: Lime', popupView)
 
     if (popupView !== 'popup') {
         sidePanel.classList.add('d-none')
