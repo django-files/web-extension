@@ -928,7 +928,7 @@ async function deleteConfirm(event) {
  * @param {String} name
  * @param {String} method
  * @param {Object} data
- * @return {Response}
+ * @return {Promise<Response>}
  */
 async function handleFile(name, method, data = null) {
     console.debug(`handleFile: ${name}`)

@@ -6,6 +6,10 @@ export default [
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
+      globals: {
+        chrome: 'readonly',
+        ClipboardJS: 'readonly',
+      },
     },
     settings: {
       env: {
