@@ -1,17 +1,20 @@
 name: "Test"
 
 on:
+  workflow_dispatch:
+  #schedule:
+  #  - cron: "18 18 * * 1,3,5"
+  pull_request:
+    branches: ["master"]
   push:
     branches: ["master"]
     paths:
       - "src/**"
       - "tests/**"
-  pull_request:
-    branches: ["master"]
-    paths:
-      - "src/**"
-      - "tests/**"
-  workflow_dispatch:
+      - ".github/workflows/test.yaml"
+      - "gulpfile.js"
+      - "manifest*.json"
+      - "package*.json"
 
 jobs:
   test:
@@ -24,20 +27,18 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v4
 
-      - name: "Setup Node"
+      - name: "Setup Node 22"
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+          #cache: npm
 
       - name: "Install"
         run: |
-          npm install
-
-      - name: "Lint"
-        run: |
-          npm run lint
+          npm ci
 
       - name: "Test"
+        id: test
         env:
           DF_URL: ${{ secrets.DF_URL }}
           DF_TOKEN: ${{ secrets.DF_TOKEN }}
@@ -47,11 +48,18 @@ jobs:
       - name: "Push Artifacts"
         uses: cssnr/push-artifacts-action@master
         with:
-          path: "tests/screenshots/"
+          source: "tests/screenshots/"
+          dest: "/static"
           host: ${{ secrets.RSYNC_HOST }}
           user: ${{ secrets.RSYNC_USER }}
           pass: ${{ secrets.RSYNC_PASS }}
           port: ${{ secrets.RSYNC_PORT }}
-          base: "/static"
           webhost: "https://artifacts.hosted-domains.com"
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          #token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Schedule Failure Notification"
+        uses: sarisia/actions-status-discord@v1
+        if: ${{ failure() && github.event_name == 'schedule' }}
+        with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}

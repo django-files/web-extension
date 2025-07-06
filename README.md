@@ -3,11 +3,16 @@
 [![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/abpbiefojfkekhkjnpakpekkpeibnjej?label=chrome&logo=googlechrome)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
 [![Mozilla Add-on Version](https://img.shields.io/amo/v/django-files?label=firefox&logo=firefox)](https://addons.mozilla.org/addon/django-files)
 [![GitHub Release Version](https://img.shields.io/github/v/release/django-files/web-extension?logo=github)](https://github.com/django-files/web-extension/releases/latest)
-[![Build](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/build.yaml?logo=github&logoColor=white&label=build)](https://github.com/django-files/web-extension/actions/workflows/build.yaml)
-[![Test](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/test.yaml?logo=github&logoColor=white&label=test)](https://github.com/django-files/web-extension/actions/workflows/test.yaml)
+[![Build](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/build.yaml?logo=github&label=build)](https://github.com/django-files/web-extension/actions/workflows/build.yaml)
+[![Test](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/test.yaml?logo=github&label=test)](https://github.com/django-files/web-extension/actions/workflows/test.yaml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/7842944ada6b4c7ebb4f9dc83ed6a654)](https://app.codacy.com/gh/django-files/web-extension/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=django-files_web-extension&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=django-files_web-extension)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/django-files/web-extension?logo=github&label=updated)](https://github.com/django-files/web-extension/graphs/commit-activity)
+[![GitHub Top Language](https://img.shields.io/github/languages/top/django-files/web-extension?logo=htmx&logoColor=white)](https://github.com/django-files/web-extension)
+[![GitHub Repo Size](https://img.shields.io/github/repo-size/django-files/web-extension?logo=bookstack&logoColor=white&label=repo%20size)](https://github.com/django-files/web-extension)
+[![GitHub Org Stars](https://img.shields.io/github/stars/django-files?style=flat&logo=github&label=org%20stars)](https://cssnr.github.io/)
 [![Discord](https://img.shields.io/discord/899171661457293343?logo=discord&logoColor=white&label=discord&color=7289da)](https://discord.gg/wXy6m2X8wY)
+
 # Django Files Web Extension
 
 [Chrome](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej) Web Extension and
@@ -20,18 +25,18 @@ and upload any Image, Video or Audio files with right click.
 
 ## Table of Contents
 
-*   [Install](#install)
-*   [Features](#features)
-*   [Configure](#configure)
-*   [Setup](#setup)
-*   [Support](#support)
-*   [Building](#building)
-*   [Development](#development)
+- [Install](#install)
+- [Features](#features)
+- [Configure](#configure)
+- [Setup](#setup)
+- [Support](#support)
+- [Building](#building)
+- [Development](#development)
 
 # Install
 
-*   [Google Chrome Web Store](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
-*   [Mozilla Firefox Add-ons](https://addons.mozilla.org/addon/django-files)
+- [Google Chrome Web Store](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
+- [Mozilla Firefox Add-ons](https://addons.mozilla.org/addon/django-files)
 
 [![Chrome](https://raw.githubusercontent.com/smashedr/logo-icons/master/browsers/chrome_48.png)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
 [![Firefox](https://raw.githubusercontent.com/smashedr/logo-icons/master/browsers/firefox_48.png)](https://addons.mozilla.org/addon/django-files)
@@ -50,15 +55,15 @@ Mobile browser support available for
 
 ## Features
 
-*   View Recent Uploads on Popup
-*   Preview Popup Images on Hover.
-*   Set Private, Password, and Expiration.
-*   Customize Popup Icons, Width and Number of Files.
-*   Right Click any Image, Video, or Audio to Upload.
-*   Upload Directly to Albums with Context Menu.
-*   Right Click any URL to Shorten.
-*   Automatically Authenticate with Django Files.
-*   Automatic Dark/Light Mode based on Browser Settings.
+- View Recent Uploads on Popup
+- Preview Popup Images on Hover.
+- Set Private, Password, and Expiration.
+- Customize Popup Icons, Width and Number of Files.
+- Right Click any Image, Video, or Audio to Upload.
+- Upload Directly to Albums with Context Menu.
+- Right Click any URL to Shorten.
+- Automatically Authenticate with Django Files.
+- Automatic Dark/Light Mode based on Browser Settings.
 
 > [!TIP]  
 > **Don't see your feature here?**
@@ -76,14 +81,14 @@ More Information on the Website: [https://django-files.github.io/extension/](htt
 
 To automatically configure the web extension to work with your Django Files instance do the following:
 
--   Log in to your Django Files Instance
--   Click the Popup Icon (from above)
--   Click `Add Auth from Current Site`
+- Log in to your Django Files Instance
+- Click the Popup Icon (from above)
+- Click `Add Auth from Current Site`
 
 The addon should now be configured to work with your Django Files instance.
 
 You can now click the Django Files icon to view your recent uploads or open Options.  
-Right-click on any Image, Video, Audio, or URL upload to Django Files or Shorten URL.  
+Right-click on any Image, Video, Audio, or URL upload to Django Files or Shorten URL.
 
 Alternatively, you can open the Options page and add your URL and Token.
 
@@ -111,23 +116,27 @@ Note: When providing anonymous feedback there is no way to follow up and get mor
 **Quick Start**
 
 First, clone (or download) this repository and change into the directory:
+
 ```shell
 git clone https://github.com/django-files/web-extension.git
 cd web-extension
 ```
 
 Second, install the dependencies:
+
 ```shell
 npm install
 ```
 
 Finally, to run Chrome or Firefox with web-ext, run one of the following:
+
 ```shell
 npm run chrome
 npm run firefox
 ```
 
 Additionally, to Load Unpacked/Temporary Add-on make a `manifest.json` and run from the [src](src) folder, run one of the following:
+
 ```shell
 npm run manifest:chrome
 npm run manifest:firefox
@@ -144,11 +153,13 @@ Example: `npm run chrome -- --chromium-binary=...`
 
 Install the requirements and copy libraries into the `src/dist` directory by running `npm install`.
 See [gulpfile.js](gulpfile.js) for more information on `postinstall`.
+
 ```shell
 npm install
 ```
 
 To create a `.zip` archive of the [src](src) directory for the desired browser run one of the following:
+
 ```shell
 npm run build
 npm run build:chrome

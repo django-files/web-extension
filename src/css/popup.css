@@ -11,19 +11,14 @@ body {
 
 #media-image {
     max-height: 44vh;
-    background-color: #303030;
-}
-
-.popup-heading {
-    overflow: hidden;
-    text-wrap: nowrap;
-    text-overflow: ellipsis;
-}
-
-ul.dropdown-menu {
-    width: 280px;
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-emphasis-color);
 }
 
 .hover-menu {
     position: absolute;
+}
+
+ul.dropdown-menu {
+    width: 280px;
 }

@@ -18,31 +18,15 @@ video {
     width: 100%;
     max-width: 767px;
     backdrop-filter: blur(6px);
+    background-color: rgba(var(--bs-emphasis-bg-rgb), 0.5);
+    border: 1px solid rgba(var(--bs-emphasis-bg-rgb), 0.15);
+    filter: drop-shadow(15px 15px 12px var(--bs-black));
 }
 
-[data-bs-theme='dark'] #options-wrapper {
-    background-color: rgba(0 0 0 / 50%);
-    border: 1px solid rgba(255 255 255 / 15%);
-    filter: drop-shadow(15px 15px 12px #000);
+#table-wrapper {
+    background-color: rgba(var(--bs-emphasis-bg-rgb), 0.5);
 }
 
-[data-bs-theme='light'] #options-wrapper {
-    background-color: rgba(255 255 255 / 60%);
-    border: 1px solid rgba(0 0 0 / 17.5%);
-}
-
-[data-bs-theme='dark'] .form-control {
-    background-color: rgba(0 0 0 / 50%);
-}
-
-[data-bs-theme='light'] .form-control {
-    background-color: rgba(255 255 255 / 50%);
-}
-
-[data-bs-theme='dark'] #table-wrapper {
-    background-color: rgba(0 0 0 / 50%);
-}
-
-[data-bs-theme='light'] #table-wrapper {
-    background-color: rgba(255 255 255 / 50%);
+.form-control {
+    background-color: rgba(var(--bs-emphasis-bg-rgb), 0.5);
 }

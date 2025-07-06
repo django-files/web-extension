@@ -1,6 +1,6 @@
 // JS Background Service Worker
 
-import { openSidePanel } from './exports.js'
+import { openExtPanel, openSidePanel } from './exports.js'
 
 chrome.runtime.onStartup.addListener(onStartup)
 chrome.runtime.onInstalled.addListener(onInstalled)
@@ -10,20 +10,11 @@ chrome.notifications.onClicked.addListener(notificationsClicked)
 chrome.storage.onChanged.addListener(onChanged)
 chrome.runtime.onMessage.addListener(onMessage)
 
-/**
- * On Startup Callback
- * @function onStartup
- */
-async function onStartup() {
-    console.log('onStartup')
-    if (typeof browser !== 'undefined') {
-        console.log('Firefox CTX Menu Workaround')
-        const { options } = await chrome.storage.sync.get(['options'])
-        console.debug('options:', options)
-        if (options.contextMenu) {
-            createContextMenus(options)
-        }
-    }
+chrome.action.onClicked.addListener(actionOnClicked)
+
+async function actionOnClicked(event) {
+    console.debug('actionOnClicked:', event)
+    await openExtPanel()
 }
 
 /**
@@ -35,7 +26,6 @@ async function onInstalled(details) {
     console.log('onInstalled:', details)
     const githubURL = 'https://github.com/django-files/web-extension'
     const installURL = 'https://django-files.github.io/extension/#configure'
-    const uninstallURL = new URL('https://django-files.github.io/uninstall/')
     const options = await Promise.resolve(
         setDefaultOptions({
             siteUrl: '',
@@ -62,12 +52,15 @@ async function onInstalled(details) {
     )
     console.log('options:', options)
     if (options.contextMenu) {
+        // noinspection ES6MissingAwait
         createContextMenus(options)
     }
     const manifest = chrome.runtime.getManifest()
     if (details.reason === 'install') {
+        // noinspection ES6MissingAwait
         chrome.runtime.openOptionsPage()
         await chrome.tabs.create({ active: false, url: installURL })
+        await chrome.storage.local.set({ popupView: 'popup' })
     } else if (details.reason === 'update' && options.showUpdate) {
         if (manifest.version !== details.previousVersion) {
             let { internal } = await chrome.storage.sync.get(['internal'])
@@ -82,9 +75,49 @@ async function onInstalled(details) {
             }
         }
     }
-    uninstallURL.searchParams.append('version', manifest.version)
-    console.log('uninstallURL:', uninstallURL.href)
-    await chrome.runtime.setUninstallURL(uninstallURL.href)
+    // noinspection ES6MissingAwait
+    setPopup()
+    setUninstallURL()
+}
+
+/**
+ * On Startup Callback
+ * @function onStartup
+ */
+async function onStartup() {
+    console.log('onStartup')
+    // noinspection JSUnresolvedReference
+    if (typeof browser !== 'undefined') {
+        console.log('Firefox CTX Menu Workaround')
+        const { options } = await chrome.storage.sync.get(['options'])
+        console.debug('options:', options)
+        if (options.contextMenu) {
+            await createContextMenus(options)
+        }
+    }
+    // noinspection ES6MissingAwait
+    setPopup()
+    setUninstallURL()
+}
+
+function setUninstallURL() {
+    const manifest = chrome.runtime.getManifest()
+    const url = new URL('https://django-files.github.io/uninstall/')
+    url.searchParams.append('version', manifest.version)
+    chrome.runtime.setUninstallURL(url.href)
+    console.debug(`setUninstallURL: ${url.href}`)
+}
+
+async function setPopup() {
+    console.debug('setPopup')
+    const { popupView } = await chrome.storage.local.get(['popupView'])
+    console.debug('popupView:', popupView)
+    if (popupView !== 'popup') {
+        console.log('%c Clearing Popup...', 'color: Yellow')
+        await chrome.action.setPopup({
+            popup: '',
+        })
+    }
 }
 
 /**
@@ -107,7 +140,7 @@ async function onCommand(command) {
             await chrome.tabs.create({ active: true, url })
         }
     } else if (command === 'showSidePanel') {
-        await openSidePanel()
+        openSidePanel()
     } else {
         console.warn('Unknown Command:', command)
     }
@@ -145,9 +178,9 @@ async function contextMenusClicked(ctx) {
             await clipboardWrite(ctx.srcUrl)
         }
     } else if (ctx.menuItemId === 'side-panel') {
-        await openSidePanel()
+        openSidePanel()
     } else if (ctx.menuItemId === 'options') {
-        chrome.runtime.openOptionsPage()
+        await chrome.runtime.openOptionsPage()
     } else {
         console.warn('Unknown ctx.menuItemId:', ctx.menuItemId)
     }
@@ -182,6 +215,7 @@ function onChanged(changes, namespace) {
             ) {
                 if (newValue?.contextMenu) {
                     console.log('Enabled contextMenu...')
+                    // noinspection JSIgnoredPromiseFromCall
                     createContextMenus(newValue)
                 } else {
                     console.log('Disabled contextMenu...')
@@ -197,15 +231,23 @@ function onChanged(changes, namespace) {
  * @function onMessage
  * @param {Object} message
  * @param {MessageSender} sender
- * @param {Function} sendResponse
  */
-function onMessage(message, sender, sendResponse) {
+function onMessage(message, sender) {
     console.debug('onMessage: message, sender:', message, sender)
     if (message === 'createContextMenus') {
         chrome.storage.sync.get(['options'], (items) => {
+            // noinspection JSIgnoredPromiseFromCall
             createContextMenus(items.options)
         })
     }
+    if (message.type === 'log') {
+        console.log(message.data)
+    }
+    // TODO: Chrome: Get openPopup to work after Pop In
+    // if (message === 'openPopup') {
+    //     // noinspection JSIgnoredPromiseFromCall
+    //     chrome.action.openPopup()
+    // }
 }
 
 /**
@@ -256,30 +298,33 @@ async function createContextMenus(options) {
 }
 
 /**
- * Add Context from Array or Separator from String
+ * Add Context from Array
  * @function addContext
- * @param {[[String],String,String]} context
- * TODO: Update to handle parentId contexts
+ * @param {[chrome.contextMenus.ContextType[],String,String,chrome.contextMenus.ContextItemType?]} context
  */
 function addContext(context) {
-    if (context[1] === 'separator') {
-        const id = Math.random().toString().substring(2, 7)
-        // context = [[context], id, 'separator', 'separator']
-        context[1] = `${id}`
-        context.push('separator', 'separator')
+    // console.debug('addContext:', context)
+    try {
+        if (context[1] === 'separator') {
+            const id = Math.random().toString().substring(2, 7)
+            context[1] = `${id}`
+            context.push('separator', 'separator')
+        }
+        // console.debug('menus.create:', context)
+        chrome.contextMenus.create({
+            contexts: context[0],
+            id: context[1],
+            title: context[2],
+            type: context[3] || 'normal',
+        })
+    } catch (e) {
+        console.log('%c Error Adding Context:', 'color: Yellow', e)
     }
-    // console.debug('menus.create:', context)
-    chrome.contextMenus.create({
-        contexts: context[0],
-        id: context[1],
-        title: context[2],
-        type: context[3] || 'normal',
-    })
 }
 
 /**
  * @function getAlbums
- * @return {String[]}
+ * @return {Promise<String[]|undefined>}
  */
 async function getAlbums() {
     const { options } = await chrome.storage.sync.get(['options'])
@@ -329,7 +374,7 @@ async function getAlbums() {
  * @param {String} endpoint
  * @param {String} url
  * @param {Object=} kwargs Additional Header Key/Value Pairs
- * @return {Response}
+ * @return {Promise<Response>}
  */
 async function postURL(endpoint, url, kwargs = {}) {
     console.debug('postURL:', endpoint, url)
@@ -419,24 +464,56 @@ async function sendNotification(title, text, id = '', timeout = 10) {
  * @param {String} value
  */
 async function clipboardWrite(value) {
-    console.debug('clipboardWrite', value)
+    console.debug('clipboardWrite:', value)
     if (navigator.clipboard) {
         // Firefox
         await navigator.clipboard.writeText(value)
     } else {
         // Chrome
+        // await setupOffscreenDocument()
         await chrome.offscreen.createDocument({
             url: 'html/offscreen.html',
             reasons: [chrome.offscreen.Reason.CLIPBOARD],
             justification: 'Write text to the clipboard.',
         })
-        await chrome.runtime.sendMessage({
-            type: 'copy-data-to-clipboard',
-            target: 'offscreen-doc',
+        const response = await chrome.runtime.sendMessage({
+            target: 'offscreen',
+            type: 'clipboard',
             data: value,
         })
+        if (response) {
+            console.warn('offscreen error:', response)
+        }
     }
 }
+
+// let creating
+// async function setupOffscreenDocument(path = 'html/offscreen.html') {
+//     const offscreenUrl = chrome.runtime.getURL(path)
+//     const existingContexts = await chrome.runtime.getContexts({
+//         contextTypes: ['OFFSCREEN_DOCUMENT'],
+//         documentUrls: [offscreenUrl],
+//     })
+//     console.log('existingContexts:', existingContexts)
+//     if (existingContexts.length > 0) {
+//         return
+//     }
+//
+//     console.log('creating:', creating)
+//     if (creating) {
+//         await creating
+//     } else {
+//         creating = chrome.offscreen.createDocument({
+//             url: path,
+//             reasons: [chrome.offscreen.Reason.CLIPBOARD],
+//             justification: 'Write text to the clipboard.',
+//         })
+//         console.log('creating:', creating)
+//         await creating
+//         console.log('creating:', creating)
+//         creating = null
+//     }
+// }
 
 /**
  * Set Default Options
