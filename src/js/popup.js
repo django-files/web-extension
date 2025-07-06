@@ -6,6 +6,7 @@ import {
     openPopup,
     openSidePanel,
     showToast,
+    updatePlatform,
 } from './exports.js'
 
 import {
@@ -123,7 +124,9 @@ async function initPopup(event) /* NOSONAR */ {
     const { options } = await chrome.storage.sync.get(['options'])
     console.debug('options:', options)
     document.getElementById('popupPreview').checked = options.popupPreview
-    const platform = await chrome.runtime.getPlatformInfo()
+    const platform = await updatePlatform()
+    console.debug('platform:', platform)
+
     if (platform.os !== 'android' && popupView === 'popup') {
         document.body.style.width = `${options.popupWidth}px`
         console.debug(`%c SET: width: ${options.popupWidth}`, 'color: Yellow')
@@ -132,11 +135,11 @@ async function initPopup(event) /* NOSONAR */ {
         }
     }
     if (platform.os === 'android') {
+        console.debug('%c SET: fontSize: 1.3rem + px-1', 'color: Orange')
         document.documentElement.style.fontSize = '1.3rem'
         document
             .querySelectorAll('.hover-menu > a')
             .forEach((el) => el.classList.add('px-1'))
-        console.debug('%c SET: fontSize: 1.3rem + px-1', 'color: Orange')
     }
 
     // Manifest
@@ -1107,6 +1110,10 @@ function onMouseLeave() {
  */
 async function popOutClick(event, close = true) {
     console.debug('popOutClick:', event)
+    const platform = await chrome.runtime.getPlatformInfo()
+    if (platform.os === 'android') {
+        return console.warn('Blocking Popout on Android.')
+    }
     await chrome.storage.local.set({ popupView: 'panel' })
     await chrome.action.setPopup({ popup: '' })
     await openExtPanel()

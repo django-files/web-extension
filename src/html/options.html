@@ -76,7 +76,7 @@
                 <input id="recentFiles" aria-describedby="recentFilesHelp" type="number" class="form-control" autocomplete="off">
                 <div class="form-text" id="recentFilesHelp">Popup Recent Files. <span class="d-inline-block">0 to Disable.</span></div>
             </div>
-            <div class="col-sm-4 col-12 mb-2 non-mobile">
+            <div class="col-sm-4 col-12 mb-2" data-mobile-add="d-none">
                 <label for="popupWidth" class="form-label"><i class="fa-solid fa-arrows-left-right-to-line me-2"></i> Popup Width</label>
                 <input id="popupWidth" aria-describedby="popupWidthHelp" type="number" class="form-control" autocomplete="off" step="10">
                 <div class="form-text" id="popupWidthHelp">Popup Width in Pixels. <span class="d-inline-block">320-600.</span></div>
@@ -141,7 +141,7 @@
             </label>
         </div>
 
-        <div class="form-check form-switch mb-2 non-mobile">
+        <div class="form-check form-switch mb-2" data-mobile-add="d-none">
             <input class="form-check-input" id="popupSidePanel" type="checkbox" role="switch">
             <label class="form-check-label" for="popupSidePanel" aria-describedby="popupSidePanelHelp">
                 Show SidePanel Button in Popup
@@ -171,7 +171,7 @@
             </label>
         </div>
 
-        <div class="form-check form-switch mb-2 non-mobile">
+        <div class="form-check form-switch mb-2" data-mobile-add="d-none">
             <input class="form-check-input" id="contextMenu" type="checkbox" role="switch" data-related="reloadMenu">
             <label class="form-check-label" for="contextMenu" aria-describedby="contextMenuHelp">
                 Enable Context Menu
@@ -180,7 +180,7 @@
                 </span>
             </label>
         </div><!-- data-related #reloadMenu -->
-        <div id="reloadMenu" class="ms-5 mb-2 non-mobile" style="display: none;">
+        <div id="reloadMenu" class="ms-5 mb-2" style="display: none;" data-mobile-add="d-none">
             <div class="form-check form-switch mb-2">
                 <input class="form-check-input" id="ctxSidePanel" type="checkbox" role="switch">
                 <label class="form-check-label" for="ctxSidePanel" aria-describedby="ctxSidePanelHelp">
