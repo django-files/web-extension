@@ -1,6 +1,6 @@
 // JS for options.html
 
-import { showToast } from './exports.js'
+import { showToast, updatePlatform } from './exports.js'
 
 chrome.storage.onChanged.addListener(onChanged)
 document.addEventListener('DOMContentLoaded', initOptions)
@@ -50,13 +50,8 @@ async function initOptions() {
         siteUrl.focus()
     }
 
-    const platform = await chrome.runtime.getPlatformInfo()
-    if (platform.os === 'android') {
-        document.querySelectorAll('.non-mobile').forEach((el) => {
-            console.log('non-mobile el:', el)
-            el.classList.add('d-none')
-        })
-    }
+    const platform = await updatePlatform()
+    console.debug('platform:', platform)
 }
 
 /**

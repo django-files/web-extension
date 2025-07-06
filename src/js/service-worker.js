@@ -20,37 +20,37 @@ async function actionOnClicked(event) {
 /**
  * On Installed Callback
  * @function onInstalled
- * @param {InstalledDetails} details
+ * @param {chrome.runtime.InstalledDetails} details
  */
 async function onInstalled(details) {
     console.log('onInstalled:', details)
     const githubURL = 'https://github.com/django-files/web-extension'
     const installURL = 'https://django-files.github.io/extension/#configure'
-    const options = await Promise.resolve(
-        setDefaultOptions({
-            siteUrl: '',
-            authToken: '',
-            recentFiles: 14,
-            popupWidth: 380,
-            popupTimeout: 10,
-            popupPreview: true,
-            popupIcons: true,
-            iconPrivate: true,
-            iconPassword: true,
-            iconExpire: false,
-            popupLinks: true,
-            popupSidePanel: true,
-            checkAuth: true,
-            deleteConfirm: true,
-            ctxSidePanel: true,
-            contextMenu: true,
-            showUpdate: false,
-            radioBackground: 'bgPicture',
-            pictureURL: 'https://picsum.photos/1920/1080',
-            videoURL: '',
-        })
-    )
+    const options = await setDefaultOptions({
+        siteUrl: '',
+        authToken: '',
+        recentFiles: 14,
+        popupWidth: 380,
+        popupTimeout: 10,
+        popupPreview: true,
+        popupIcons: true,
+        iconPrivate: true,
+        iconPassword: true,
+        iconExpire: false,
+        popupLinks: true,
+        popupSidePanel: true,
+        checkAuth: true,
+        deleteConfirm: true,
+        ctxSidePanel: true,
+        contextMenu: true,
+        showUpdate: false,
+        radioBackground: 'bgPicture',
+        pictureURL: 'https://picsum.photos/1920/1080',
+        videoURL: '',
+    })
     console.log('options:', options)
+    await setStorageDefaults(chrome.storage.local, { popupView: 'popup' })
+
     if (options.contextMenu) {
         // noinspection ES6MissingAwait
         createContextMenus(options)
@@ -60,7 +60,6 @@ async function onInstalled(details) {
         // noinspection ES6MissingAwait
         chrome.runtime.openOptionsPage()
         await chrome.tabs.create({ active: false, url: installURL })
-        await chrome.storage.local.set({ popupView: 'popup' })
     } else if (details.reason === 'update' && options.showUpdate) {
         if (manifest.version !== details.previousVersion) {
             let { internal } = await chrome.storage.sync.get(['internal'])
@@ -149,7 +148,7 @@ async function onCommand(command) {
 /**
  * Context Menus On Clicked Callback
  * @function contextMenusClicked
- * @param {OnClickData} ctx
+ * @param {chrome.contextMenus.OnClickData} ctx
  */
 async function contextMenusClicked(ctx) {
     console.debug('contextMenusClicked:', ctx)
@@ -230,7 +229,7 @@ function onChanged(changes, namespace) {
  * On Message Callback
  * @function onMessage
  * @param {Object} message
- * @param {MessageSender} sender
+ * @param {chrome.runtime.MessageSender} sender
  */
 function onMessage(message, sender) {
     console.debug('onMessage: message, sender:', message, sender)
@@ -519,7 +518,7 @@ async function clipboardWrite(value) {
  * Set Default Options
  * @function setDefaultOptions
  * @param {Object} defaultOptions
- * @return {Object}
+ * @return {Promise<Object>}
  */
 async function setDefaultOptions(defaultOptions) {
     console.log('setDefaultOptions')
@@ -536,7 +535,28 @@ async function setDefaultOptions(defaultOptions) {
     }
     if (changed) {
         await chrome.storage.sync.set({ options })
-        console.log('options:', options)
+        console.log('changed options:', options)
     }
     return options
+}
+
+/**
+ * @function setStorageDefaults
+ * @param {chrome.storage.LocalStorageArea|chrome.storage.SyncStorageArea} storageArea
+ * @param {Object} defaultOptions
+ * @return {Promise<void>}
+ */
+async function setStorageDefaults(storageArea, defaultOptions) {
+    console.log('%c setStorageDefaults:', 'color: Lime', defaultOptions)
+    const current = await storageArea.get()
+    const data = {}
+    for (const [key, value] of Object.entries(defaultOptions)) {
+        if (current[key] === undefined) {
+            data[key] = value
+        }
+    }
+    if (Object.keys(data).length > 0) {
+        console.log('%c Set data:', 'color: Yellow', data)
+        await storageArea.set(data)
+    }
 }
