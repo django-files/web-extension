@@ -38,10 +38,10 @@
 [Django Files](https://github.com/django-files/django-files) to view recent uploads, shorten URLs,
 and upload any Image, Video or Audio files with right click.
 
+[![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=quicklook)](https://django-files.github.io/clients/browser)
+
 > [!IMPORTANT]  
 > This Web Extension is designed to work with [Django Files](https://github.com/django-files/django-files).
-
-[![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=quicklook)](https://django-files.github.io/clients/browser)
 
 # Install
 
