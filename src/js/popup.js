@@ -172,7 +172,7 @@ async function initPopup(event) /* NOSONAR */ {
     }
 
     // If recent files disabled, do nothing
-    if (!parseInt(options.recentFiles, 10)) {
+    if (!Number.parseInt(options.recentFiles, 10)) {
         return displayAlert({
             message: 'Recent Files Disabled in Options.',
             type: 'success',
@@ -219,11 +219,11 @@ async function initPopup(event) /* NOSONAR */ {
     } else if (!fileData.length) {
         return displayAlert({ message: 'No Files Returned.' })
     }
-    if (popupView !== 'popup') {
+    if (popupView === 'popup') {
+        document.body.style.minHeight = '300px'
+    } else {
         console.debug('%c SET: panel WxH', 'color: Lime')
         document.body.style.width = '100%'
-    } else {
-        document.body.style.minHeight = '300px'
     }
 
     // if (fileData.length < 8) {
@@ -343,7 +343,7 @@ export async function linkClick(event, close = true) {
         close = false
     }
     console.debug('close:', close)
-    const href = target.getAttribute('href').replace(/^\.+/g, '')
+    const href = target.getAttribute('href').replace(/^\.+/, '')
     console.debug('href:', href)
     let url
     if (href.startsWith('#')) {
@@ -465,7 +465,7 @@ async function authCredentials(event) {
  */
 function genLoadingData(rows) {
     console.debug('genLoadingData:', rows)
-    const number = parseInt(rows.toString(), 10)
+    const number = Number.parseInt(rows.toString(), 10)
     if (number > 0) {
         filesTable.classList.remove('d-none')
         const tbody = filesTable.querySelector('tbody')

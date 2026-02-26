@@ -66,8 +66,8 @@ export async function openExtPanel(
     console.debug('lastPanelID, panelSize:', lastPanelID, panelSize)
     const size = panelSize?.split('x') || [0, 0]
     console.debug('size:', size)
-    width = parseInt(width || size[0] || 340)
-    height = parseInt(height || size[1] || 600)
+    width = Number.parseInt(width || size[0] || 340)
+    height = Number.parseInt(height || size[1] || 600)
     console.debug(`openExtPanel: ${url}`, width, height)
     try {
         const window = await chrome.windows.get(lastPanelID)

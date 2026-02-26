@@ -169,7 +169,7 @@ async function saveOptions(event) {
         event.target.value = event.target.value.replace(/\/+$/, '')
         value = event.target.value
     } else if (event.target.type === 'number') {
-        const number = parseInt(event.target.value, 10)
+        const number = Number.parseInt(event.target.value, 10)
         let min = 0
         let max = 60
         if (event.target.id === 'recentFiles') {
@@ -178,7 +178,7 @@ async function saveOptions(event) {
             min = 320
             max = 600
         }
-        if (!isNaN(number) && number >= min && number <= max) {
+        if (!Number.isNaN(number) && number >= min && number <= max) {
             event.target.value = number.toString()
             value = number
         } else {
@@ -199,12 +199,12 @@ async function saveOptions(event) {
     } else {
         value = event.target.value
     }
-    if (value !== undefined) {
+    if (value === undefined) {
+        console.warn('No Value for key:', key)
+    } else {
         options[key] = value
         console.info(`Set: ${key}:`, value)
         await chrome.storage.sync.set({ options })
-    } else {
-        console.warn('No Value for key:', key)
     }
 }
 
@@ -216,7 +216,7 @@ async function saveOptions(event) {
 function updateOptions(options) {
     console.debug('updateOptions:', options)
     for (let [key, value] of Object.entries(options)) {
-        if (typeof value === 'undefined') {
+        if (value === undefined) {
             console.warn('Value undefined for key:', key)
             continue
         }
