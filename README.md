@@ -16,7 +16,7 @@
 [![GitHub Discussions](https://img.shields.io/github/discussions/django-files/web-extension?logo=theconversation)](https://github.com/django-files/web-extension/discussions)
 [![GitHub Forks](https://img.shields.io/github/forks/django-files/web-extension?style=flat&logo=forgejo&logoColor=white)](https://github.com/django-files/web-extension/forks)
 [![GitHub Repo Stars](https://img.shields.io/github/stars/django-files/web-extension?style=flat&logo=gleam&logoColor=white)](https://github.com/django-files/web-extension/stargazers)
-[![GitHub Org Stars](https://img.shields.io/github/stars/cssnr?style=flat&logo=apachespark&logoColor=white&label=org%20stars)](https://cssnr.github.io/)
+[![GitHub Org Stars](https://img.shields.io/github/stars/django-files?style=flat&logo=apachespark&logoColor=white&label=org%20stars)](https://django-files.github.io/)
 [![Discord](https://img.shields.io/discord/899171661457293343?logo=discord&logoColor=white&label=discord&color=7289da)](https://discord.gg/wXy6m2X8wY)
 
 # Django Files Web Extension
@@ -102,24 +102,24 @@ Right-click on any Image, Video, Audio, or URL upload to Django Files or Shorten
 
 Alternatively, you can open the Options page and add your URL and Token.
 
-# Support
-
-For help using the web extension, utilize any these resources:
-
-- Documentation: https://django-files.github.io/clients/browser
-- Q&A Discussion: https://github.com/django-files/web-extension/discussions/categories/q-a
-- Request a Feature: https://github.com/django-files/web-extension/discussions/categories/feature-requests
-
-If you are experiencing an issue/bug or getting unexpected results, use:
-
-- Report an Issue: https://github.com/django-files/web-extension/issues
-- Chat with us on Discord: https://discord.gg/wXy6m2X8wY
-- Provide Anonymous Feedback: [https://cssnr.github.io/feedback](https://cssnr.github.io/feedback?app=Django%20Files%20Extension)
+## Support
 
 Logs can be found inspecting the page (Ctrl+Shift+I), clicking on the Console, and;
 Firefox: toggling Debug logs, Chrome: toggling Verbose from levels dropdown.
 
-Note: When providing anonymous feedback there is no way to follow up and get more information unless you provide a contact method.
+If you run into any issues or need help getting started, please do one of the following:
+
+- Report an Issue: <https://github.com/django-files/web-extension/issues>
+- Q&A Discussion: <https://github.com/django-files/web-extension/discussions/categories/q-a>
+- Request a Feature: <https://github.com/django-files/web-extension/issues/new?template=1-feature.yaml>
+- Chat with us on Discord: <https://discord.gg/wXy6m2X8wY>
+
+[![Features](https://img.shields.io/badge/features-brightgreen?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/django-files/web-extension/issues/new?template=1-feature.yaml)
+[![Issues](https://img.shields.io/badge/issues-red?style=for-the-badge&logo=southwestairlines&logoColor=white)](https://github.com/django-files/web-extension/issues)
+[![Discussions](https://img.shields.io/badge/discussions-blue?style=for-the-badge&logo=livechat&logoColor=white)](https://github.com/django-files/web-extension/discussions)
+[![Discord](https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/wXy6m2X8wY)
+
+To support this project, see the [Contributing](#Contributing) section at the bottom.
 
 # Development
 
