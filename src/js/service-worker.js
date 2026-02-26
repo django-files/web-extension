@@ -380,7 +380,7 @@ async function postURL(endpoint, url, kwargs = {}) {
     if (!options?.siteUrl || !options?.authToken) {
         throw new Error('Missing URL or Token.')
     }
-    const headers = { ...{ Authorization: options.authToken }, ...kwargs }
+    const headers = { Authorization: options.authToken, ...kwargs }
     console.debug('headers:', headers)
     const body = JSON.stringify({ url: url })
     const opts = {
