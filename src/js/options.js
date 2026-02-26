@@ -35,8 +35,7 @@ const bgVideoInput = document.getElementById('bgVideoInput')
 async function initOptions() {
     console.debug('initOptions')
 
-    document.getElementById('version').textContent =
-        chrome.runtime.getManifest().version
+    document.getElementById('version').textContent = chrome.runtime.getManifest().version
     await setShortcuts('#keyboard-shortcuts')
 
     const { options } = await chrome.storage.sync.get(['options'])

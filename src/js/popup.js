@@ -9,22 +9,13 @@ import {
     updatePlatform,
 } from './exports.js'
 
-import {
-    Uppy,
-    Dashboard,
-    DropTarget,
-    XHRUpload,
-} from '../dist/uppy/uppy.min.mjs'
+import { Uppy, Dashboard, DropTarget, XHRUpload } from '../dist/uppy/uppy.min.mjs'
 
 chrome.runtime.onMessage.addListener(onMessage)
 document.addEventListener('DOMContentLoaded', initPopup)
 document.getElementById('expire-form').addEventListener('submit', expireForm)
-document
-    .getElementById('password-form')
-    .addEventListener('submit', passwordForm)
-document
-    .getElementById('confirm-delete')
-    .addEventListener('click', deleteConfirm)
+document.getElementById('password-form').addEventListener('submit', passwordForm)
+document.getElementById('confirm-delete').addEventListener('click', deleteConfirm)
 document
     .querySelectorAll('a[href]')
     .forEach((el) => el.addEventListener('click', linkClick))
@@ -44,7 +35,7 @@ document.querySelectorAll('.modal').forEach((el) =>
         const input = event.target?.querySelector('input')
         input?.focus()
         input?.select()
-    })
+    }),
 )
 
 async function windowResize() {
@@ -249,7 +240,7 @@ async function initPopup(event) /* NOSONAR */ {
             document.body.style.width = `${document.body.clientWidth - 15}px`
             console.debug(
                 `%c SET: width: ${document.body.clientWidth - 15}`,
-                'color: Yellow'
+                'color: Yellow',
             )
         }
     }
@@ -555,7 +546,7 @@ function updateTable(data, options) /* NOSONAR */ {
             'link-underline',
             'link-underline-opacity-0',
             'link-underline-opacity-75-hover',
-            'file-link'
+            'file-link',
             // 'mouse-link'
         )
         link.target = '_blank'
@@ -600,9 +591,7 @@ function updateTable(data, options) /* NOSONAR */ {
         const button = document.querySelector(`#row-${i} .ctx-button`)
 
         // CTX Drop Down -> Menu
-        const drop = document
-            .querySelector('.clone > .dropdown-menu')
-            .cloneNode(true)
+        const drop = document.querySelector('.clone > .dropdown-menu').cloneNode(true)
         drop.id = `ctx-${i}`
         // noinspection JSIgnoredPromiseFromCall
         updateContextMenu(drop, data[i])
@@ -677,15 +666,13 @@ function hoverLinks(event) {
         if (menuShown) {
             document.getElementById(`menu-${menuShown}`).classList.add('d-none')
             const ctx = bootstrap.Dropdown.getOrCreateInstance(
-                `#menu-${menuShown} .ctx-button`
+                `#menu-${menuShown} .ctx-button`,
             )
             // console.debug('ctx:', ctx)
             ctx.hide()
         }
         menuShown = row.dataset.idx
-        document
-            .getElementById(`menu-${row.dataset.idx}`)
-            .classList.remove('d-none')
+        document.getElementById(`menu-${row.dataset.idx}`).classList.remove('d-none')
     }
 }
 
@@ -769,8 +756,7 @@ async function ctxMenu(event) {
     const file = fileData[fileLink.dataset?.row]
     console.debug('file:', file)
     if (action === 'delete') {
-        document.querySelector('#delete-modal .file-name').textContent =
-            file.name
+        document.querySelector('#delete-modal .file-name').textContent = file.name
         const { options } = await chrome.storage.sync.get(['options'])
         if (options.deleteConfirm) {
             deleteModal.show()
@@ -779,13 +765,11 @@ async function ctxMenu(event) {
         }
     } else if (action === 'expire') {
         expireInput.value = file.expr
-        document.querySelector('#expire-modal .file-name').textContent =
-            file.name
+        document.querySelector('#expire-modal .file-name').textContent = file.name
         expireModal.show()
     } else if (action === 'password') {
         passwordInput.value = file.password
-        document.querySelector('#password-modal .file-name').textContent =
-            file.name
+        document.querySelector('#password-modal .file-name').textContent = file.name
         passwordModal.show()
     } else if (action === 'private') {
         await togglePrivate()

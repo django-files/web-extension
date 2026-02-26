@@ -27,7 +27,7 @@ gulp.task('fontawesome', () => {
             {
                 base: 'node_modules/@fortawesome/fontawesome-free',
                 encoding: false,
-            }
+            },
         )
         .pipe(gulp.dest('src/dist/fontawesome'))
 })
@@ -47,5 +47,5 @@ gulp.task('uppy', () => {
 
 gulp.task(
     'default',
-    gulp.parallel('bootstrap', 'clipboard', 'fontawesome', 'jquery', 'uppy')
+    gulp.parallel('bootstrap', 'clipboard', 'fontawesome', 'jquery', 'uppy'),
 )

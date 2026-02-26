@@ -25,13 +25,12 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: "Setup Node 22"
-        uses: actions/setup-node@v4
+      - name: "Setup Node 24"
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
-          #cache: npm
+          node-version: 24
 
       - name: "Install"
         run: |
@@ -59,7 +58,8 @@ jobs:
           #token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Schedule Failure Notification"
-        uses: sarisia/actions-status-discord@v1
+        uses: sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0
         if: ${{ failure() && github.event_name == 'schedule' }}
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          description: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

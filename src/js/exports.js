@@ -57,7 +57,7 @@ export async function openExtPanel(
     url = '/html/popup.html',
     width = 0,
     height = 0,
-    type = 'panel'
+    type = 'panel',
 ) {
     let { lastPanelID, panelSize } = await chrome.storage.local.get([
         'lastPanelID',
@@ -80,6 +80,7 @@ export async function openExtPanel(
     } catch (e) {
         console.log(e)
     }
+    // noinspection JSCheckFunctionSignatures
     const window = await chrome.windows.create({ type, url, width, height })
     // NOTE: Code after windows.create is not executed on the first pop-out...
     console.debug(`%c Created new window: ${window.id}`, 'color: Magenta')
@@ -93,21 +94,20 @@ export async function openExtPanel(
  * @param {String} message
  * @param {String} type
  */
-export function showToast(message, type = 'success') {
+export function showToast(message, type = 'primary') {
     console.debug(`showToast: ${type}: ${message}`)
     const clone = document.querySelector('.d-none .toast')
     const container = document.getElementById('toast-container')
-    if (clone && container) {
-        const element = clone.cloneNode(true)
-        element.querySelector('.toast-body').innerHTML = message
-        element.classList.add(`text-bg-${type}`)
-        container.appendChild(element)
-        const toast = new bootstrap.Toast(element)
-        element.addEventListener('mousemove', () => toast.hide())
-        toast.show()
-    } else {
-        console.info('Missing clone or container:', clone, container)
+    if (!clone || !container) {
+        return console.warn('Missing clone or container:', clone, container)
     }
+    const element = clone.cloneNode(true)
+    element.querySelector('.toast-body').textContent = message
+    element.classList.add(`text-bg-${type}`)
+    container.appendChild(element)
+    const toast = new bootstrap.Toast(element)
+    element.addEventListener('mousemove', () => toast.hide())
+    toast.show()
 }
 
 /**
@@ -126,7 +126,7 @@ export function debounce(fn, timeout = 250) {
 
 /**
  * @function updatePlatform
- * @return {Promise<any>}
+ * @return {Promise<chrome.runtime.PlatformInfo>}
  */
 export async function updatePlatform() {
     const platform = await chrome.runtime.getPlatformInfo()
@@ -136,7 +136,7 @@ export async function updatePlatform() {
         // document.querySelectorAll('[class*="mobile-"]').forEach((el) => {
         document
             .querySelectorAll(
-                '[data-mobile-add],[data-mobile-remove],[data-mobile-replace]'
+                '[data-mobile-add],[data-mobile-remove],[data-mobile-replace]',
             )
             .forEach((el) => {
                 if (el.dataset.mobileAdd) {

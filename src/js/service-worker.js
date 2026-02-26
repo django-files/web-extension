@@ -25,7 +25,7 @@ async function actionOnClicked(event) {
 async function onInstalled(details) {
     console.log('onInstalled:', details)
     const githubURL = 'https://github.com/django-files/web-extension'
-    const installURL = 'https://django-files.github.io/extension/#configure'
+    const installURL = 'https://django-files.github.io/clients/browser#setup'
     const options = await setDefaultOptions({
         siteUrl: '',
         authToken: '',
@@ -86,7 +86,10 @@ async function onInstalled(details) {
 async function onStartup() {
     console.log('onStartup')
     // noinspection JSUnresolvedReference
-    if (typeof browser !== 'undefined') {
+    if (
+        typeof browser !== 'undefined' &&
+        typeof browser?.runtime?.getBrowserInfo === 'function'
+    ) {
         console.log('Firefox CTX Menu Workaround')
         const { options } = await chrome.storage.sync.get(['options'])
         console.debug('options:', options)
@@ -162,12 +165,7 @@ async function contextMenusClicked(ctx) {
         const album = ctx.menuItemId.split('-')[1]
         console.debug(`album: ${album}`)
         const kwargs = { albums: album }
-        await processRemote(
-            'remote',
-            ctx.srcUrl,
-            `Uploaded to ${album}`,
-            kwargs
-        )
+        await processRemote('remote', ctx.srcUrl, `Uploaded to ${album}`, kwargs)
     } else if (ctx.menuItemId === 'short') {
         if (ctx.linkUrl) {
             await processRemote('shorten', ctx.linkUrl, 'Short Created')
@@ -288,7 +286,7 @@ async function createContextMenus(options) {
     if (options.ctxSidePanel) {
         contexts.push(
             [['all'], 'side-panel', 'Show Side Panel'],
-            [['all'], 'options', 'Open Options']
+            [['all'], 'options', 'Open Options'],
         )
     } else {
         contexts.push([ctx, 'options', 'Open Options'])
@@ -299,17 +297,17 @@ async function createContextMenus(options) {
 /**
  * Add Context from Array
  * @function addContext
- * @param {[chrome.contextMenus.ContextType[],String,String,chrome.contextMenus.ContextItemType?]} context
+ * @param {[chrome.contextMenus.ContextType[],String,String?,chrome.contextMenus.ContextType?]} context
  */
 function addContext(context) {
-    // console.debug('addContext:', context)
+    console.debug('addContext:', context)
     try {
         if (context[1] === 'separator') {
-            const id = Math.random().toString().substring(2, 7)
-            context[1] = `${id}`
+            context[1] = Math.random().toString().substring(2, 7)
             context.push('separator', 'separator')
         }
         // console.debug('menus.create:', context)
+        // noinspection JSCheckFunctionSignatures
         chrome.contextMenus.create({
             contexts: context[0],
             id: context[1],
@@ -317,7 +315,7 @@ function addContext(context) {
             type: context[3] || 'normal',
         })
     } catch (e) {
-        console.log('%c Error Adding Context:', 'color: Yellow', e)
+        console.log(`%cError Adding Context: ${e.message}`, 'color: Red', e)
     }
 }
 
@@ -428,7 +426,7 @@ async function processRemote(endpoint, url, message, kwargs) {
             console.info('error:', e)
             await sendNotification(
                 'Processing Error',
-                `Error: Response Status: ${response.status}`
+                `Error: Response Status: ${response.status}`,
             )
         }
     }
