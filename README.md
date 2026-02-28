@@ -3,27 +3,26 @@
 [![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/abpbiefojfkekhkjnpakpekkpeibnjej?label=chrome&logo=googlechrome)](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej)
 [![Mozilla Add-on Version](https://img.shields.io/amo/v/django-files?label=firefox&logo=firefox)](https://addons.mozilla.org/addon/django-files)
 [![GitHub Release Version](https://img.shields.io/github/v/release/django-files/web-extension?logo=github)](https://github.com/django-files/web-extension/releases/latest)
-[![Build](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/build.yaml?logo=github&label=build)](https://github.com/django-files/web-extension/actions/workflows/build.yaml)
-[![Test](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/test.yaml?logo=github&label=test)](https://github.com/django-files/web-extension/actions/workflows/test.yaml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/7842944ada6b4c7ebb4f9dc83ed6a654)](https://app.codacy.com/gh/django-files/web-extension/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=django-files_web-extension&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=django-files_web-extension)
-[![GitHub Last Commit](https://img.shields.io/github/last-commit/django-files/web-extension?logo=github&label=updated)](https://github.com/django-files/web-extension/graphs/commit-activity)
-[![GitHub Top Language](https://img.shields.io/github/languages/top/django-files/web-extension?logo=htmx&logoColor=white)](https://github.com/django-files/web-extension)
-[![GitHub Repo Size](https://img.shields.io/github/repo-size/django-files/web-extension?logo=bookstack&logoColor=white&label=repo%20size)](https://github.com/django-files/web-extension)
-[![GitHub Org Stars](https://img.shields.io/github/stars/django-files?style=flat&logo=github&label=org%20stars)](https://cssnr.github.io/)
+[![Workflow Build](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/build.yaml?logo=norton&logoColor=white&label=build)](https://github.com/django-files/web-extension/actions/workflows/build.yaml)
+[![Workflow Test](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/test.yaml?logo=norton&logoColor=white&label=test)](https://github.com/django-files/web-extension/actions/workflows/test.yaml)
+[![Workflow Lint](https://img.shields.io/github/actions/workflow/status/django-files/web-extension/lint.yaml?logo=norton&logoColor=white&label=lint)](https://github.com/django-files/web-extension/actions/workflows/lint.yaml)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/django-files/web-extension?logo=listenhub&label=updated)](https://github.com/django-files/web-extension/pulse)
+[![GitHub Repo Size](https://img.shields.io/github/repo-size/django-files/web-extension?logo=buffer&label=repo%20size)](https://github.com/django-files/web-extension?tab=readme-ov-file#readme)
+[![GitHub Top Language](https://img.shields.io/github/languages/top/django-files/web-extension?logo=devbox)](https://github.com/django-files/web-extension?tab=readme-ov-file#readme)
+[![GitHub Contributors](https://img.shields.io/github/contributors-anon/django-files/web-extension?logo=southwestairlines)](https://github.com/django-files/web-extension/graphs/contributors)
+[![GitHub Issues](https://img.shields.io/github/issues/django-files/web-extension?logo=codeforces&logoColor=white)](https://github.com/django-files/web-extension/issues)
+[![GitHub Discussions](https://img.shields.io/github/discussions/django-files/web-extension?logo=theconversation)](https://github.com/django-files/web-extension/discussions)
+[![GitHub Forks](https://img.shields.io/github/forks/django-files/web-extension?style=flat&logo=forgejo&logoColor=white)](https://github.com/django-files/web-extension/forks)
+[![GitHub Repo Stars](https://img.shields.io/github/stars/django-files/web-extension?style=flat&logo=gleam&logoColor=white)](https://github.com/django-files/web-extension/stargazers)
+[![GitHub Org Stars](https://img.shields.io/github/stars/django-files?style=flat&logo=apachespark&logoColor=white&label=org%20stars)](https://django-files.github.io/)
 [![Discord](https://img.shields.io/discord/899171661457293343?logo=discord&logoColor=white&label=discord&color=7289da)](https://discord.gg/wXy6m2X8wY)
 
 # Django Files Web Extension
 
-[Chrome](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej) Web Extension and
-[Firefox](https://addons.mozilla.org/addon/django-files) Browser Addon for
-[Django Files](https://github.com/django-files/django-files) to view recent uploads, shorten URLs,
-and upload any Image, Video or Audio files with right click.
-
-> [!IMPORTANT]  
-> This Web Extension is designed to work with [Django Files](https://github.com/django-files/django-files).
-
-## Table of Contents
+<a title="Django Files" href="https://django-files.github.io/" target="_blank">
+<img alt="Django Files" align="right" width="128" height="auto" src="https://raw.githubusercontent.com/django-files/web-extension/refs/heads/master/src/media/logo128.png"></a>
 
 - [Install](#install)
 - [Features](#features)
@@ -32,6 +31,17 @@ and upload any Image, Video or Audio files with right click.
 - [Support](#support)
 - [Building](#building)
 - [Development](#development)
+- [Contributing](#contributing)
+
+[Chrome](https://chromewebstore.google.com/detail/django-files/abpbiefojfkekhkjnpakpekkpeibnjej) Web Extension and
+[Firefox](https://addons.mozilla.org/addon/django-files) Browser Addon for
+[Django Files](https://github.com/django-files/django-files) to view recent uploads, shorten URLs,
+and upload any Image, Video or Audio files with right click.
+
+[![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=quicklook)](https://django-files.github.io/clients/browser)
+
+> [!IMPORTANT]  
+> This Web Extension is designed to work with [Django Files](https://github.com/django-files/django-files).
 
 # Install
 
@@ -75,7 +85,7 @@ You can pin the Addon by clicking the `Puzzle Piece`, find the `Django Files ico
 **Firefox**, click the `Settings Wheel` and `Pin to Toolbar`.  
 **Chrome**, click the `Pin` icon.
 
-More Information on the Website: [https://django-files.github.io/extension/](https://django-files.github.io/extension/#configure)
+[![View Documentation](https://img.shields.io/badge/view_documentation-blue?style=for-the-badge&logo=quicklook)](https://django-files.github.io/clients/browser)
 
 ## Setup
 
@@ -92,24 +102,24 @@ Right-click on any Image, Video, Audio, or URL upload to Django Files or Shorten
 
 Alternatively, you can open the Options page and add your URL and Token.
 
-# Support
-
-For help using the web extension, utilize any these resources:
-
-- Documentation: https://django-files.github.io/extension/
-- Q&A Discussion: https://github.com/django-files/web-extension/discussions/categories/q-a
-- Request a Feature: https://github.com/django-files/web-extension/discussions/categories/feature-requests
-
-If you are experiencing an issue/bug or getting unexpected results, use:
-
-- Report an Issue: https://github.com/django-files/web-extension/issues
-- Chat with us on Discord: https://discord.gg/wXy6m2X8wY
-- Provide Anonymous Feedback: [https://cssnr.github.io/feedback](https://cssnr.github.io/feedback?app=Django%20Files%20Extension)
+## Support
 
 Logs can be found inspecting the page (Ctrl+Shift+I), clicking on the Console, and;
 Firefox: toggling Debug logs, Chrome: toggling Verbose from levels dropdown.
 
-Note: When providing anonymous feedback there is no way to follow up and get more information unless you provide a contact method.
+If you run into any issues or need help getting started, please do one of the following:
+
+- Report an Issue: <https://github.com/django-files/web-extension/issues>
+- Q&A Discussion: <https://github.com/django-files/web-extension/discussions/categories/q-a>
+- Request a Feature: <https://github.com/django-files/web-extension/issues/new?template=1-feature.yaml>
+- Chat with us on Discord: <https://discord.gg/wXy6m2X8wY>
+
+[![Features](https://img.shields.io/badge/features-brightgreen?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/django-files/web-extension/issues/new?template=1-feature.yaml)
+[![Issues](https://img.shields.io/badge/issues-red?style=for-the-badge&logo=southwestairlines&logoColor=white)](https://github.com/django-files/web-extension/issues)
+[![Discussions](https://img.shields.io/badge/discussions-blue?style=for-the-badge&logo=livechat&logoColor=white)](https://github.com/django-files/web-extension/discussions)
+[![Discord](https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/wXy6m2X8wY)
+
+To support this project, see the [Contributing](#Contributing) section at the bottom.
 
 # Development
 
@@ -190,3 +200,22 @@ You may also use an Unbranded Build: [https://wiki.mozilla.org/Add-ons/Extension
 1.  Run `npm run build:firefox` then use `web-ext-artifacts/{name}-firefox-{version}.zip`.
 1.  Open `about:config` search for `xpinstall.signatures.required` and set to `false`.
 1.  Open `about:addons` and drag the zip file to the page or choose Install from File from the Settings wheel.
+
+# Contributing
+
+Currently, the best way to contribute to this project is to star this project on GitHub.
+
+You can also support other related projects:
+
+- [Django Files Server](https://github.com/django-files/django-files)
+- [Django Files iOS App](https://github.com/django-files/ios-client)
+- [Django Files Android App](https://github.com/django-files/android-client)
+- [Django Files Web Extension](https://github.com/django-files/web-extension)
+
+<a href="https://django-files.github.io/">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=django-files/django-files%2Cdjango-files/ios-client%2Cdjango-files/android-client%2Cdjango-files/web-extension&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=django-files/django-files%2Cdjango-files/ios-client%2Cdjango-files/android-client%2Cdjango-files/web-extension&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=django-files/django-files%2Cdjango-files/ios-client%2Cdjango-files/android-client%2Cdjango-files/web-extension&type=date&legend=top-left" />
+ </picture>
+</a>
