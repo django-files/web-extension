@@ -40,9 +40,9 @@ document.querySelectorAll('.modal').forEach((el) =>
 
 async function windowResize() {
     // console.debug('windowResize:', event)
-    const panelSize = `${window.outerWidth}x${window.outerHeight}`
-    console.debug('panelSize:', panelSize)
-    await chrome.storage.local.set({ panelSize })
+    const size = { panelWidth: window.outerWidth, panelHeight: window.outerHeight }
+    console.debug('windowResize:', size)
+    await chrome.storage.local.set(size).catch((e) => console.warn(e))
 }
 
 const filesTable = document.getElementById('files-table')

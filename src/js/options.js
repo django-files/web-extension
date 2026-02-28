@@ -323,10 +323,13 @@ async function copySupport(event) {
     const { options } = await chrome.storage.sync.get(['options'])
     delete options.siteUrl
     delete options.authToken
+    const local = await chrome.storage.local.get()
+    delete local.auth
     const result = [
         `${manifest.name} - ${manifest.version}`,
         navigator.userAgent,
         `options: ${JSON.stringify(options)}`,
+        `local: ${JSON.stringify(local)}`,
     ]
     await navigator.clipboard.writeText(result.join('\n'))
     showToast('Support Information Copied.')
