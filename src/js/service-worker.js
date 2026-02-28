@@ -17,6 +17,8 @@ async function actionOnClicked(event) {
     await openExtPanel()
 }
 
+const githubURL = 'https://github.com/django-files/web-extension'
+
 /**
  * On Installed Callback
  * @function onInstalled
@@ -24,7 +26,6 @@ async function actionOnClicked(event) {
  */
 async function onInstalled(details) {
     console.log('onInstalled:', details)
-    const githubURL = 'https://github.com/django-files/web-extension'
     const installURL = 'https://django-files.github.io/clients/browser#setup'
     const options = await setDefaultOptions({
         siteUrl: '',
@@ -103,11 +104,13 @@ async function onStartup() {
 }
 
 function setUninstallURL() {
-    const manifest = chrome.runtime.getManifest()
-    const url = new URL('https://django-files.github.io/uninstall/')
-    url.searchParams.append('version', manifest.version)
-    chrome.runtime.setUninstallURL(url.href)
-    console.debug(`setUninstallURL: ${url.href}`)
+    // const manifest = chrome.runtime.getManifest()
+    // const url = new URL('https://django-files.github.io/uninstall/')
+    // url.searchParams.append('version', manifest.version)
+    // chrome.runtime.setUninstallURL(url.href)
+    // console.debug(`setUninstallURL: ${url.href}`)
+    chrome.runtime.setUninstallURL(`${githubURL}/issues`)
+    console.debug(`setUninstallURL: ${githubURL}/issues`)
 }
 
 async function setPopup() {
